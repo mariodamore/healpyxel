@@ -1,0 +1,620 @@
+#!/usr/bin/env python3
+"""healpix_accumulator.py
+
+Accumulate streaming planetary science data into HEALPix cells.
+Maintains incremental statistics including approximate percentiles.
+
+Features:
+- Mean/std via Welford's algorithm (streaming)
+- Approximate median/percentiles via T-Digest
+- Efficient state management with parquet
+- Dask support for parallel processing (optional)
+- Memory-efficient: stores only aggregated statistics, not raw data
+
+Requirements:
+- pandas, numpy, pyarrow (core)
+- tdigest (for percentile tracking) - optional but recommended
+- dask[dataframe] (for parallelization) - optional
+
+Usage example:
+  # First batch (initialize state)
+  python healpix_accumulator.py \
+    --input observations_day001.parquet \
+    --sidecar sidecars/day001_nside-512.parquet \
+    --columns r750 r950 vis_slope \
+    --state-output state/state_v001.parquet
+
+  # Subsequent batches (incremental update)
+  python healpix_accumulator.py \
+    --input observations_day002.parquet \
+    --sidecar sidecars/day002_nside-512.parquet \
+    --columns r750 r950 vis_slope \
+    --state-input state/state_v001.parquet \
+    --state-output state/state_v002.parquet
+"""
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Optional, List, Dict, Any
+import logging
+import argparse
+import json
+from datetime import datetime
+import sys
+
+import numpy as np
+import pandas as pd
+
+try:
+    from tdigest import TDigest
+    TDIGEST_AVAILABLE = True
+except ImportError:
+    TDIGEST_AVAILABLE = False
+    TDigest = None
+
+try:
+    import dask.dataframe as dd
+    DASK_AVAILABLE = True
+except ImportError:
+    DASK_AVAILABLE = False
+    dd = None
+
+try:
+    from tqdm.auto import tqdm
+    TQDM_AVAILABLE = True
+except ImportError:
+    TQDM_AVAILABLE = False
+    tqdm = None
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+logger = logging.getLogger(__name__)
+
+
+class StreamingStats:
+    """Container for streaming statistics using Welford's algorithm.
+    
+    Maintains running statistics (mean, std, min, max) without storing raw data.
+    """
+    
+    def __init__(self):
+        self.n = 0
+        self.sum = 0.0
+        self.sum_sq = 0.0
+        self.min_val = float('inf')
+        self.max_val = float('-inf')
+    
+    def update(self, values: np.ndarray):
+        """Add new observations to the running statistics."""
+        values = values[np.isfinite(values)]
+        if len(values) == 0:
+            return
+        
+        self.n += len(values)
+        self.sum += np.sum(values)
+        self.sum_sq += np.sum(values ** 2)
+        self.min_val = min(self.min_val, float(np.min(values)))
+        self.max_val = max(self.max_val, float(np.max(values)))
+    
+    def merge(self, other: 'StreamingStats'):
+        """Merge with another StreamingStats object (for parallel processing)."""
+        if not isinstance(other, StreamingStats):
+            raise TypeError("Can only merge with another StreamingStats")
+        
+        self.n += other.n
+        self.sum += other.sum
+        self.sum_sq += other.sum_sq
+        self.min_val = min(self.min_val, other.min_val)
+        self.max_val = max(self.max_val, other.max_val)
+    
+    @property
+    def mean(self) -> float:
+        """Compute mean from running statistics."""
+        return self.sum / self.n if self.n > 0 else float('nan')
+    
+    @property
+    def std(self) -> float:
+        """Compute standard deviation from running statistics."""
+        if self.n <= 1:
+            return float('nan')
+        variance = (self.sum_sq / self.n) - (self.mean ** 2)
+        return float(np.sqrt(max(0, variance)))  # Ensure non-negative
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to dictionary for storage."""
+        return {
+            'n': int(self.n),
+            'sum': float(self.sum),
+            'sum_sq': float(self.sum_sq),
+            'min': float(self.min_val) if np.isfinite(self.min_val) else None,
+            'max': float(self.max_val) if np.isfinite(self.max_val) else None,
+        }
+    
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any]) -> 'StreamingStats':
+        """Deserialize from dictionary."""
+        stats = cls()
+        stats.n = d['n']
+        stats.sum = d['sum']
+        stats.sum_sq = d['sum_sq']
+        stats.min_val = d.get('min', float('inf'))
+        if stats.min_val is None:
+            stats.min_val = float('inf')
+        stats.max_val = d.get('max', float('-inf'))
+        if stats.max_val is None:
+            stats.max_val = float('-inf')
+        return stats
+
+
+class CellAccumulator:
+    """Accumulator for a single HEALPix cell.
+    
+    Maintains streaming statistics for multiple columns plus optional T-Digest
+    for approximate percentile computation.
+    """
+    
+    def __init__(self, use_tdigest: bool = True):
+        self.stats_by_column: Dict[str, StreamingStats] = {}
+        self.use_tdigest = use_tdigest and TDIGEST_AVAILABLE
+        
+        if self.use_tdigest:
+            self.tdigests: Dict[str, TDigest] = {}
+    
+    def update(self, column: str, values: np.ndarray):
+        """Add observations for a specific column.
+        
+        Args:
+            column: Column name
+            values: Array of new observations
+        """
+        # Update basic streaming stats
+        if column not in self.stats_by_column:
+            self.stats_by_column[column] = StreamingStats()
+        self.stats_by_column[column].update(values)
+        
+        # Update T-Digest for approximate percentiles
+        if self.use_tdigest:
+            if column not in self.tdigests:
+                self.tdigests[column] = TDigest()
+            
+            # Only add finite values to T-Digest
+            values_clean = values[np.isfinite(values)]
+            for v in values_clean:
+                self.tdigests[column].update(float(v))
+    
+    def merge(self, other: 'CellAccumulator'):
+        """Merge with another CellAccumulator (for parallel processing)."""
+        # Merge streaming stats
+        for col, stats in other.stats_by_column.items():
+            if col not in self.stats_by_column:
+                self.stats_by_column[col] = StreamingStats()
+            self.stats_by_column[col].merge(stats)
+        
+        # Merge T-Digests
+        if self.use_tdigest and hasattr(other, 'tdigests'):
+            for col, digest in other.tdigests.items():
+                if col not in self.tdigests:
+                    self.tdigests[col] = TDigest()
+                # Merge by adding all centroids
+                for centroid in digest.C:
+                    self.tdigests[col].update(centroid.mean, centroid.count)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Serialize to dictionary for storage."""
+        result = {
+            'stats': {col: stats.to_dict() 
+                     for col, stats in self.stats_by_column.items()}
+        }
+        
+        if self.use_tdigest and hasattr(self, 'tdigests'):
+            # Serialize T-Digest centroids for efficient storage
+            result['tdigests'] = {
+                col: {
+                    'centroids': [(float(c.mean), int(c.count)) for c in digest.C],
+                    'compression': digest.K if hasattr(digest, 'K') else 100
+                }
+                for col, digest in self.tdigests.items()
+            }
+        
+        return result
+    
+    @classmethod
+    def from_dict(cls, d: Dict[str, Any], use_tdigest: bool = True) -> 'CellAccumulator':
+        """Deserialize from dictionary."""
+        acc = cls(use_tdigest=use_tdigest)
+        
+        # Restore streaming stats
+        for col, stats_dict in d['stats'].items():
+            acc.stats_by_column[col] = StreamingStats.from_dict(stats_dict)
+        
+        # Restore T-Digests
+        if use_tdigest and TDIGEST_AVAILABLE and 'tdigests' in d:
+            for col, digest_dict in d['tdigests'].items():
+                digest = TDigest()
+                # Reconstruct from centroids
+                for mean, count in digest_dict['centroids']:
+                    digest.update(float(mean), int(count))
+                acc.tdigests[col] = digest
+        
+        return acc
+
+
+def accumulate_batch(
+    new_data: pd.DataFrame,
+    sidecar: pd.DataFrame,
+    value_columns: List[str],
+    existing_state: Optional[Dict[int, CellAccumulator]] = None,
+    use_tdigest: bool = True,
+    filter_expr: Optional[str] = None,
+) -> Dict[int, CellAccumulator]:
+    """
+    Process one batch of data and update accumulator state.
+    
+    Args:
+        new_data: DataFrame with observations
+        sidecar: HEALPix mapping (source_id -> healpix_id)
+        value_columns: Columns to accumulate
+        existing_state: Previous accumulator state (None for first batch)
+        use_tdigest: Enable T-Digest for approximate percentiles
+        filter_expr: Optional pandas query expression to filter data
+        
+    Returns:
+        Updated state dictionary {healpix_id: CellAccumulator}
+    """
+    if existing_state is None:
+        state = {}
+    else:
+        state = existing_state
+    
+    logger.info(f"Processing batch with {len(new_data)} observations")
+    logger.info(f"Columns to accumulate: {value_columns}")
+    
+    # Apply filter if provided
+    if filter_expr:
+        logger.info(f"Applying filter: {filter_expr}")
+        new_data = new_data.query(filter_expr)
+        logger.info(f"After filtering: {len(new_data)} observations")
+    
+    # Merge data with sidecar
+    merged = sidecar[['source_id', 'healpix_id']].merge(
+        new_data.reset_index().rename(columns={'index': 'source_id'}),
+        on='source_id',
+        how='inner'
+    )
+    
+    logger.info(f"Matched {len(merged)} source-cell pairs")
+    
+    if len(merged) == 0:
+        logger.warning("No matches found between sidecar and data!")
+        return state
+    
+    # Group by healpix_id and accumulate
+    cells_updated = 0
+    cells_created = 0
+    
+    grouped = merged.groupby('healpix_id')
+    total_groups = len(grouped)
+    
+    iterator = grouped if not TQDM_AVAILABLE else tqdm(grouped, desc="Accumulating cells", total=total_groups)
+    
+    for hp_id, grp in iterator:
+        # Get or create accumulator for this cell
+        if hp_id not in state:
+            state[hp_id] = CellAccumulator(use_tdigest=use_tdigest)
+            cells_created += 1
+        
+        cells_updated += 1
+        
+        # Update each column
+        for col in value_columns:
+            if col not in grp.columns:
+                logger.warning(f"Column {col} not found in data, skipping")
+                continue
+            
+            values = grp[col].dropna().to_numpy()
+            if len(values) > 0:
+                state[hp_id].update(col, values)
+    
+    logger.info(f"Updated {cells_updated} cells (created: {cells_created}, total: {len(state)})")
+    return state
+
+
+def save_state(
+    state: Dict[int, CellAccumulator],
+    output_path: Path,
+    metadata: Optional[Dict[str, Any]] = None
+):
+    """Save accumulator state to parquet + JSON metadata.
+    
+    The parquet file stores nested dictionaries efficiently. The JSON sidecar
+    provides human-readable metadata about the accumulation process.
+    """
+    logger.info(f"Saving state to {output_path}")
+    
+    # Convert state to DataFrame rows
+    rows = []
+    for hp_id, acc in (tqdm(state.items(), desc="Serializing state") if TQDM_AVAILABLE else state.items()):
+        row = {'healpix_id': int(hp_id)}
+        acc_dict = acc.to_dict()
+        
+        # Flatten structure for easier parquet storage
+        # Store as JSON strings to preserve nested structure
+        row['stats_json'] = json.dumps(acc_dict['stats'])
+        if 'tdigests' in acc_dict:
+            row['tdigests_json'] = json.dumps(acc_dict['tdigests'])
+        
+        rows.append(row)
+    
+    df = pd.DataFrame(rows)
+    df.to_parquet(output_path, index=False, engine='pyarrow', compression='snappy')
+    
+    # Save metadata sidecar
+    if metadata is not None:
+        meta_path = output_path.with_suffix('.meta.json')
+        with open(meta_path, 'w') as f:
+            json.dump(metadata, f, indent=2, default=str)
+        logger.info(f"Saved metadata to {meta_path}")
+    
+    logger.info(f"✓ Saved {len(state)} cells ({output_path.stat().st_size / 1024 / 1024:.1f} MB)")
+
+
+def load_state(
+    input_path: Path,
+    use_tdigest: bool = True
+) -> Dict[int, CellAccumulator]:
+    """Load accumulator state from parquet file.
+    
+    Args:
+        input_path: Path to state parquet file
+        use_tdigest: Whether to restore T-Digest data
+        
+    Returns:
+        State dictionary {healpix_id: CellAccumulator}
+    """
+    logger.info(f"Loading state from {input_path}")
+    
+    if not input_path.exists():
+        raise FileNotFoundError(f"State file not found: {input_path}")
+    
+    df = pd.read_parquet(input_path, engine='pyarrow')
+    
+    state = {}
+    iterator = df.iterrows() if not TQDM_AVAILABLE else tqdm(df.iterrows(), total=len(df), desc="Loading state")
+    
+    for _, row in iterator:
+        hp_id = int(row['healpix_id'])
+        
+        # Reconstruct accumulator from JSON-serialized data
+        acc_dict = {
+            'stats': json.loads(row['stats_json'])
+        }
+        
+        if 'tdigests_json' in row and pd.notna(row['tdigests_json']):
+            acc_dict['tdigests'] = json.loads(row['tdigests_json'])
+        
+        state[hp_id] = CellAccumulator.from_dict(acc_dict, use_tdigest=use_tdigest)
+    
+    logger.info(f"✓ Loaded {len(state)} cells")
+    return state
+
+
+def find_sidecar(input_path: Path, nside: Optional[int] = None, mode: str = 'fuzzy') -> Optional[Path]:
+    """Attempt to find matching sidecar file for input data.
+    
+    Args:
+        input_path: Path to input parquet file
+        nside: Desired nside (if None, finds any matching sidecar)
+        mode: Assignment mode ('fuzzy' or 'strict')
+        
+    Returns:
+        Path to matching sidecar file, or None if not found
+    """
+    # Look in same directory and 'sidecars/' subdirectory
+    search_dirs = [input_path.parent, input_path.parent / 'sidecars']
+    
+    base_name = input_path.stem
+    pattern = f"{base_name}.cell-healpix_assignment-{mode}"
+    if nside:
+        pattern += f"_nside-{nside}"
+    pattern += "_order-nested.parquet"
+    
+    for search_dir in search_dirs:
+        if not search_dir.exists():
+            continue
+        
+        # Exact match
+        candidate = search_dir / pattern
+        if candidate.exists():
+            return candidate
+        
+        # Pattern match (if nside not specified)
+        if not nside:
+            for candidate in search_dir.glob(f"{base_name}.cell-healpix_assignment-{mode}_nside-*_order-nested.parquet"):
+                return candidate
+    
+    return None
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Accumulate streaming data into HEALPix cells with incremental statistics",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  # Initialize state from first batch
+  python healpix_accumulator.py --input day001.parquet --sidecar day001_nside512.parquet \\
+    --columns r750 r950 --state-output state_v001.parquet
+  
+  # Incremental update with second batch
+  python healpix_accumulator.py --input day002.parquet --sidecar day002_nside512.parquet \\
+    --columns r750 r950 --state-input state_v001.parquet --state-output state_v002.parquet
+  
+  # With data filtering
+  python healpix_accumulator.py --input day003.parquet --sidecar day003_nside512.parquet \\
+    --columns r750 r950 --state-input state_v002.parquet --state-output state_v003.parquet \\
+    --filter "quality > 0.5 and solar_zenith < 80"
+"""
+    )
+    
+    # Input/output
+    parser.add_argument('-i', '--input', required=True, type=Path,
+                       help='Input parquet file with new observations')
+    parser.add_argument('-s', '--sidecar', type=Path,
+                       help='HEALPix sidecar mapping file (auto-detected if not specified)')
+    parser.add_argument('--nside', type=int,
+                       help='nside for auto-detection of sidecar file')
+    parser.add_argument('--mode', choices=['fuzzy', 'strict'], default='fuzzy',
+                       help='Assignment mode for sidecar auto-detection (default: fuzzy)')
+    
+    # Columns to process
+    parser.add_argument('-c', '--columns', nargs='+', required=True,
+                       help='Column names to accumulate (e.g., r750 r950 vis_slope)')
+    
+    # State management
+    parser.add_argument('--state-input', type=Path,
+                       help='Existing state file for incremental update (omit for first batch)')
+    parser.add_argument('-o', '--state-output', required=True, type=Path,
+                       help='Output state file path')
+    
+    # Options
+    parser.add_argument('-f', '--filter', dest='filter_expr',
+                       help='Pandas query expression to filter data (e.g., "quality > 0.5")')
+    parser.add_argument('--no-tdigest', action='store_true',
+                       help='Disable T-Digest percentile tracking')
+    
+    # Metadata
+    parser.add_argument('--batch-id', help='Batch identifier for metadata tracking')
+    
+    # Logging
+    parser.add_argument('-v', '--verbose', action='store_true',
+                       help='Enable verbose debug logging')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                       help='Suppress progress bars and non-critical messages')
+    
+    args = parser.parse_args(argv)
+    
+    # Configure logging
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+    elif args.quiet:
+        logging.getLogger().setLevel(logging.WARNING)
+    
+    # Check T-Digest availability
+    use_tdigest = not args.no_tdigest
+    if use_tdigest and not TDIGEST_AVAILABLE:
+        logger.warning("T-Digest not available (pip install tdigest), disabling percentile tracking")
+        use_tdigest = False
+    
+    # Find or load sidecar
+    if args.sidecar:
+        sidecar_path = args.sidecar
+    else:
+        logger.info("No sidecar specified, attempting auto-detection...")
+        sidecar_path = find_sidecar(args.input, nside=args.nside, mode=args.mode)
+        if sidecar_path is None:
+            logger.error(f"Could not find sidecar file for {args.input}")
+            logger.error("Please specify --sidecar explicitly or run healpix_sidecar.py first")
+            return 1
+        logger.info(f"Found sidecar: {sidecar_path}")
+    
+    if not sidecar_path.exists():
+        logger.error(f"Sidecar file not found: {sidecar_path}")
+        return 1
+    
+    # Load existing state if provided
+    existing_state = None
+    if args.state_input:
+        if not args.state_input.exists():
+            logger.error(f"State input file not found: {args.state_input}")
+            return 1
+        existing_state = load_state(args.state_input, use_tdigest=use_tdigest)
+        logger.info(f"Loaded existing state with {len(existing_state)} cells")
+    else:
+        logger.info("No existing state provided, initializing new accumulator")
+    
+    # Load input data
+    logger.info(f"Loading input data from {args.input}")
+    try:
+        new_data = pd.read_parquet(args.input)
+        logger.info(f"Loaded {len(new_data)} observations")
+    except Exception as e:
+        logger.error(f"Failed to load input data: {e}")
+        return 1
+    
+    # Verify columns exist
+    missing_cols = [col for col in args.columns if col not in new_data.columns]
+    if missing_cols:
+        logger.error(f"Columns not found in input data: {missing_cols}")
+        logger.info(f"Available columns: {list(new_data.columns)}")
+        return 1
+    
+    # Load sidecar
+    logger.info(f"Loading sidecar from {sidecar_path}")
+    try:
+        sidecar = pd.read_parquet(sidecar_path)
+        logger.info(f"Loaded sidecar with {len(sidecar)} mappings")
+    except Exception as e:
+        logger.error(f"Failed to load sidecar: {e}")
+        return 1
+    
+    # Process batch
+    logger.info("Starting accumulation...")
+    start_time = datetime.now()
+    
+    state = accumulate_batch(
+        new_data=new_data,
+        sidecar=sidecar,
+        value_columns=args.columns,
+        existing_state=existing_state,
+        use_tdigest=use_tdigest,
+        filter_expr=args.filter_expr,
+    )
+    
+    elapsed = (datetime.now() - start_time).total_seconds()
+    logger.info(f"✓ Accumulation completed in {elapsed:.1f}s")
+    
+    # Prepare metadata
+    total_obs = sum(
+        acc.stats_by_column[args.columns[0]].n 
+        for acc in state.values()
+        if args.columns[0] in acc.stats_by_column
+    )
+    
+    metadata = {
+        'last_updated': datetime.now().isoformat(),
+        'batch_id': args.batch_id or args.input.name,
+        'input_file': str(args.input),
+        'sidecar_file': str(sidecar_path),
+        'columns': args.columns,
+        'filter': args.filter_expr,
+        'n_cells': len(state),
+        'total_observations': int(total_obs),
+        'use_tdigest': use_tdigest,
+        'processing_time_sec': round(elapsed, 2),
+    }
+    
+    # Add previous state info if incremental
+    if args.state_input:
+        metadata['state_input'] = str(args.state_input)
+        if existing_state:
+            prev_obs = sum(
+                acc.stats_by_column[args.columns[0]].n 
+                for acc in existing_state.values()
+                if args.columns[0] in acc.stats_by_column
+            )
+            metadata['observations_before'] = int(prev_obs)
+            metadata['observations_added'] = int(total_obs - prev_obs)
+    
+    # Save state
+    args.state_output.parent.mkdir(parents=True, exist_ok=True)
+    save_state(state, args.state_output, metadata=metadata)
+    
+    logger.info(f"✓ Accumulation complete!")
+    logger.info(f"  Cells: {len(state)}")
+    logger.info(f"  Total observations: {total_obs:,}")
+    logger.info(f"  State file: {args.state_output}")
+    
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

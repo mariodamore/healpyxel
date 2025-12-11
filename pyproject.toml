@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "healpyxel"
+version = "0.1.0"
+description = "HEALPix-based spatial aggregation for planetary science data"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "Your Name", email = "your.email@example.com"}
+]
+keywords = ["healpix", "planetary-science", "spatial-aggregation", "streaming"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Astronomy",
+]
+
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "pyarrow>=12.0",
+    "shapely>=2.0",
+    "healpy>=1.16",
+    "dask-geopandas>=0.3",
+    "antimeridian",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+dev = ["nbdev>=2.3.12", "jupyter", "pytest"]
+tdigest = ["tdigest"]
+dask = ["dask[dataframe]"]
+duckdb = ["duckdb"]
+
+[project.scripts]
+healpyxel-sidecar = "healpyxel.cli:sidecar_cli"
+healpyxel-aggregate = "healpyxel.cli:aggregate_cli"
+healpyxel-accumulate = "healpyxel.cli:accumulator_cli"
+healpyxel-finalize = "healpyxel.cli:finalize_cli"
+
+[project.urls]
+Homepage = "https://github.com/kidpixo/healpyxel"
+Documentation = "https://kidpixo.github.io/healpyxel"
+Repository = "https://github.com/kidpixo/healpyxel"
+"Bug Tracker" = "https://github.com/kidpixo/healpyxel/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["healpyxel*"]
