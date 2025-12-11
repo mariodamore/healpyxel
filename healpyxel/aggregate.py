@@ -8,6 +8,7 @@ __all__ = ['logger', 'AGG_LOOKUP', 'generate_output_filename', 'collect_sidecar_
            'main']
 
 # %% ../nbs/02_aggregate.ipynb 2
+#| eval: false
 """
 Aggregate parquet data by HEALPix cells using sidecar mapping files.
 
