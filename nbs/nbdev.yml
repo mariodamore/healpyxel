@@ -1,0 +1,9 @@
+project:
+  output-dir: docs
+
+website:
+  title: "Healpyxel"
+  site-url: "https://mariodamore.github.io/healpyxel"
+  description: "HEALPix-based spatial aggregation for planetary science data"
+  repo-branch: main
+  repo-url: "https://github.com/mariodamore/healpyxel"

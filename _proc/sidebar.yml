@@ -1,0 +1,12 @@
+website:
+  sidebar:
+    contents:
+      - index.ipynb
+      - 00_core.ipynb
+      - 00_setup.ipynb
+      - 01_sidecar.ipynb
+      - 02_aggregate.ipynb
+      - 03_accumulator.ipynb
+      - 04_finalize.ipynb
+      - 05_cli.ipynb
+      - 90_example_streaming.ipynb
