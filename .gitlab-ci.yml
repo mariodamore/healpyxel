@@ -1,5 +1,5 @@
 stages:
-  - deploy # deploy the documentation
+  - deploy
 
 pages:
   stage: deploy
@@ -10,5 +10,4 @@ pages:
     paths:
       - public
   only:
-    - main
     - master
