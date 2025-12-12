@@ -2,14 +2,54 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mariodamore.github.io/healpyxel/index.html</loc>
-    <lastmod>2025-12-11T09:37:45.196Z</lastmod>
-  </url>
-  <url>
-    <loc>https://mariodamore.github.io/healpyxel/00_setup.html</loc>
-    <lastmod>2025-12-11T09:37:45.030Z</lastmod>
+    <lastmod>2025-12-12T14:00:04.343Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/example_streaming.html</loc>
-    <lastmod>2025-12-11T09:37:45.172Z</lastmod>
+    <lastmod>2025-12-12T14:00:04.355Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/example_visualization_workflow.html</loc>
+    <lastmod>2025-12-12T14:00:04.391Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/aggregate.html</loc>
+    <lastmod>2025-12-12T14:00:04.251Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/accumulator.html</loc>
+    <lastmod>2025-12-12T14:00:04.294Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/00_core.html</loc>
+    <lastmod>2025-12-12T14:00:03.918Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/example_accumulation.html</loc>
+    <lastmod>2025-12-12T14:00:04.377Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/example_quickstart.html</loc>
+    <lastmod>2025-12-12T14:00:04.281Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/00_setup.html</loc>
+    <lastmod>2025-12-12T14:00:04.081Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/sidecar.html</loc>
+    <lastmod>2025-12-12T14:00:05.303Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/cli.html</loc>
+    <lastmod>2025-12-12T14:00:04.334Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/finalize.html</loc>
+    <lastmod>2025-12-12T14:00:04.307Z</lastmod>
+  </url>
+  <url>
+    <loc>https://mariodamore.github.io/healpyxel/06_visualization.html</loc>
+    <lastmod>2025-12-12T14:00:04.904Z</lastmod>
   </url>
 </urlset>

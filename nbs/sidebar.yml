@@ -9,4 +9,8 @@ website:
       - 03_accumulator.ipynb
       - 04_finalize.ipynb
       - 05_cli.ipynb
+      - 06_visualization.ipynb
+      - 80_example_quickstart.ipynb
+      - 81_example_visualization_workflow.ipynb
+      - 82_example_accumulation.ipynb
       - 90_example_streaming.ipynb

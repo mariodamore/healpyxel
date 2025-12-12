@@ -30,7 +30,7 @@ except Exception:
     raise ImportError("This script requires dask_geopandas. Install it with `pip install dask-geopandas`.")
 
 try:
-    # cdshealpix is preferred for speed
+    # cdshealpix is pre/ferred for speed
     import cdshealpix as ch
 except Exception:
     ch = None

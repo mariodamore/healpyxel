@@ -3,10 +3,17 @@ project:
 
 format:
   html:
-    theme: cosmo
+    theme: 
+      dark: darkly
+      light: cosmo
     css: styles.css
     toc: true
     keep-md: true
+    page-layout: full
+    grid:
+      body-width : 1200px
+      sidebar-width: 250px
+      margin-width: 200px
   commonmark: default
 
 website:
@@ -18,5 +25,23 @@ website:
     search: true
   sidebar:
     style: floating
+    contents:
+      - index.ipynb
+      # - 00_core.ipynb
+      - section: Core Concepts
+        contents:
+        - 00_setup.ipynb
+        - 01_sidecar.ipynb
+        - 02_aggregate.ipynb
+        - 03_accumulator.ipynb
+        - 04_finalize.ipynb
+        - 05_cli.ipynb
+        - 06_visualization.ipynb
+      - section: Examples
+        contents:
+          - 80_example_quickstart.ipynb
+          - 81_example_visualization_workflow.ipynb
+          - 82_example_accumulation.ipynb
+          - 90_example_streaming.ipynb
 
-metadata-files: [nbdev.yml, sidebar.yml]
+metadata-files: [nbdev.yml]
