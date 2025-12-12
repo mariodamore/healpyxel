@@ -11,3 +11,5 @@ pages:
       - public
   only:
     - master
+  tags:
+      - psl  # <--- Use 'psl' if you want the shell runner
