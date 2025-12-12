@@ -3,6 +3,7 @@ project:
 
 format:
   html:
+    logo: "logo.png"  #
     theme: 
       dark: darkly
       light: cosmo
@@ -17,6 +18,7 @@ format:
   commonmark: default
 
 website:
+  favicon : favicon.ico
   twitter-card: true
   open-graph: true
   repo-actions: [issue]

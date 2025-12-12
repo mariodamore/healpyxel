@@ -1,4 +1,8 @@
+stages:
+  - deploy # deploy the documentation
+
 pages:
+  stage: deploy
   script:
     - mkdir -p public
     - cp -r docs/* public/
