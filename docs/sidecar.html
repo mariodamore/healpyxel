@@ -196,11 +196,8 @@ ul.task-list li input[type="checkbox"] {
   </div>
 </li>
           <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accumulation</span></a>
-  </div>
-</li>
+ <span class="menu-text">82_example_accumulation.ipynb</span>
+  </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_streaming.html" class="sidebar-item-text sidebar-link">
@@ -219,15 +216,43 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#compute_healpix_ids_from_lonlat" id="toc-compute_healpix_ids_from_lonlat" class="nav-link active" data-scroll-target="#compute_healpix_ids_from_lonlat">compute_healpix_ids_from_lonlat</a></li>
+  <li><a href="#healpix-sidecar-psf-weighting-extensions" id="toc-healpix-sidecar-psf-weighting-extensions" class="nav-link active" data-scroll-target="#healpix-sidecar-psf-weighting-extensions">HEALPix Sidecar: PSF Weighting Extensions</a>
+  <ul class="collapse">
+  <li><a href="#compute_healpix_ids_from_lonlat" id="toc-compute_healpix_ids_from_lonlat" class="nav-link" data-scroll-target="#compute_healpix_ids_from_lonlat">compute_healpix_ids_from_lonlat</a></li>
+  <li><a href="#format_geo_statistics" id="toc-format_geo_statistics" class="nav-link" data-scroll-target="#format_geo_statistics">format_geo_statistics</a></li>
+  <li><a href="#compute_geo_statistics" id="toc-compute_geo_statistics" class="nav-link" data-scroll-target="#compute_geo_statistics">compute_geo_statistics</a></li>
+  <li><a href="#detect_lonlat_columns" id="toc-detect_lonlat_columns" class="nav-link" data-scroll-target="#detect_lonlat_columns">detect_lonlat_columns</a></li>
   <li><a href="#process_partition" id="toc-process_partition" class="nav-link" data-scroll-target="#process_partition">process_partition</a></li>
+  <li><a href="#add_psf_weights_to_sidecar" id="toc-add_psf_weights_to_sidecar" class="nav-link" data-scroll-target="#add_psf_weights_to_sidecar">add_psf_weights_to_sidecar</a></li>
+  <li><a href="#normalize_weights_per_cell" id="toc-normalize_weights_per_cell" class="nav-link" data-scroll-target="#normalize_weights_per_cell">normalize_weights_per_cell</a></li>
+  <li><a href="#compute_assignment_weight" id="toc-compute_assignment_weight" class="nav-link" data-scroll-target="#compute_assignment_weight">compute_assignment_weight</a></li>
+  <li><a href="#write_sidecar_metadata" id="toc-write_sidecar_metadata" class="nav-link" data-scroll-target="#write_sidecar_metadata">write_sidecar_metadata</a></li>
   <li><a href="#build_output_path" id="toc-build_output_path" class="nav-link" data-scroll-target="#build_output_path">build_output_path</a></li>
   <li><a href="#parse_arguments" id="toc-parse_arguments" class="nav-link" data-scroll-target="#parse_arguments">parse_arguments</a></li>
   <li><a href="#validate_nside" id="toc-validate_nside" class="nav-link" data-scroll-target="#validate_nside">validate_nside</a></li>
+  <li><a href="#get_psf" id="toc-get_psf" class="nav-link" data-scroll-target="#get_psf">get_psf</a></li>
+  <li><a href="#gaussianpsf" id="toc-gaussianpsf" class="nav-link" data-scroll-target="#gaussianpsf">GaussianPSF</a></li>
+  <li><a href="#psf" id="toc-psf" class="nav-link" data-scroll-target="#psf">PSF</a></li>
   <li><a href="#write_partitioned_output" id="toc-write_partitioned_output" class="nav-link" data-scroll-target="#write_partitioned_output">write_partitioned_output</a></li>
   <li><a href="#write_coalesced_output" id="toc-write_coalesced_output" class="nav-link" data-scroll-target="#write_coalesced_output">write_coalesced_output</a></li>
   <li><a href="#main" id="toc-main" class="nav-link" data-scroll-target="#main">main</a></li>
+  <li><a href="#get_healpix_cell_geometry" id="toc-get_healpix_cell_geometry" class="nav-link" data-scroll-target="#get_healpix_cell_geometry">get_healpix_cell_geometry</a></li>
+  </ul></li>
   <li><a href="#usage-example" id="toc-usage-example" class="nav-link" data-scroll-target="#usage-example">Usage Example</a></li>
+  <li><a href="#geographical-statistics-feature" id="toc-geographical-statistics-feature" class="nav-link" data-scroll-target="#geographical-statistics-feature">Geographical Statistics Feature</a>
+  <ul class="collapse">
+  <li><a href="#key-design" id="toc-key-design" class="nav-link" data-scroll-target="#key-design">Key Design</a></li>
+  <li><a href="#usage" id="toc-usage" class="nav-link" data-scroll-target="#usage">Usage</a></li>
+  </ul></li>
+  <li><a href="#step-1b-inspect-with-filtering-to-see-what-will-be-processed" id="toc-step-1b-inspect-with-filtering-to-see-what-will-be-processed" class="nav-link" data-scroll-target="#step-1b-inspect-with-filtering-to-see-what-will-be-processed">Step 1b: Inspect with filtering to see what will be processed</a></li>
+  <li><a href="#step-2-run-actual-processing-with-appropriate-convention" id="toc-step-2-run-actual-processing-with-appropriate-convention" class="nav-link" data-scroll-target="#step-2-run-actual-processing-with-appropriate-convention">Step 2: Run actual processing with appropriate convention</a></li>
+  <li><a href="#optional-specify-explicit-lonlat-columns" id="toc-optional-specify-explicit-lonlat-columns" class="nav-link" data-scroll-target="#optional-specify-explicit-lonlat-columns">Optional: Specify explicit lon/lat columns</a></li>
+  <li><a href="#optional-control-sample-size-for-geometry-based-extraction" id="toc-optional-control-sample-size-for-geometry-based-extraction" class="nav-link" data-scroll-target="#optional-control-sample-size-for-geometry-based-extraction">Optional: Control sample size for geometry-based extraction</a></li>
+  <li><a href="#compare-raw-vs-filtered-statistics" id="toc-compare-raw-vs-filtered-statistics" class="nav-link" data-scroll-target="#compare-raw-vs-filtered-statistics">Compare raw vs filtered statistics</a>
+  <ul class="collapse">
+  <li><a href="#statistics-computed" id="toc-statistics-computed" class="nav-link" data-scroll-target="#statistics-computed">Statistics Computed</a></li>
+  <li><a href="#why-this-matters" id="toc-why-this-matters" class="nav-link" data-scroll-target="#why-this-matters">Why This Matters</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mariodamore/healpyxel/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="sidecar.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
     </div>
@@ -259,6 +284,16 @@ ul.task-list li input[type="checkbox"] {
 
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="healpix-sidecar-psf-weighting-extensions" class="level2">
+<h2 class="anchored" data-anchor-id="healpix-sidecar-psf-weighting-extensions">HEALPix Sidecar: PSF Weighting Extensions</h2>
+<p>This section introduces support for data point spread functions (PSF) and cell spread functions (CSF) in the sidecar generation process.</p>
+<ul>
+<li><strong>Data PSF</strong>: Models the spatial response of each data geometry (e.g., a 2D Gaussian).</li>
+<li><strong>Cell PSF</strong>: Models the spatial response of each HEALPix cell (e.g., a 2D Gaussian centered on the cell).</li>
+<li><strong>Combination</strong>: The final weight for each (source, cell) assignment is computed by combining the two (default: multiplication).</li>
+<li><strong>Normalization</strong>: Weights are normalized per cell so that their sum is 1, preserving compatibility with unweighted aggregation.</li>
+</ul>
+<p>The implementation is modular and ready for future extension to custom/user-provided PSFs.</p>
 <hr>
 <section id="compute_healpix_ids_from_lonlat" class="level3">
 <h3 class="anchored" data-anchor-id="compute_healpix_ids_from_lonlat">compute_healpix_ids_from_lonlat</h3>
@@ -270,15 +305,89 @@ ul.task-list li input[type="checkbox"] {
 <p>Tries to use cdshealpix if available, otherwise falls back to healpy. Returns a 1D integer numpy array of same length as inputs.*</p>
 <hr>
 </section>
+<section id="format_geo_statistics" class="level3">
+<h3 class="anchored" data-anchor-id="format_geo_statistics">format_geo_statistics</h3>
+<blockquote class="blockquote">
+<pre><code> format_geo_statistics (stats:dict)</code></pre>
+</blockquote>
+<p>*Format geo-statistics for display using rich tables.</p>
+<p>Args: stats: Statistics dictionary from compute_geo_statistics</p>
+<p>Returns: Formatted string representation*</p>
+<hr>
+</section>
+<section id="compute_geo_statistics" class="level3">
+<h3 class="anchored" data-anchor-id="compute_geo_statistics">compute_geo_statistics</h3>
+<blockquote class="blockquote">
+<pre><code> compute_geo_statistics (input_path:pathlib.Path, lon_col:str|None=None,
+                         lat_col:str|None=None, sample_size:int=10000,
+                         lon_convention:str|None=None)</code></pre>
+</blockquote>
+<p>*Compute geographical statistics for a GeoParquet file using DuckDB for efficiency.</p>
+<p>This function can analyze raw data or apply filtering based on longitude convention.</p>
+<p>Args: input_path: Path to input GeoParquet file lon_col: Name of longitude column (if None, will auto-detect or extract from geometry) lat_col: Name of latitude column (if None, will auto-detect or extract from geometry) sample_size: Number of rows to sample for geometry-based extraction (if needed) lon_convention: Optional longitude convention for filtering: ‘0_360’ for [0,360) × [-90,90] ‘minus_plus180’ for [-180,180) × [-90,90] None (default) for no filtering (raw data)</p>
+<p>Returns: Dictionary with statistics: { ‘lon’: {‘min’, ‘max’, ‘mean’, ‘std’, ‘count’}, ‘lat’: {‘min’, ‘max’, ‘mean’, ‘std’, ‘count’}, ‘source’: ‘columns’ or ‘geometry’, ‘lon_col’: column name or None, ‘lat_col’: column name or None, ‘filtered’: bool (True if convention filtering was applied), ‘total_count’: int (total records before filtering, if filtered), ‘filtered_count’: int (records after filtering, if filtered) }*</p>
+<hr>
+</section>
+<section id="detect_lonlat_columns" class="level3">
+<h3 class="anchored" data-anchor-id="detect_lonlat_columns">detect_lonlat_columns</h3>
+<blockquote class="blockquote">
+<pre><code> detect_lonlat_columns (gdf_sample)</code></pre>
+</blockquote>
+<p>*Auto-detect longitude and latitude columns from a GeoDataFrame sample.</p>
+<p>Returns: Tuple of (lon_column, lat_column) or (None, None) if not found*</p>
+<hr>
+</section>
 <section id="process_partition" class="level3">
 <h3 class="anchored" data-anchor-id="process_partition">process_partition</h3>
 <blockquote class="blockquote">
 <pre><code> process_partition (gdf, nside:int, mode:str, base_index:int|None=None,
-                    lon_convention:str='0_360')</code></pre>
+                    lon_convention:str='None', data_psf=None,
+                    cell_psf=None, combine_method='multiply')</code></pre>
 </blockquote>
 <p>*Process a single dask partition (GeoDataFrame) and return DataFrame of assignments.</p>
-<p>The returned DataFrame has columns [‘source_id’, ‘healpix_id’] and one row per assignment (for strict mode: at most one row per source_id; for fuzzy mode: one row per touched healpix cell).</p>
-<p>Args: gdf: GeoDataFrame partition nside: HEALPix nside parameter mode: ‘strict’ or ‘fuzzy’ assignment mode base_index: Base index for source_id generation lon_convention: Longitude convention - ‘0_360’ for [0,360) or ‘-180_180’ for [-180,180)*</p>
+<p>The returned D/ataFrame has columns [‘source_id’, ‘healpix_id’] and one row per assignment (for strict mode: at most one row per source_id; for fuzzy mode: one row per touched healpix cell).</p>
+<p>Args: gdf: GeoDataFrame partition nside: HEALPix nside parameter mode: ‘strict’ or ‘fuzzy’ assignment mode base_index: Base index for source_id generation lon_convention: Longitude convention - ‘0_360’ for [0,360) or ‘minus_plus180’ for [-180,180)*</p>
+<hr>
+</section>
+<section id="add_psf_weights_to_sidecar" class="level3">
+<h3 class="anchored" data-anchor-id="add_psf_weights_to_sidecar">add_psf_weights_to_sidecar</h3>
+<blockquote class="blockquote">
+<pre><code> add_psf_weights_to_sidecar (sidecar_df, src_geoms, cell_geoms,
+                             data_psf=None, cell_psf=None,
+                             combine_method='multiply', normalize=True)</code></pre>
+</blockquote>
+<p><em>Add a ‘weight’ column to the sidecar DataFrame using PSF functions. - src_geoms: sequence of source geometries (indexed by source_id) - cell_geoms: dict or sequence mapping healpix_id to cell geometry</em></p>
+<hr>
+</section>
+<section id="normalize_weights_per_cell" class="level3">
+<h3 class="anchored" data-anchor-id="normalize_weights_per_cell">normalize_weights_per_cell</h3>
+<blockquote class="blockquote">
+<pre><code> normalize_weights_per_cell (df, cell_col='healpix_id',
+                             weight_col='weight')</code></pre>
+</blockquote>
+<p><em>Normalize weights so that sum of weights per cell is 1.0.</em></p>
+<hr>
+</section>
+<section id="compute_assignment_weight" class="level3">
+<h3 class="anchored" data-anchor-id="compute_assignment_weight">compute_assignment_weight</h3>
+<blockquote class="blockquote">
+<pre><code> compute_assignment_weight (src_geom, cell_geom, data_psf=None,
+                            cell_psf=None, combine_method='multiply',
+                            data_psf_sigma=None, cell_psf_sigma=None)</code></pre>
+</blockquote>
+<p><em>Compute the assignment weight for a (source geometry, cell geometry) pair. - data_psf: callable or None - cell_psf: callable or None - combine_method: ‘multiply’, ‘sum’, ‘min’, ‘max’</em></p>
+<hr>
+</section>
+<section id="write_sidecar_metadata" class="level3">
+<h3 class="anchored" data-anchor-id="write_sidecar_metadata">write_sidecar_metadata</h3>
+<blockquote class="blockquote">
+<pre><code> write_sidecar_metadata (output_path:pathlib.Path,
+                         input_path:pathlib.Path, nside:int, mode:str,
+                         lon_convention:str, ncores:int, args)</code></pre>
+</blockquote>
+<p>*Write sidecar processing metadata to JSON file.</p>
+<p>Args: output_path: Path to the sidecar parquet file input_path: Path to the input file nside: HEALPix nside parameter mode: Assignment mode (‘strict’ or ‘fuzzy’) lon_convention: Longitude convention used ncores: Number of cores used args: Parsed command-line arguments</p>
+<p>Returns: Path to the written metadata file*</p>
 <hr>
 </section>
 <section id="build_output_path" class="level3">
@@ -305,12 +414,36 @@ ul.task-list li input[type="checkbox"] {
 <p><em>Validate that nside is a positive power of two.</em></p>
 <hr>
 </section>
+<section id="get_psf" class="level3">
+<h3 class="anchored" data-anchor-id="get_psf">get_psf</h3>
+<blockquote class="blockquote">
+<pre><code> get_psf (psf_type, sigma=None)</code></pre>
+</blockquote>
+<hr>
+</section>
+<section id="gaussianpsf" class="level3">
+<h3 class="anchored" data-anchor-id="gaussianpsf">GaussianPSF</h3>
+<blockquote class="blockquote">
+<pre><code> GaussianPSF (sigma=None)</code></pre>
+</blockquote>
+<p><em>2D Gaussian PSF centered at (0,0).</em></p>
+<hr>
+</section>
+<section id="psf" class="level3">
+<h3 class="anchored" data-anchor-id="psf">PSF</h3>
+<blockquote class="blockquote">
+<pre><code> PSF ()</code></pre>
+</blockquote>
+<p><em>Base class for Point Spread Functions (PSF).</em></p>
+<hr>
+</section>
 <section id="write_partitioned_output" class="level3">
 <h3 class="anchored" data-anchor-id="write_partitioned_output">write_partitioned_output</h3>
 <blockquote class="blockquote">
 <pre><code> write_partitioned_output (tasks, out_file:pathlib.Path, nparts:int)</code></pre>
 </blockquote>
-<p><em>Write output as partitioned parquet files (one per partition).</em></p>
+<p>*Write output as partitioned parquet files (one per partition).</p>
+<p>Returns: Total number of rows written*</p>
 <hr>
 </section>
 <section id="write_coalesced_output" class="level3">
@@ -319,7 +452,8 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> write_coalesced_output (tasks, out_file:pathlib.Path, nside:int,
                          mode:str, ncores:int, nparts:int)</code></pre>
 </blockquote>
-<p><em>Write output as a single coalesced parquet file with incremental batching.</em></p>
+<p>*Write output as a single coalesced parquet file with incremental batching.</p>
+<p>Returns: Total number of rows written*</p>
 <hr>
 </section>
 <section id="main" class="level3">
@@ -328,12 +462,96 @@ ul.task-list li input[type="checkbox"] {
 <pre><code> main (argv=None)</code></pre>
 </blockquote>
 <p><em>Main entry point for HEALPix sidecar generation.</em></p>
+<hr>
+</section>
+<section id="get_healpix_cell_geometry" class="level3">
+<h3 class="anchored" data-anchor-id="get_healpix_cell_geometry">get_healpix_cell_geometry</h3>
+<blockquote class="blockquote">
+<pre><code> get_healpix_cell_geometry (healpix_id, nside, nest=True)</code></pre>
+</blockquote>
+<p><em>Return a shapely Polygon for the given HEALPix cell. Uses healpy boundaries (in degrees, lon/lat).</em></p>
+</section>
 </section>
 <section id="usage-example" class="level2">
 <h2 class="anchored" data-anchor-id="usage-example">Usage Example</h2>
 <p>See the <code>main()</code> function for CLI usage, or import functions directly for programmatic use.</p>
+</section>
+<section id="geographical-statistics-feature" class="level2">
+<h2 class="anchored" data-anchor-id="geographical-statistics-feature">Geographical Statistics Feature</h2>
+<p>The sidecar tool includes a standalone geo-statistics feature to inspect your data <strong>before</strong> processing.</p>
+<section id="key-design" class="level3">
+<h3 class="anchored" data-anchor-id="key-design">Key Design</h3>
+<p><strong><code>--geo-stats</code> is a separate operation</strong>: When specified, the tool analyzes the raw data, displays statistics, and <strong>exits</strong> without performing sidecar calculations. This allows you to:</p>
+<ol type="1">
+<li>Inspect data ranges and quality</li>
+<li>Get convention recommendations based on actual data</li>
+<li>Validate coordinates before heavy processing</li>
+</ol>
+</section>
+<section id="usage" class="level3">
+<h3 class="anchored" data-anchor-id="usage">Usage</h3>
+<p>```bash # Step 1: Inspect your data (raw, no filtering - auto-detects lon/lat columns) healpyxel-sidecar -i data.parquet –geo-stats</p>
+</section>
+</section>
+<section id="step-1b-inspect-with-filtering-to-see-what-will-be-processed" class="level1">
+<h1>Step 1b: Inspect with filtering to see what will be processed</h1>
+<p>healpyxel-sidecar -i data.parquet –geo-stats –lon-convention 0_360</p>
+</section>
+<section id="step-2-run-actual-processing-with-appropriate-convention" class="level1">
+<h1>Step 2: Run actual processing with appropriate convention</h1>
+<p>healpyxel-sidecar -i data.parquet –nside 64 –lon-convention 0_360 –mode fuzzy</p>
+</section>
+<section id="optional-specify-explicit-lonlat-columns" class="level1">
+<h1>Optional: Specify explicit lon/lat columns</h1>
+<p>healpyxel-sidecar -i data.parquet –geo-stats<br>
+–lon-col longitude –lat-col latitude</p>
+</section>
+<section id="optional-control-sample-size-for-geometry-based-extraction" class="level1">
+<h1>Optional: Control sample size for geometry-based extraction</h1>
+<p>healpyxel-sidecar -i data.parquet –geo-stats<br>
+–stats-sample-size 50000</p>
+</section>
+<section id="compare-raw-vs-filtered-statistics" class="level1">
+<h1>Compare raw vs filtered statistics</h1>
+<ol start="2" type="1">
+<li><strong>Flexible analysis modes</strong>:
+<ul>
+<li><strong>Raw data</strong> (default): No filtering, shows actual data ranges</li>
+<li><strong>Filtered data</strong> (with <code>--lon-convention</code>): Apply same filtering as HEALPix processing</li>
+</ul></li>
+<li><strong>Automatic column detection</strong>: Intelligently detects lon/lat columns using common naming patterns</li>
+<li><strong>Geometry extraction</strong>: Falls back to extracting coordinates from geometry column (centroids for polygons)</li>
+<li><strong>Efficient computation</strong>: Uses DuckDB SQL with WHERE clauses for fast filtered statistics</li>
+<li><strong>Filtering impact</strong>: Shows total records, filtered records, and drop percentage</li>
+<li><strong>Convention suggestion</strong>: Recommends appropriate <code>--lon-convention</code> based on data ranges</li>
+<li><strong>Validation warnings</strong>: Checks if coordinates are within valid ranges</li>
+<li><strong>Beautiful output</strong>: Uses Rich library for formatted tables (falls back to plain text if unavailable)</li>
+<li><strong>JSON export</strong>: Saves statistics to <code>.geo_stats.json</code> file for reference</li>
+</ol>
+<section id="statistics-computed" class="level3">
+<h3 class="anchored" data-anchor-id="statistics-computed">Statistics Computed</h3>
+<ul>
+<li><strong>Count</strong>: Number of valid coordinates</li>
+<li><strong>Min/Max</strong>: Range of longitude and latitude values (as-is from file)</li>
+<li><strong>Mean</strong>: Average position</li>
+<li><strong>Std Dev</strong>: Standard deviation (spread)</li>
+</ul>
+</section>
+<section id="why-this-matters" class="level3">
+<h3 class="anchored" data-anchor-id="why-this-matters">Why This Matters</h3>
+<ul>
+<li><p><strong>Workflow efficiency</strong>: Quick data inspection before heavy processing</p></li>
+<li><p><strong>Convention detection</strong>: Tool suggests the right <code>--lon-convention</code> for your data</p></li>
+<li><p><strong>Data validation</strong>: Catch coordinate system issues early ### Why This Matters- <strong>Performance</strong>: Statistics computed efficiently without loading entire dataset into memory</p></li>
+<li><p><strong>Quality control</strong>: Identify outliers or invalid coordinates</p></li>
+<li><p><strong>Quality control</strong>: Identify outliers or invalid coordinates</p></li>
+<li><p><strong>Performance</strong>: Statistics computed efficiently without loading entire dataset into memory</p></li>
+<li><p><strong>Workflow efficiency</strong>: Quick data inspection before heavy processing- <strong>Data validation</strong>: Catch coordinate system issues early</p></li>
+<li><p><strong>Convention detection</strong>: Tool suggests the right <code>--lon-convention</code> for your data</p></li>
+</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

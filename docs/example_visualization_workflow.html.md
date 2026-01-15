@@ -45,9 +45,9 @@ else:
 
     Contents:
       README.md: 0.00 MB
-      batches/: 10 files
+      batches/: 11 files
       regions/: 0 files
-      samples/: 3 files
+      samples/: 4 files
       validation/: 2 files
 
 ## Quick Test with Sample Data
@@ -56,7 +56,7 @@ If test data is available, let’s try a quick aggregation:
 
 ``` python
 # Check for sample data
-sample_file = test_data_dir / 'sample_001.parquet'
+sample_file = test_data_dir / 'samples/sample_50k.parquet'
 
 if sample_file.exists():
     print(f"Loading sample: {sample_file.name}")
@@ -77,8 +77,180 @@ else:
     print("  cd .. && bash create_test_data.sh")
 ```
 
-    Sample data not found. Generate test data first:
-      cd .. && bash create_test_data.sh
+    Loading sample: sample_50k.parquet
+
+    Shape: (50000, 61)
+
+    Columns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'geometry']
+
+    First few rows:
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ref_id</th>
+<th data-quarto-table-cell-role="th">a</th>
+<th data-quarto-table-cell-role="th">b</th>
+<th data-quarto-table-cell-role="th">c</th>
+<th data-quarto-table-cell-role="th">d</th>
+<th data-quarto-table-cell-role="th">e</th>
+<th data-quarto-table-cell-role="th">f</th>
+<th data-quarto-table-cell-role="th">g</th>
+<th data-quarto-table-cell-role="th">h</th>
+<th data-quarto-table-cell-role="th">i</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">lat_center</th>
+<th data-quarto-table-cell-role="th">lon_center</th>
+<th data-quarto-table-cell-role="th">surface</th>
+<th data-quarto-table-cell-role="th">width</th>
+<th data-quarto-table-cell-role="th">length</th>
+<th data-quarto-table-cell-role="th">ang_incidence</th>
+<th data-quarto-table-cell-role="th">ang_emission</th>
+<th data-quarto-table-cell-role="th">ang_phase</th>
+<th data-quarto-table-cell-role="th">azimuth</th>
+<th data-quarto-table-cell-role="th">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>1221107223201068</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>5.927996</td>
+<td>59.658302</td>
+<td>1901453.4</td>
+<td>884.02386</td>
+<td>2738.6200</td>
+<td>25.221247</td>
+<td>52.641087</td>
+<td>77.85977</td>
+<td>129.176030</td>
+<td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1124821221900340</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>2</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>0.317725</td>
+<td>303.638760</td>
+<td>1062135.2</td>
+<td>599.24713</td>
+<td>2256.7527</td>
+<td>56.044827</td>
+<td>21.791897</td>
+<td>77.82958</td>
+<td>97.918365</td>
+<td>b"\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>1221902412000176</td>
+<td>0</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>-68.457260</td>
+<td>23.021687</td>
+<td>22254792.0</td>
+<td>4192.15530</td>
+<td>6759.2153</td>
+<td>68.652030</td>
+<td>33.230824</td>
+<td>101.83984</td>
+<td>107.450775</td>
+<td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>1308423281701252</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>6.530286</td>
+<td>240.178450</td>
+<td>1333903.5</td>
+<td>859.48000</td>
+<td>1976.0538</td>
+<td>53.991188</td>
+<td>23.853260</td>
+<td>77.83787</td>
+<td>99.408930</td>
+<td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>1334901094500334</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>3.555044</td>
+<td>51.978970</td>
+<td>1012146.3</td>
+<td>604.04944</td>
+<td>2133.4424</td>
+<td>61.469143</td>
+<td>16.375393</td>
+<td>77.83818</td>
+<td>94.556915</td>
+<td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
+</tr>
+</tbody>
+</table>
+
+<p>5 rows × 61 columns</p>
+</div>
 
 ``` python
 import duckdb
@@ -706,8 +878,7 @@ aggregated = aggregate_by_sidecar(
     source_id_col='source_id',
     healpix_col='healpix_id',
     min_count=1,  # Minimum number of sources per cell
-    include_counts=True,  # Include count columns
-    sentinel_threshold=1e30  # Mask extreme values
+   sentinel_threshold=1e30  # Mask extreme values
 )
 
 print(f"Aggregated data shape: {aggregated.shape}")
@@ -1022,7 +1193,7 @@ from healpyxel.aggregate import densify_healpix_aggregates
 aggregated_dense = densify_healpix_aggregates(
     agg_sparse_df=aggregated,
     nside=nside,
-    index_name='healpix_id'
+    healpix_col='healpix_id'
 )
 
 print(f"Sparse aggregated cells: {len(aggregated)}")
@@ -1247,7 +1418,7 @@ _ = sp_south.draw_hpxmap(
     healpix_map,
     nest=nest_flag,
     cmap='Spectral_r',
-    zoom=True,
+    zoom=False,
 )
 fig.colorbar(mappable, ax=sp_south.ax, orientation='vertical', label=output_column)
 sp_south.ax.set_title('LAEA — South pole (lat_0=-90)')
@@ -1259,7 +1430,7 @@ _ = sp_north.draw_hpxmap(
     healpix_map,
     nest=nest_flag,
     cmap='Spectral_r',
-    zoom=True,
+    zoom=False,
 )
 fig.colorbar(mappable, ax=sp_north.ax, orientation='vertical', label=output_column)
 sp_north.ax.set_title('LAEA — North pole (lat_0=+90)')
@@ -1268,4 +1439,4 @@ plt.suptitle(f'HEALPix Map: {output_column} (nside={nside})');
 # plt.tight_layout()
 ```
 
-![](81_example_visualization_workflow_files/figure-commonmark/cell-21-output-1.png)
+    NameError: name 'healpy' is not defined

@@ -141,7 +141,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_accumulation.html">Accumulation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Accumulation</li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -234,11 +234,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
           <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Accumulation</span></a>
-  </div>
-</li>
+ <span class="menu-text">82_example_accumulation.ipynb</span>
+  </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_streaming.html" class="sidebar-item-text sidebar-link">
@@ -273,7 +270,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content column-body" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_accumulation.html">Accumulation</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
 <h1 class="title">Accumulation</h1>
 </div>
@@ -645,15 +642,14 @@ First few rows:</code></pre>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>        source_id_col<span class="op">=</span><span class="st">'source_id'</span>,</span>
 <span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        healpix_col<span class="op">=</span><span class="st">'healpix_id'</span>,</span>
 <span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        min_count<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>        include_counts<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>        sentinel_threshold<span class="op">=</span><span class="fl">1e30</span></span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Aggregated </span><span class="sc">{</span><span class="bu">len</span>(aggregated)<span class="sc">}</span><span class="ss"> HEALPix cells"</span>)</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Columns: </span><span class="sc">{</span><span class="bu">list</span>(aggregated.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    display(aggregated.head(<span class="dv">10</span>))</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Cannot aggregate: no suitable value columns or no sidecars created"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>       sentinel_threshold<span class="op">=</span><span class="fl">1e30</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Aggregated </span><span class="sc">{</span><span class="bu">len</span>(aggregated)<span class="sc">}</span><span class="ss"> HEALPix cells"</span>)</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Columns: </span><span class="sc">{</span><span class="bu">list</span>(aggregated.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    display(aggregated.head(<span class="dv">10</span>))</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Cannot aggregate: no suitable value columns or no sidecars created"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>2025-12-11 15:11:07,204 INFO Starting aggregation for 1 column(s): ['r1050']
 2025-12-11 15:11:07,205 INFO Aggregation functions: ['mean', 'median', 'std', 'mad', 'robust_std']
@@ -814,7 +810,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    aggregated_dense <span class="op">=</span> densify_healpix_aggregates(</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        agg_sparse_df<span class="op">=</span>aggregated,</span>
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        nside<span class="op">=</span>nside,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        index_name<span class="op">=</span><span class="st">'healpix_id'</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        healpix_col<span class="op">=</span><span class="st">'healpix_id'</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    </span>
 <span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    total_cells <span class="op">=</span> <span class="dv">12</span> <span class="op">*</span> nside <span class="op">**</span> <span class="dv">2</span></span>
@@ -1008,7 +1004,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="82_example_accumulation_files/figure-html/cell-8-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="83_example_accumulation_files/figure-html/cell-8-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>

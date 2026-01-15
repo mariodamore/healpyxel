@@ -159,7 +159,6 @@ if test_data_dir.exists():
             source_id_col='source_id',
             healpix_col='healpix_id',
             min_count=1,
-            include_counts=True,
         )
         
         # Densify

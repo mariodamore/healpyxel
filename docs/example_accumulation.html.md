@@ -360,8 +360,7 @@ if value_columns and sidecars:
         source_id_col='source_id',
         healpix_col='healpix_id',
         min_count=1,
-        include_counts=True,
-        sentinel_threshold=1e30
+       sentinel_threshold=1e30
     )
     
     print(f"\nAggregated {len(aggregated)} HEALPix cells")
@@ -534,7 +533,7 @@ if value_columns and sidecars:
     aggregated_dense = densify_healpix_aggregates(
         agg_sparse_df=aggregated,
         nside=nside,
-        index_name='healpix_id'
+        healpix_col='healpix_id'
     )
     
     total_cells = 12 * nside ** 2
@@ -733,7 +732,7 @@ if value_columns and sidecars:
 
     <Figure size 1200x800 with 0 Axes>
 
-![](82_example_accumulation_files/figure-commonmark/cell-8-output-3.png)
+![](83_example_accumulation_files/figure-commonmark/cell-8-output-3.png)
 
 
     Map Statistics:

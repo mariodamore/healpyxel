@@ -233,11 +233,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </div>
 </li>
           <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accumulation</span></a>
-  </div>
-</li>
+ <span class="menu-text">82_example_accumulation.ipynb</span>
+  </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_streaming.html" class="sidebar-item-text sidebar-link">
@@ -416,22 +413,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>            source_id_col<span class="op">=</span><span class="st">'source_id'</span>,</span>
 <span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>            healpix_col<span class="op">=</span><span class="st">'healpix_id'</span>,</span>
 <span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>            min_count<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>            include_counts<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Densify</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>        aggregated_dense <span class="op">=</span> densify_healpix_aggregates(</span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>            agg_sparse_df<span class="op">=</span>aggregated,</span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>            nside<span class="op">=</span>nside,</span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>            index_name<span class="op">=</span><span class="st">'healpix_id'</span></span>
-<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>        </span>
-<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"✓ Prepared test data: </span><span class="sc">{</span><span class="bu">len</span>(aggregated_dense)<span class="sc">}</span><span class="ss"> HEALPix cells (nside=</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">)"</span>)</span>
-<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Data cells: </span><span class="sc">{</span>aggregated_dense[<span class="st">'r1050_median'</span>]<span class="sc">.</span>notna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Empty cells: </span><span class="sc">{</span>aggregated_dense[<span class="st">'r1050_median'</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Test data not found. Examples will be skipped."</span>)</span>
-<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run: cd .. &amp;&amp; bash create_test_data.sh"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Densify</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>        aggregated_dense <span class="op">=</span> densify_healpix_aggregates(</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>            agg_sparse_df<span class="op">=</span>aggregated,</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>            nside<span class="op">=</span>nside,</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>            index_name<span class="op">=</span><span class="st">'healpix_id'</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"✓ Prepared test data: </span><span class="sc">{</span><span class="bu">len</span>(aggregated_dense)<span class="sc">}</span><span class="ss"> HEALPix cells (nside=</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Data cells: </span><span class="sc">{</span>aggregated_dense[<span class="st">'r1050_median'</span>]<span class="sc">.</span>notna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Empty cells: </span><span class="sc">{</span>aggregated_dense[<span class="st">'r1050_median'</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Test data not found. Examples will be skipped."</span>)</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run: cd .. &amp;&amp; bash create_test_data.sh"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>2025-12-12 12:59:39,257 INFO Partition (lon_convention=0_360): processed 50000 geometries, dropped 17 (0.0%) total [pre-filter: 17, post-processing: 0]
 2025-12-12 12:59:39,337 INFO Starting aggregation for 1 column(s): ['r1050']
