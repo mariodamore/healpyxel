@@ -473,7 +473,7 @@ def print_dry_run_summary(
 
 
 def densify_healpix_aggregates(
-    agg_df: pd.DataFrame,
+    agg_sparse_df: pd.DataFrame,
     nside: int,
     healpix_col: str = "healpix_id"
 ) -> pd.DataFrame:
@@ -496,9 +496,9 @@ def densify_healpix_aggregates(
     full_index = pd.RangeIndex(start=0, stop=n_pixels, name=healpix_col)
     
     # Reindex to full grid, filling missing with NaN
-    densified = agg_df.reindex(full_index)
+    densified = agg_sparse_df.reindex(full_index)
     
-    logger.info(f"Densified from {len(agg_df)} to {len(densified)} cells (nside={nside})")
+    logger.info(f"Densified from {len(agg_sparse_df)} to {len(densified)} cells (nside={nside})")
     return densified
 
 
