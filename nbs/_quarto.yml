@@ -3,7 +3,7 @@ project:
 
 format:
   html:
-    logo: "logo.png"  #
+    logo: logo_cutout_128.png
     theme: 
       dark: darkly
       light: cosmo
@@ -25,8 +25,22 @@ website:
   navbar:
     background: primary
     search: true
+    left:
+      - text: "Home"
+        href: index.html
+      - text: "Quickstart"
+        href: example_quickstart.html
+    tools:
+      - icon: github
+        menu:
+          - text: Source Code
+            href: https://github.com/mariodamore/healpyxel/
+          - text: Report a Bug
+            href: https://github.com/mariodamore/healpyxel/issues/new
   sidebar:
     style: floating
+    logo: logo_cutout_128.png
+    collapse-level: 1
     contents:
       - index.ipynb
       # - 00_core.ipynb
@@ -43,7 +57,8 @@ website:
         contents:
           - 80_example_quickstart.ipynb
           - 81_example_visualization_workflow.ipynb
-          - 82_example_accumulation.ipynb
+          - 82_example_visualization_psf.ipynb
+          - 83_example_accumulation.ipynb
           - 90_example_streaming.ipynb
 
 metadata-files: [nbdev.yml]
