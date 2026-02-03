@@ -28,14 +28,26 @@ dependencies = [
     "pandas>=2.0",
     "numpy>=1.24",
     "pyarrow>=12.0",
-    "shapely>=2.0",
     "healpy>=1.16",
-    "dask-geopandas>=0.3",
-    "antimeridian",
+    "click>=8.0",
     "tqdm",
 ]
 
 [project.optional-dependencies]
+geospatial = [
+    "geopandas>=0.14",
+    "shapely>=2.0",
+    "dask-geopandas>=0.3",
+    "antimeridian",
+]
+streaming = [
+    "tdigest",
+]
+viz = [
+    "matplotlib>=3.5",
+    "scikit-image>=0.20",
+    "skyproj>=0.2",
+]
 dev = [
     "nbdev>=2.3.12",
     "jupyter",
@@ -46,17 +58,33 @@ dev = [
     "mypy>=1.0",
     "build>=0.10",
     "twine>=4.0",
+    # Include all optional deps in dev
+    "geopandas>=0.14",
+    "shapely>=2.0",
+    "dask-geopandas>=0.3",
+    "antimeridian",
+    "tdigest",
+    "matplotlib>=3.5",
+    "scikit-image>=0.20",
+    "skyproj>=0.2",
 ]
-tdigest = ["tdigest"]
-dask = ["dask[dataframe]"]
-duckdb = ["duckdb"]
-all = ["tdigest", "dask[dataframe]", "duckdb"]
+all = [
+    "geopandas>=0.14",
+    "shapely>=2.0",
+    "dask-geopandas>=0.3",
+    "antimeridian",
+    "tdigest",
+    "matplotlib>=3.5",
+    "scikit-image>=0.20",
+    "skyproj>=0.2",
+]
 
 [project.scripts]
-healpix_sidecar = "healpyxel.cli:sidecar_cli"
-healpix_aggregate = "healpyxel.cli:aggregate_cli"
-healpix_accumulator = "healpyxel.cli:accumulator_cli"
-healpix_finalize = "healpyxel.cli:finalize_cli"
+healpyxel_sidecar = "healpyxel.cli:sidecar_cli"
+healpyxel_aggregate = "healpyxel.cli:aggregate_cli"
+healpyxel_accumulator = "healpyxel.cli:accumulator_cli"
+healpyxel_finalize = "healpyxel.cli:finalize_cli"
+healpyxel_to_geoparquet = "healpyxel.cli:to_geoparquet_cli"
 
 [project.urls]
 Homepage = "https://github.com/mariodamore/healpyxel"

@@ -45,9 +45,10 @@ else:
 
     Contents:
       README.md: 0.00 MB
-      batches/: 11 files
+      batches/: 10 files
+      derived/: 1 files
       regions/: 0 files
-      samples/: 4 files
+      samples/: 3 files
       validation/: 2 files
 
 ## Quick Test with Sample Data
@@ -128,55 +129,55 @@ else:
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>1221107223201068</td>
+<td>1310408274001158</td>
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>2</td>
+<td>1</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>5.927996</td>
-<td>59.658302</td>
-<td>1901453.4</td>
-<td>884.02386</td>
-<td>2738.6200</td>
-<td>25.221247</td>
-<td>52.641087</td>
-<td>77.85977</td>
-<td>129.176030</td>
+<td>5.186568</td>
+<td>272.40450</td>
+<td>1567133.40</td>
+<td>1006.63727</td>
+<td>1982.1799</td>
+<td>43.049232</td>
+<td>34.814793</td>
+<td>77.85916</td>
+<td>109.019295</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>1124821221900340</td>
+<td>1335313413800913</td>
 <td>0</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>0.317725</td>
-<td>303.638760</td>
-<td>1062135.2</td>
-<td>599.24713</td>
-<td>2256.7527</td>
-<td>56.044827</td>
-<td>21.791897</td>
-<td>77.82958</td>
-<td>97.918365</td>
-<td>b"\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
+<td>-60.939438</td>
+<td>71.77686</td>
+<td>13564574.00</td>
+<td>4064.49850</td>
+<td>4249.2210</td>
+<td>64.178116</td>
+<td>37.690910</td>
+<td>101.84035</td>
+<td>111.930336</td>
+<td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>1221902412000176</td>
+<td>1224306405800836</td>
 <td>0</td>
 <td>2</td>
 <td>2</td>
@@ -187,44 +188,44 @@ else:
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>-68.457260</td>
-<td>23.021687</td>
-<td>22254792.0</td>
-<td>4192.15530</td>
-<td>6759.2153</td>
-<td>68.652030</td>
-<td>33.230824</td>
-<td>101.83984</td>
-<td>107.450775</td>
+<td>5.613894</td>
+<td>54.23045</td>
+<td>1755143.50</td>
+<td>1013.51886</td>
+<td>2204.9104</td>
+<td>53.815990</td>
+<td>24.053764</td>
+<td>77.86254</td>
+<td>99.559425</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>1308423281701252</td>
+<td>1421301274400732</td>
 <td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>6.530286</td>
-<td>240.178450</td>
-<td>1333903.5</td>
-<td>859.48000</td>
-<td>1976.0538</td>
-<td>53.991188</td>
-<td>23.853260</td>
-<td>77.83787</td>
-<td>99.408930</td>
+<td>-41.672714</td>
+<td>324.49740</td>
+<td>23309360.00</td>
+<td>6511.20950</td>
+<td>4558.0470</td>
+<td>52.841824</td>
+<td>46.625698</td>
+<td>99.40995</td>
+<td>121.833626</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>1334901094500334</td>
+<td>1310308273500668</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
@@ -235,15 +236,15 @@ else:
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>3.555044</td>
-<td>51.978970</td>
-<td>1012146.3</td>
-<td>604.04944</td>
-<td>2133.4424</td>
-<td>61.469143</td>
-<td>16.375393</td>
-<td>77.83818</td>
-<td>94.556915</td>
+<td>26.975400</td>
+<td>284.81708</td>
+<td>905292.56</td>
+<td>480.38028</td>
+<td>2399.4622</td>
+<td>56.780300</td>
+<td>21.083624</td>
+<td>77.85945</td>
+<td>97.433360</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 </tbody>
@@ -328,40 +329,84 @@ display(df_stats)
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>samples/sample_50k.parquet</td>
-<td>18.907251</td>
+<td>18.891136</td>
 <td>50000</td>
-<td>-75.011170</td>
-<td>74.860380</td>
-<td>0.023469</td>
-<td>359.96622</td>
+<td>-74.986440</td>
+<td>74.946884</td>
+<td>0.020273</td>
+<td>359.96555</td>
 <td>sample_50k</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>samples/sample_5k.parquet</td>
-<td>1.938233</td>
+<td>1.941895</td>
 <td>5000</td>
-<td>-74.987915</td>
-<td>74.925750</td>
-<td>0.068102</td>
-<td>359.82980</td>
+<td>-74.954390</td>
+<td>74.846540</td>
+<td>0.274960</td>
+<td>359.80890</td>
 <td>sample_5k</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>samples/sample_25k.parquet</td>
-<td>9.599403</td>
+<td>9.614980</td>
 <td>25000</td>
-<td>-74.999180</td>
-<td>74.782600</td>
-<td>0.044146</td>
-<td>359.95227</td>
+<td>-74.934560</td>
+<td>74.767715</td>
+<td>0.057941</td>
+<td>359.97324</td>
 <td>sample_25k</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
+<td>derived/cli_quickstart/sample_50k.cell-healpix...</td>
+<td>0.430335</td>
+<td>54931</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k.cell-healpix_assignment-fuzzy_nside...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>derived/cli_quickstart/sample_50k-aggregated.c...</td>
+<td>0.552613</td>
+<td>12288</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k-aggregated.cell-healpix_assignment-...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>derived/cli_quickstart/sample_50k-aggregated.c...</td>
+<td>1.302203</td>
+<td>49152</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k-aggregated.cell-healpix_assignment-...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>derived/cli_quickstart/sample_50k.cell-healpix...</td>
+<td>0.525922</td>
+<td>59592</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k.cell-healpix_assignment-fuzzy_nside...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
 <td>validation/high_quality_subset.parquet</td>
-<td>9.039520</td>
+<td>9.039313</td>
 <td>25121</td>
 <td>-74.992330</td>
 <td>74.683150</td>
@@ -370,9 +415,9 @@ display(df_stats)
 <td>high_quality_subset</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
+<td data-quarto-table-cell-role="th">8</td>
 <td>validation/combined_batch_001_003.parquet</td>
-<td>3.963549</td>
+<td>3.963343</td>
 <td>10890</td>
 <td>-74.627014</td>
 <td>74.447170</td>
@@ -381,9 +426,9 @@ display(df_stats)
 <td>combined_batch_001_003</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
+<td data-quarto-table-cell-role="th">9</td>
 <td>batches/batch_009.parquet</td>
-<td>1.613872</td>
+<td>1.613665</td>
 <td>4417</td>
 <td>-74.822310</td>
 <td>74.647300</td>
@@ -392,9 +437,9 @@ display(df_stats)
 <td>batch_009</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
+<td data-quarto-table-cell-role="th">10</td>
 <td>batches/batch_003.parquet</td>
-<td>1.373711</td>
+<td>1.373512</td>
 <td>3734</td>
 <td>-73.450960</td>
 <td>74.447170</td>
@@ -403,9 +448,9 @@ display(df_stats)
 <td>batch_003</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
+<td data-quarto-table-cell-role="th">11</td>
 <td>batches/batch_007.parquet</td>
-<td>1.530560</td>
+<td>1.530362</td>
 <td>4174</td>
 <td>-73.332790</td>
 <td>74.656006</td>
@@ -414,9 +459,9 @@ display(df_stats)
 <td>batch_007</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
+<td data-quarto-table-cell-role="th">12</td>
 <td>batches/batch_010.parquet</td>
-<td>1.800152</td>
+<td>1.799953</td>
 <td>4931</td>
 <td>-74.797844</td>
 <td>74.683150</td>
@@ -425,9 +470,9 @@ display(df_stats)
 <td>batch_010</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
+<td data-quarto-table-cell-role="th">13</td>
 <td>batches/batch_004.parquet</td>
-<td>1.463713</td>
+<td>1.463505</td>
 <td>3990</td>
 <td>-74.927130</td>
 <td>74.425640</td>
@@ -436,9 +481,9 @@ display(df_stats)
 <td>batch_004</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
+<td data-quarto-table-cell-role="th">14</td>
 <td>batches/batch_006.parquet</td>
-<td>1.425115</td>
+<td>1.424916</td>
 <td>3885</td>
 <td>-74.992330</td>
 <td>74.492300</td>
@@ -447,9 +492,9 @@ display(df_stats)
 <td>batch_006</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
+<td data-quarto-table-cell-role="th">15</td>
 <td>batches/batch_008.parquet</td>
-<td>1.636130</td>
+<td>1.635924</td>
 <td>4482</td>
 <td>-74.920740</td>
 <td>74.619770</td>
@@ -458,9 +503,9 @@ display(df_stats)
 <td>batch_008</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
+<td data-quarto-table-cell-role="th">16</td>
 <td>batches/batch_001.parquet</td>
-<td>1.117720</td>
+<td>1.117513</td>
 <td>3029</td>
 <td>-74.627014</td>
 <td>74.381710</td>
@@ -469,9 +514,9 @@ display(df_stats)
 <td>batch_001</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
+<td data-quarto-table-cell-role="th">17</td>
 <td>batches/batch_005.parquet</td>
-<td>1.655594</td>
+<td>1.655387</td>
 <td>4502</td>
 <td>-74.632195</td>
 <td>74.596970</td>
@@ -480,9 +525,9 @@ display(df_stats)
 <td>batch_005</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
+<td data-quarto-table-cell-role="th">18</td>
 <td>batches/batch_002.parquet</td>
-<td>1.513315</td>
+<td>1.513108</td>
 <td>4127</td>
 <td>-73.357796</td>
 <td>74.422920</td>
@@ -565,7 +610,6 @@ gdf.head(3)
 
     Converting WKB geometry to GeoDataFrame...
     CRS: EPSG:4326
-    CRS: EPSG:4326
 
 <div>
 <style scoped>
@@ -610,55 +654,55 @@ gdf.head(3)
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>1221107223201068</td>
+<td>1310408274001158</td>
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>2</td>
+<td>1</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>5.927996</td>
-<td>59.658302</td>
-<td>1901453.4</td>
-<td>884.02386</td>
-<td>2738.6200</td>
-<td>25.221247</td>
-<td>52.641087</td>
-<td>77.85977</td>
-<td>129.176030</td>
-<td>POLYGON ((59.63697 5.9037, 59.66616 5.92117, 5...</td>
+<td>5.186568</td>
+<td>272.40450</td>
+<td>1567133.4</td>
+<td>1006.63727</td>
+<td>1982.1799</td>
+<td>43.049232</td>
+<td>34.814793</td>
+<td>77.85916</td>
+<td>109.019295</td>
+<td>POLYGON ((272.39758 5.16433, 272.41583 5.18307...</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>1124821221900340</td>
+<td>1335313413800913</td>
 <td>0</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>0.317725</td>
-<td>303.638760</td>
-<td>1062135.2</td>
-<td>599.24713</td>
-<td>2256.7527</td>
-<td>56.044827</td>
-<td>21.791897</td>
-<td>77.82958</td>
-<td>97.918365</td>
-<td>POLYGON ((303.6493 0.29339, 303.64523 0.32052,...</td>
+<td>-60.939438</td>
+<td>71.77686</td>
+<td>13564574.0</td>
+<td>4064.49850</td>
+<td>4249.2210</td>
+<td>64.178116</td>
+<td>37.690910</td>
+<td>101.84035</td>
+<td>111.930336</td>
+<td>POLYGON ((71.72596 -60.89612, 71.69186 -60.963...</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>1221902412000176</td>
+<td>1224306405800836</td>
 <td>0</td>
 <td>2</td>
 <td>2</td>
@@ -669,16 +713,16 @@ gdf.head(3)
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>-68.457260</td>
-<td>23.021687</td>
-<td>22254792.0</td>
-<td>4192.15530</td>
-<td>6759.2153</td>
-<td>68.652030</td>
-<td>33.230824</td>
-<td>101.83984</td>
-<td>107.450775</td>
-<td>POLYGON ((23.04131 -68.53648, 23.15511 -68.452...</td>
+<td>5.613894</td>
+<td>54.23045</td>
+<td>1755143.5</td>
+<td>1013.51886</td>
+<td>2204.9104</td>
+<td>53.815990</td>
+<td>24.053764</td>
+<td>77.86254</td>
+<td>99.559425</td>
+<td>POLYGON ((54.24406 5.63592, 54.22025 5.62014, ...</td>
 </tr>
 </tbody>
 </table>
@@ -713,16 +757,17 @@ print(f"Sidecar dtypes:\n{sidecar_df.dtypes}")
 sidecar_df.head(10)
 ```
 
-    2025-12-12 13:02:29,798 INFO Partition (lon_convention=0_360): processed 50000 geometries, dropped 17 (0.0%) total [pre-filter: 17, post-processing: 0]
+    2026-02-03 13:18:50,894 INFO Partition (lon_convention=0_360): processed 50000 geometries, dropped 12 (0.0%) total [pre-filter: 12, post-processing: 0]
 
-    Created sidecar with 54888 assignments
-    Unique geometries: 49983
-    Unique HEALPix cells: 10825
+    Created sidecar with 54931 assignments
+    Unique geometries: 49988
+    Unique HEALPix cells: 10860
 
-    Sidecar columns: ['source_id', 'healpix_id']
+    Sidecar columns: ['source_id', 'healpix_id', 'weight']
     Sidecar dtypes:
-    source_id      int64
-    healpix_id    UInt64
+    source_id       int64
+    healpix_id     UInt64
+    weight        float64
     dtype: object
 
 <div>
@@ -744,58 +789,69 @@ sidecar_df.head(10)
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">source_id</th>
 <th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th">weight</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>0</td>
-<td>5815</td>
+<td>7943</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>1</td>
-<td>7536</td>
+<td>8287</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>2</td>
-<td>8333</td>
+<td>5819</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>3</td>
-<td>7906</td>
+<td>11685</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>4</td>
-<td>5805</td>
+<td>3618</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>4</td>
-<td>5807</td>
+<td>5</td>
+<td>3805</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>5</td>
-<td>9771</td>
+<td>6</td>
+<td>9522</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>5</td>
-<td>9857</td>
+<td>7</td>
+<td>10975</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
-<td>6</td>
-<td>7355</td>
+<td>8</td>
+<td>1820</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
-<td>7</td>
-<td>12212</td>
+<td>9</td>
+<td>3710</td>
+<td>1.0</td>
 </tr>
 </tbody>
 </table>
@@ -824,10 +880,10 @@ print(assignments_per_geom.value_counts().sort_index().head(10))
       Median cells per geometry: 1
 
     Distribution of assignments per geometry:
-    1    45380
-    2     4327
-    3      250
-    4       26
+    1    45331
+    2     4396
+    3      236
+    4       25
     Name: count, dtype: int64
 
 ``` python
@@ -839,7 +895,7 @@ print(f"File size: {sidecar_output.stat().st_size / 1024:.2f} KB")
 ```
 
     Saved sidecar to: /tmp/sample_50k_sidecar_nside32_fuzzy.parquet
-    File size: 440.74 KB
+    File size: 441.63 KB
 
 ## Aggregate Data by HEALPix Cells
 
@@ -861,7 +917,7 @@ else:
 ```
 
     ✓ Column 'r1050' found in the data
-      Range: [-0.003, 0.174]
+      Range: [-0.050, 0.325]
       Missing values: 0 / 50000
 
 ``` python
@@ -889,27 +945,17 @@ print(f"\nAggregated columns: {list(aggregated.columns)}")
 aggregated.head(10)
 ```
 
-    2025-12-12 13:02:30,012 INFO Starting aggregation for 1 column(s): ['r1050']
-    2025-12-12 13:02:30,012 INFO Aggregation functions: ['mean', 'median', 'std', 'mad', 'robust_std']
-    2025-12-12 13:02:30,021 INFO Creating source_id column from DataFrame index
-    2025-12-12 13:02:30,012 INFO Aggregation functions: ['mean', 'median', 'std', 'mad', 'robust_std']
-    2025-12-12 13:02:30,021 INFO Creating source_id column from DataFrame index
-    2025-12-12 13:02:30,055 INFO Sidecar source_id overlap: 49983/49983 (100.0%)
-    2025-12-12 13:02:30,055 INFO Merging sidecar with original data
-    2025-12-12 13:02:30,060 INFO Grouping by healpix_id and computing aggregations
-    2025-12-12 13:02:30,055 INFO Sidecar source_id overlap: 49983/49983 (100.0%)
-    2025-12-12 13:02:30,055 INFO Merging sidecar with original data
-    2025-12-12 13:02:30,060 INFO Grouping by healpix_id and computing aggregations
-    2025-12-12 13:02:30,127 INFO Processing 10825 HEALPix cells
-    2025-12-12 13:02:30,127 INFO Processing 10825 HEALPix cells
-    2025-12-12 13:02:33,399 INFO Creating output DataFrame with 10825 cells
-    2025-12-12 13:02:33,423 INFO Aggregation complete. Output shape: (10825, 6)
-    2025-12-12 13:02:33,423 INFO Aggregation complete. Output shape: (10825, 6)
+    2026-02-03 13:18:51,041 INFO Creating source_id column from DataFrame index
+    2026-02-03 13:18:51,074 INFO Sidecar source_id overlap: 49988/49988 (100.0%)
+    2026-02-03 13:18:51,075 INFO Merging sidecar with original data
+    2026-02-03 13:18:51,080 INFO Grouping by healpix_id and computing aggregations
+    2026-02-03 13:18:51,159 INFO Processing 10860 HEALPix cells
+    2026-02-03 13:18:54,635 INFO Aggregation complete: 10860 cells with data
 
-    Aggregating HEALPix cells:   0%|          | 0/10825 [00:00<?, ?cell/s]
+    Aggregating HEALPix cells:   0%|          | 0/10860 [00:00<?, ?cell/s]
 
-    Aggregated data shape: (10825, 6)
-    Number of HEALPix cells with data: 10825
+    Aggregated data shape: (10860, 6)
+    Number of HEALPix cells with data: 10860
 
     Aggregated columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_std', 'n_sources']
 
@@ -950,93 +996,93 @@ aggregated.head(10)
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>0.047764</td>
-<td>0.047652</td>
-<td>0.001116</td>
-<td>0.000877</td>
-<td>0.001300</td>
+<td>0.048616</td>
+<td>0.047857</td>
+<td>0.003759</td>
+<td>0.002672</td>
+<td>0.003962</td>
 <td>4</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>0.055255</td>
-<td>0.055561</td>
-<td>0.009401</td>
-<td>0.001885</td>
-<td>0.002795</td>
-<td>5</td>
+<td>0.051467</td>
+<td>0.052283</td>
+<td>0.002976</td>
+<td>0.001888</td>
+<td>0.002799</td>
+<td>6</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0.050887</td>
-<td>0.051560</td>
-<td>0.003475</td>
-<td>0.002050</td>
-<td>0.003039</td>
-<td>5</td>
+<td>0.049697</td>
+<td>0.049118</td>
+<td>0.003637</td>
+<td>0.002289</td>
+<td>0.003394</td>
+<td>6</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>0.052687</td>
-<td>0.053003</td>
-<td>0.001374</td>
-<td>0.001186</td>
-<td>0.001759</td>
+<td>0.059066</td>
+<td>0.063241</td>
+<td>0.007149</td>
+<td>0.001711</td>
+<td>0.002537</td>
 <td>3</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>0.048042</td>
-<td>0.048304</td>
-<td>0.003802</td>
-<td>0.003442</td>
-<td>0.005103</td>
-<td>4</td>
+<td>0.051262</td>
+<td>0.051523</td>
+<td>0.006552</td>
+<td>0.002510</td>
+<td>0.003721</td>
+<td>9</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>0.052645</td>
-<td>0.052189</td>
-<td>0.004026</td>
-<td>0.003416</td>
-<td>0.005065</td>
-<td>4</td>
+<td>0.047092</td>
+<td>0.047639</td>
+<td>0.008176</td>
+<td>0.003183</td>
+<td>0.004719</td>
+<td>7</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>0.058018</td>
-<td>0.056681</td>
-<td>0.003631</td>
-<td>0.000435</td>
-<td>0.000645</td>
-<td>5</td>
+<td>0.058219</td>
+<td>0.058195</td>
+<td>0.002682</td>
+<td>0.002040</td>
+<td>0.003024</td>
+<td>6</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>0.048398</td>
-<td>0.048118</td>
-<td>0.002235</td>
-<td>0.001603</td>
-<td>0.002377</td>
-<td>4</td>
+<td>0.053656</td>
+<td>0.054208</td>
+<td>0.008577</td>
+<td>0.006288</td>
+<td>0.009323</td>
+<td>8</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
-<td>0.048196</td>
-<td>0.049001</td>
-<td>0.001647</td>
-<td>0.001294</td>
-<td>0.001918</td>
-<td>5</td>
+<td>0.037711</td>
+<td>0.037711</td>
+<td>0.008823</td>
+<td>0.008823</td>
+<td>0.013080</td>
+<td>2</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
-<td>0.052534</td>
-<td>0.052957</td>
-<td>0.002989</td>
-<td>0.003007</td>
-<td>0.004458</td>
-<td>3</td>
+<td>0.041094</td>
+<td>0.041094</td>
+<td>0.012205</td>
+<td>0.012205</td>
+<td>0.018096</td>
+<td>2</td>
 </tr>
 </tbody>
 </table>
@@ -1071,40 +1117,40 @@ print(f"Cells with 5+ sources: {(aggregated['n_sources'] > 5).sum()}")
     Summary statistics for aggregated HEALPix cells:
 
              r1050_mean  r1050_median     r1050_std     r1050_mad  \
-    count  10825.000000  10825.000000  10825.000000  10825.000000   
-    mean       0.054775      0.054660      0.004834      0.003116   
-    std        0.008045      0.008020      0.004080      0.003007   
-    min        0.019774      0.019774      0.000000      0.000000   
-    25%        0.049531      0.049424      0.001914      0.000998   
-    50%        0.053805      0.053680      0.004271      0.002541   
-    75%        0.059047      0.058956      0.006892      0.004357   
-    max        0.129722      0.129722      0.050240      0.050240   
+    count  10860.000000  10860.000000  10860.000000  10860.000000   
+    mean       0.054837      0.054731      0.004838      0.003076   
+    std        0.008117      0.008069      0.004290      0.002981   
+    min        0.008949      0.008949      0.000000      0.000000   
+    25%        0.049472      0.049385      0.001861      0.000960   
+    50%        0.053936      0.053849      0.004238      0.002508   
+    75%        0.059213      0.059099      0.006812      0.004329   
+    max        0.141338      0.141338      0.133480      0.032018   
 
            r1050_robust_std     n_sources  
-    count      10825.000000  10825.000000  
-    mean           0.004620      5.070485  
-    std            0.004458      4.811633  
+    count      10860.000000  10860.000000  
+    mean           0.004561      5.058103  
+    std            0.004420      4.835600  
     min            0.000000      1.000000  
-    25%            0.001479      2.000000  
-    50%            0.003767      4.000000  
-    75%            0.006459      6.000000  
-    max            0.074486     85.000000  
+    25%            0.001424      2.000000  
+    50%            0.003718      4.000000  
+    75%            0.006418      6.000000  
+    max            0.047470     98.000000  
 
 
     Distribution of source counts per HEALPix cell:
-    count    10825.000000
-    mean         5.070485
-    std          4.811633
+    count    10860.000000
+    mean         5.058103
+    std          4.835600
     min          1.000000
     25%          2.000000
     50%          4.000000
     75%          6.000000
-    max         85.000000
+    max         98.000000
     Name: n_sources, dtype: float64
 
-    Cells with only 1 source: 1612
-    Cells with 2-5 sources: 5641
-    Cells with 5+ sources: 3572
+    Cells with only 1 source: 1644
+    Cells with 2-5 sources: 5696
+    Cells with 5+ sources: 3520
 
 ### HEALPix Metadata
 
@@ -1205,13 +1251,13 @@ print(f"Cells with data: {aggregated_dense['r1050_median'].notna().sum()}")
 aggregated_dense.head(10)
 ```
 
-    2025-12-12 13:02:33,586 INFO Densified to 12288 cells (added 1463 empty cells)
+    2026-02-03 13:18:55,069 INFO Densified from 10860 to 12288 cells (nside=32)
 
-    Sparse aggregated cells: 10825
+    Sparse aggregated cells: 10860
     Dense HEALPix grid cells: 12288 (expected: 12288)
 
-    Empty cells (no data): 1463
-    Cells with data: 10825
+    Empty cells (no data): 1428
+    Cells with data: 10860
 
 <div>
 <style scoped>
@@ -1250,93 +1296,93 @@ aggregated_dense.head(10)
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>0.047764</td>
-<td>0.047652</td>
-<td>0.001116</td>
-<td>0.000877</td>
-<td>0.001300</td>
-<td>4</td>
+<td>0.048616</td>
+<td>0.047857</td>
+<td>0.003759</td>
+<td>0.002672</td>
+<td>0.003962</td>
+<td>4.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>0.055255</td>
-<td>0.055561</td>
-<td>0.009401</td>
-<td>0.001885</td>
-<td>0.002795</td>
-<td>5</td>
+<td>0.051467</td>
+<td>0.052283</td>
+<td>0.002976</td>
+<td>0.001888</td>
+<td>0.002799</td>
+<td>6.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0.050887</td>
-<td>0.051560</td>
-<td>0.003475</td>
-<td>0.002050</td>
-<td>0.003039</td>
-<td>5</td>
+<td>0.049697</td>
+<td>0.049118</td>
+<td>0.003637</td>
+<td>0.002289</td>
+<td>0.003394</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>0.052687</td>
-<td>0.053003</td>
-<td>0.001374</td>
-<td>0.001186</td>
-<td>0.001759</td>
-<td>3</td>
+<td>0.059066</td>
+<td>0.063241</td>
+<td>0.007149</td>
+<td>0.001711</td>
+<td>0.002537</td>
+<td>3.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>0.048042</td>
-<td>0.048304</td>
-<td>0.003802</td>
-<td>0.003442</td>
-<td>0.005103</td>
-<td>4</td>
+<td>0.051262</td>
+<td>0.051523</td>
+<td>0.006552</td>
+<td>0.002510</td>
+<td>0.003721</td>
+<td>9.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>0.052645</td>
-<td>0.052189</td>
-<td>0.004026</td>
-<td>0.003416</td>
-<td>0.005065</td>
-<td>4</td>
+<td>0.047092</td>
+<td>0.047639</td>
+<td>0.008176</td>
+<td>0.003183</td>
+<td>0.004719</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>0.058018</td>
-<td>0.056681</td>
-<td>0.003631</td>
-<td>0.000435</td>
-<td>0.000645</td>
-<td>5</td>
+<td>0.058219</td>
+<td>0.058195</td>
+<td>0.002682</td>
+<td>0.002040</td>
+<td>0.003024</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>0.048398</td>
-<td>0.048118</td>
-<td>0.002235</td>
-<td>0.001603</td>
-<td>0.002377</td>
-<td>4</td>
+<td>0.053656</td>
+<td>0.054208</td>
+<td>0.008577</td>
+<td>0.006288</td>
+<td>0.009323</td>
+<td>8.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
-<td>0.048196</td>
-<td>0.049001</td>
-<td>0.001647</td>
-<td>0.001294</td>
-<td>0.001918</td>
-<td>5</td>
+<td>0.037711</td>
+<td>0.037711</td>
+<td>0.008823</td>
+<td>0.008823</td>
+<td>0.013080</td>
+<td>2.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
-<td>0.052534</td>
-<td>0.052957</td>
-<td>0.002989</td>
-<td>0.003007</td>
-<td>0.004458</td>
-<td>3</td>
+<td>0.041094</td>
+<td>0.041094</td>
+<td>0.012205</td>
+<td>0.012205</td>
+<td>0.018096</td>
+<td>2.0</td>
 </tr>
 </tbody>
 </table>
@@ -1367,8 +1413,8 @@ print(f"  Invalid pixels: {invalid_pixels.sum()}")
 
     HEALPix map prepared:
       Total pixels: 12288
-      Valid pixels: 10825
-      Invalid pixels: 1463
+      Valid pixels: 10860
+      Invalid pixels: 1428
 
 ``` python
 import healpy
@@ -1379,11 +1425,9 @@ ax = healpy.visufunc.orthview(healpix_map, nest=nest_flag,
 healpy.visufunc.graticule()
 ```
 
-    2025-12-12 13:02:34,529 INFO 0.0 180.0 -180.0 180.0
-    2025-12-12 13:02:34,529 INFO The interval between parallels is 30 deg -0.00'.
-    2025-12-12 13:02:34,529 INFO The interval between meridians is 30 deg -0.00'.
-    2025-12-12 13:02:34,529 INFO The interval between parallels is 30 deg -0.00'.
-    2025-12-12 13:02:34,529 INFO The interval between meridians is 30 deg -0.00'.
+    2026-02-03 13:18:56,234 INFO 0.0 180.0 -180.0 180.0
+    2026-02-03 13:18:56,235 INFO The interval between parallels is 30 deg -0.00'.
+    2026-02-03 13:18:56,236 INFO The interval between meridians is 30 deg -0.00'.
 
 ![](81_example_visualization_workflow_files/figure-commonmark/cell-19-output-2.png)
 
@@ -1439,4 +1483,442 @@ plt.suptitle(f'HEALPix Map: {output_column} (nside={nside})');
 # plt.tight_layout()
 ```
 
-    NameError: name 'healpy' is not defined
+![](81_example_visualization_workflow_files/figure-commonmark/cell-21-output-1.png)
+
+## Generate data in CLI and Visualize
+
+The same data generated here can be produced with the script in
+`examples/cli_regrid_sample_50k.sh` :
+
+``` bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+# define variables
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+INPUT="$ROOT_DIR/test_data/samples/sample_50k.parquet"
+OUT_DIR="$ROOT_DIR/test_data/derived/cli_quickstart"
+NSIDE=32
+MODE=fuzzy
+LON_CONVENTION=0_360
+# generate output directly
+mkdir -p "$OUT_DIR"
+
+# 2) Aggregate sparse regridded map
+healpix_aggregate \
+  --input "$INPUT" \
+  --sidecar-dir "$OUT_DIR" \
+  --sidecar-index 0 \
+  --aggregate \
+  --columns r1050 \
+  --aggs mean median std mad robust_std \
+  --min-count 1 \
+  --output "$OUT_DIR/sample_50k_nside${NSIDE}_r1050_sparse_aggregate.parquet"
+# 3) Aggregate (densified) regridded map
+healpix_aggregate \
+  --input "$INPUT" \
+  --sidecar-dir "$OUT_DIR" \
+  --sidecar-index 0 \
+  --aggregate \
+  --columns r1050 \
+  --aggs mean median std mad robust_std \
+  --min-count 1 \
+  --densify \
+  --output "$OUT_DIR/sample_50k_nside${NSIDE}_r1050_dense_aggregate.parquet"
+```
+
+``` python
+import json
+import rich
+from pathlib import Path
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+# Define paths to CLI outputs
+cli_output_dir = Path('../test_data/derived/cli_quickstart')
+```
+
+### Load CLI-Generated Products
+
+Load the sidecar and aggregated maps created by the CLI script above.
+
+``` python
+# Load sidecar metadata
+sidecar_meta_path = cli_output_dir / 'sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json'
+if sidecar_meta_path.exists():
+    with open(sidecar_meta_path, 'r') as f:
+        sidecar_metadata = json.load(f)
+    
+    print("Sidecar Metadata:")
+    print("="*60)
+    print(sidecar_metadata)
+else:
+    print(f"Sidecar metadata not found: {sidecar_meta_path}")
+    print("Run the CLI script first: bash examples/cli_regrid_sample_50k.sh")
+```
+
+    Sidecar Metadata:
+    ============================================================
+    {'processing': {'stage': 'sidecar', 'timestamp': '2026-02-03T12:06:33.952423Z', 'source_file': '/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet', 'output_file': '/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet'}, 'healpix': {'nside': 32, 'mode': 'fuzzy', 'order': 'nested', 'npix': 12288}, 'coordinates': {'lon_convention': '0_360', 'lon_range': [0, 360], 'lat_range': [-90, 90]}, 'processing_params': {'ncores': 15, 'coalesced': True, 'data_psf': 'none', 'data_psf_sigma_level': 2.0, 'cell_psf': 'none', 'cell_psf_sigma_level': 2.0, 'psf_combine': 'multiply', 'psf_normalize': True}}
+
+``` python
+# Load sidecar parquet file using metadata
+if sidecar_meta_path.exists():
+    # Extract output file path from metadata
+    sidecar_path = Path(sidecar_metadata['processing']['output_file'])
+    
+    if sidecar_path.exists():
+        sidecar_cli = pd.read_parquet(sidecar_path)
+        
+        print(f"Sidecar DataFrame:")
+        print(f"  Shape: {sidecar_cli.shape}")
+        print(f"  Columns: {list(sidecar_cli.columns)}")
+        print(f"  Dtypes:\n{sidecar_cli.dtypes}")
+        print(f"\n  Unique sources: {sidecar_cli['source_id'].nunique()}")
+        print(f"  Unique HEALPix cells: {sidecar_cli['healpix_id'].nunique()}")
+        print(f"  Total assignments: {len(sidecar_cli)}")
+        
+        # Check for weight column
+        if 'weight' in sidecar_cli.columns:
+            print(f"\n  Has 'weight' column: Yes")
+            print(f"    Weight range: [{sidecar_cli['weight'].min():.6f}, {sidecar_cli['weight'].max():.6f}]")
+        else:
+            print(f"\n  Has 'weight' column: No")
+        
+        print(f"\n  First few rows:")
+        display(sidecar_cli.head(10))
+    else:
+        print(f"Sidecar file not found: {sidecar_path}")
+else:
+    print(f"Sidecar metadata not found: {sidecar_meta_path}")
+    print("Run the CLI script first: bash examples/cli_regrid_sample_50k.sh")
+```
+
+    Sidecar DataFrame:
+      Shape: (54931, 3)
+      Columns: ['source_id', 'healpix_id', 'weight']
+      Dtypes:
+    source_id       int64
+    healpix_id     uint64
+    weight        float64
+    dtype: object
+
+      Unique sources: 49988
+      Unique HEALPix cells: 10860
+      Total assignments: 54931
+
+      Has 'weight' column: Yes
+        Weight range: [1.000000, 1.000000]
+
+      First few rows:
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>7943</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>8287</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2</td>
+<td>5819</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>11685</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>3618</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>5</td>
+<td>3805</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>6</td>
+<td>9522</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>7</td>
+<td>10975</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>8</td>
+<td>1820</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>9</td>
+<td>3710</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+### Load Sparse Aggregated Map
+
+The sparse map contains only cells with data. We’ll load it and densify
+it for visualization.
+
+``` python
+# Load sparse aggregate using metadata
+from healpyxel.metadata import HEALPyxelxMetadata
+
+sparse_agg_meta_path = cli_output_dir / 'sample_50k_nside32_r1050_sparse_aggregate.meta.json'
+if sparse_agg_meta_path.exists():
+    # Read and validate metadata
+    with open(sparse_agg_meta_path, 'r') as f:
+        sparse_meta = json.load(f)
+    
+    # Validate metadata structure
+    sparse_metadata = HEALPyxelxMetadata.from_dict(sparse_meta)
+    print(f"Sparse Aggregate Metadata validated:")
+    print(f"  File type: {sparse_metadata.file_type}")
+    print(f"  HEALPix nside: {sparse_metadata.nside}")
+    print(f"  HEALPix order: {sparse_metadata.order}")
+    
+    # Extract output file path from metadata
+    sparse_agg_path = Path(sparse_meta['processing']['output_file'])
+    
+    if sparse_agg_path.exists():
+        sparse_agg = pd.read_parquet(sparse_agg_path)
+        # Verify index
+        assert sparse_agg.index.name == 'healpix_id', f"Expected index 'healpix_id', got {sparse_agg.index.name}"
+
+        ######## WARNING ######## 
+        # When you call .set_index('healpix_id') on a DataFrame where healpix_id is already the index, 
+        # pandas creates a new integer index and moves the old index to a column, causing chaos.
+        # sparse_agg = pd.read_parquet(sparse_agg_path).set_index('healpix_id')
+        #########################
+
+        print(f"\nSparse Aggregated Map:")
+        print(f"  Shape: {sparse_agg.shape}")
+        print(f"  Columns: {list(sparse_agg.columns)}")
+        print(f"  Index name: {sparse_agg.index.name}")
+        print(f"\n  Statistics:")
+        print(f"    Cells with data: {len(sparse_agg)}")
+        print(f"    Expected cells (12*nside²): {12 * 32**2} = 12,288")
+        print(f"    Coverage: {len(sparse_agg) / (12 * 32**2) * 100:.2f}%")
+        
+        print(f"\n  First few rows:")
+        display(sparse_agg.head(10))
+
+        # Densify the sparse map with proper alignment
+        from healpyxel.aggregate import densify_healpix_aggregates
+
+        sparse_agg_dense = densify_healpix_aggregates(
+            agg_sparse_df=sparse_agg,
+            nside=32,
+            healpix_col='healpix_id'
+        )
+        
+        # CRITICAL: Sort by healpix_id and reset index to align with pixel positions
+        sparse_agg_dense = sparse_agg_dense.sort_index()
+
+        # Verify alignment
+        assert len(sparse_agg_dense) == 12 * 32**2, f"Expected {12*32**2}, got {len(sparse_agg_dense)}"
+        assert sparse_agg_dense.index.equals(pd.RangeIndex(0, 12 * 32**2)), "Index not 0..12287"
+
+        print(f"✓ Sparse densified aligned: {len(sparse_agg_dense)} rows, index 0..{len(sparse_agg_dense)-1}")
+        print(f"  After densification:")
+        print(f"    Total cells: {len(sparse_agg_dense)}")
+        print(f"    Empty cells: {sparse_agg_dense['r1050_median'].isna().sum()}")
+        print(f"    Cells with data: {sparse_agg_dense['r1050_median'].notna().sum()}")
+    else:
+        print(f"Sparse aggregate file not found: {sparse_agg_path}")
+else:
+    print(f"Sparse aggregate metadata not found: {sparse_agg_meta_path}")
+    print("Run the CLI script first: bash examples/cli_regrid_sample_50k.sh")
+```
+
+    Sparse aggregate metadata not found: ../test_data/derived/cli_quickstart/sample_50k_nside32_r1050_sparse_aggregate.meta.json
+    Run the CLI script first: bash examples/cli_regrid_sample_50k.sh
+
+### Load Dense Aggregated Map
+
+The dense map already includes all HEALPix cells (with NaN for empty
+cells).
+
+``` python
+# Load dense aggregate using metadata
+from healpyxel.metadata import HEALPyxelxMetadata
+
+dense_agg_meta_path = cli_output_dir / 'sample_50k_nside32_r1050_dense_aggregate.meta.json'
+if dense_agg_meta_path.exists():
+    # Read and validate metadata
+    with open(dense_agg_meta_path, 'r') as f:
+        dense_meta = json.load(f)
+    
+    # Validate metadata structure
+    dense_metadata = HEALPyxelxMetadata.from_dict(dense_meta)
+    print(f"Dense Aggregate Metadata validated:")
+    print(f"  File type: {dense_metadata.file_type}")
+    print(f"  HEALPix nside: {dense_metadata.nside}")
+    print(f"  HEALPix order: {dense_metadata.order}")
+    
+    # Extract output file path from metadata
+    dense_agg_path = Path(dense_meta['processing']['output_file'])
+    
+    if dense_agg_path.exists():
+        dense_agg = pd.read_parquet(dense_agg_path)
+        
+        print(f"\nDense Aggregated Map:")
+        print(f"  Shape: {dense_agg.shape}")
+        print(f"  Columns: {list(dense_agg.columns)}")
+        print(f"  Index name: {dense_agg.index.name}")
+        print(f"\n  Statistics:")
+        print(f"    Total cells: {len(dense_agg)}")
+        print(f"    Expected cells (12*nside²): {12 * 32**2} = 12,288")
+        print(f"    Empty cells: {dense_agg['r1050_median'].isna().sum()}")
+        print(f"    Cells with data: {dense_agg['r1050_median'].notna().sum()}")
+        
+        print(f"\n  First 10 rows (including empty cells):")
+        display(dense_agg.head(10))
+        
+        # Ensure dense_agg is also sorted and reindexed (should already be, but verify)
+        if dense_agg.index.name == 'healpix_id':
+            dense_agg = dense_agg.sort_index()
+        
+        assert len(dense_agg) == 12 * 32**2 and dense_agg.index.equals(pd.RangeIndex(0, 12*32**2)), \
+            "dense_agg alignment failed"
+
+        print(f"✓ Dense agg aligned: {len(dense_agg)} rows")
+
+        # Verify densification: compare with sparse densified version
+        if 'sparse_agg_dense' in locals():
+            # Compare non-NaN values
+            sparse_valid = sparse_agg_dense['r1050_median'].notna()
+            dense_valid = dense_agg['r1050_median'].notna()
+            
+            print(f"\n  Validation:")
+            print(f"    Densified sparse matches dense: {(sparse_valid == dense_valid).all()}")
+            if (sparse_valid == dense_valid).all():
+                # Check if values are identical
+                matching_cells = sparse_agg_dense.loc[sparse_valid, 'r1050_median'].values == dense_agg.loc[dense_valid, 'r1050_median'].values
+                print(f"    Values match: {matching_cells.all()}")
+    else:
+        print(f"Dense aggregate file not found: {dense_agg_path}")
+else:
+    print(f"Dense aggregate metadata not found: {dense_agg_meta_path}")
+    print("Run the CLI script first: bash examples/cli_regrid_sample_50k.sh")
+```
+
+    Dense aggregate metadata not found: ../test_data/derived/cli_quickstart/sample_50k_nside32_r1050_dense_aggregate.meta.json
+    Run the CLI script first: bash examples/cli_regrid_sample_50k.sh
+
+### Visualize CLI-Generated Maps
+
+Create HEALPix visualizations using the dense aggregated map from CLI.
+
+``` python
+if 'dense_agg' in locals() and 'sparse_agg_dense' in locals():
+    # Prepare HEALPix maps for visualization (both dense and sparse-densified)
+    from healpyxel.visualization import prepare_healpix_map
+    import healpy
+    import skyproj
+    
+    output_col = 'r1050_median'
+    nside_cli = 32
+    
+    # Prepare dense map
+    healpix_map_dense, valid_pix_dense, invalid_pix_dense, mappable_dense = prepare_healpix_map(
+        dense_agg.reset_index(),
+        output_column=output_col,
+        equalize=True,
+        percentile_cutoff=None,
+        cmap='Spectral_r'
+    )
+    healpix_map_dense[invalid_pix_dense] = healpy.UNSEEN
+    
+    # Prepare sparse-densified map
+    healpix_map_sparse, valid_pix_sparse, invalid_pix_sparse, mappable_sparse = prepare_healpix_map(
+        sparse_agg_dense,
+        output_column=output_col,
+        equalize=True,
+        percentile_cutoff=None,
+        cmap='Spectral_r'
+    )
+    healpix_map_sparse[invalid_pix_sparse] = healpy.UNSEEN
+    
+    print(f"Prepared HEALPix maps for comparison:")
+    print(f"  Dense map - Valid pixels: {valid_pix_dense.sum()}")
+    print(f"  Sparse (densified) map - Valid pixels: {valid_pix_sparse.sum()}")
+    print(f"  Maps are identical: {np.allclose(healpix_map_dense[valid_pix_dense], healpix_map_sparse[valid_pix_sparse], equal_nan=True)}")
+    
+    # Create visualization with 2 rows
+    fig, axes = plt.subplots(2, 1, figsize=(14, 10))
+    
+    # Top: Dense aggregate (CLI --densify)
+    sp_dense = skyproj.MollweideSkyproj(ax=axes[0], lon_0=-180, longitude_ticks='symmetric')
+    _ = sp_dense.draw_hpxmap(
+        healpix_map_dense,
+        nest=True,
+        cmap='Spectral_r',
+        zoom=True,
+    )
+    fig.colorbar(mappable_dense, ax=sp_dense.ax, orientation='vertical', label=output_col, fraction=0.046, pad=0.04)
+    sp_dense.ax.set_title(f'Dense Aggregate (CLI --densify) — nside={nside_cli}')
+    
+    # Bottom: Sparse aggregate (manually densified)
+    sp_sparse = skyproj.MollweideSkyproj(ax=axes[1], lon_0=-180, longitude_ticks='symmetric')
+    _ = sp_sparse.draw_hpxmap(
+        healpix_map_sparse,
+        nest=True,
+        cmap='Spectral_r',
+        zoom=True,
+    )
+    fig.colorbar(mappable_sparse, ax=sp_sparse.ax, orientation='vertical', label=output_col, fraction=0.046, pad=0.04)
+    sp_sparse.ax.set_title(f'Sparse Aggregate (manually densified) — nside={nside_cli}')
+    
+    plt.suptitle(f'CLI-Generated HEALPix Maps Comparison: {output_col}', y=0.98)
+    plt.tight_layout()
+else:
+    print("Dense and/or sparse aggregate not loaded. Run CLI script first.")
+```
+
+    Dense and/or sparse aggregate not loaded. Run CLI script first.

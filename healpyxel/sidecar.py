@@ -479,7 +479,7 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                         ) -> pd.DataFrame:
     """Process a single dask partition (GeoDataFrame) and return DataFrame of assignments.
 
-    The returned DataFrame has columns ['source_id', 'healpix_id'] and one row per assignment
+    The returned D/ataFrame has columns ['source_id', 'healpix_id'] and one row per assignment
     (for strict mode: at most one row per source_id; for fuzzy mode: one row per touched healpix cell).
     
     Args:
@@ -799,8 +799,8 @@ def write_sidecar_metadata(output_path: Path, input_path: Path, nside: int, mode
         Path to the written metadata file
     """
     from datetime import datetime
-    import json
-    
+    from healpyxel.metadata import HEALPyxelxMetadata
+
     metadata = {
         'processing': {
             'stage': 'sidecar',
@@ -830,14 +830,9 @@ def write_sidecar_metadata(output_path: Path, input_path: Path, nside: int, mode
             'psf_normalize': not getattr(args, 'no_psf_normalize', False)
         }
     }
-    
-    # Write metadata to JSON
-    metadata_path = output_path.with_suffix('.meta.json')
-    with open(metadata_path, 'w') as f:
-        json.dump(metadata, f, indent=2)
-    
-    return metadata_path
-    
+
+    return HEALPyxelxMetadata.write_json(metadata, output_path, validate=True)
+
 
 # %% ../nbs/01_sidecar.ipynb 11
 def validate_nside(nside: int) -> bool:

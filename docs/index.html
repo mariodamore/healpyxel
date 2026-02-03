@@ -306,7 +306,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#python-api" id="toc-python-api" class="nav-link" data-scroll-target="#python-api">Python API</a></li>
   <li><a href="#documentation" id="toc-documentation" class="nav-link" data-scroll-target="#documentation">Documentation</a></li>
-  <li><a href="#developed-for-messengermascs" id="toc-developed-for-messengermascs" class="nav-link" data-scroll-target="#developed-for-messengermascs">Developed for MESSENGER/MASCS</a></li>
+  <li><a href="#developed-for-messengermascs" id="toc-developed-for-messengermascs" class="nav-link" data-scroll-target="#developed-for-messengermascs">Developed for MESSENGER/MASCS</a>
+  <ul class="collapse">
+  <li><a href="#useful-healpix-data-for-those-missions" id="toc-useful-healpix-data-for-those-missions" class="nav-link" data-scroll-target="#useful-healpix-data-for-those-missions">Useful Healpix data for those missions</a></li>
+  </ul></li>
   <li><a href="#license" id="toc-license" class="nav-link" data-scroll-target="#license">License</a></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mariodamore/healpyxel/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
@@ -433,6 +436,68 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Native resolution mosaics (sub-footprint sampling)</li>
 </ul>
 <p>While designed for MASCS, healpyxel is general-purpose and works with any planetary science dataset in GeoParquet format.</p>
+<section id="useful-healpix-data-for-those-missions" class="level3">
+<h3 class="anchored" data-anchor-id="useful-healpix-data-for-those-missions">Useful Healpix data for those missions</h3>
+<div id="7d27f9c7" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpy <span class="im">as</span> hp</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Mean planetary radii (km)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>R_MERCURY <span class="op">=</span> <span class="fl">2439.7</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>R_MOON <span class="op">=</span> <span class="fl">1737.4</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>R_VENUS <span class="op">=</span> <span class="fl">6051.8</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#| export</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>nsides <span class="op">=</span> <span class="dv">2</span> <span class="op">**</span> np.arange(<span class="dv">1</span>, <span class="dv">13</span>, dtype<span class="op">=</span>np.int64)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>npix <span class="op">=</span> hp.nside2npix(nsides)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>cell_ang_rad <span class="op">=</span> np.sqrt(<span class="dv">4</span> <span class="op">*</span> np.pi <span class="op">/</span> npix)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>cell_ang_deg <span class="op">=</span> np.degrees(cell_ang_rad)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>df_resolution <span class="op">=</span> pd.DataFrame({</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nside"</span>: nsides,</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Number of Cells"</span>: npix,</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Cell Angular Size"</span>: cell_ang_deg,</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Mercury Cell Size"</span>: cell_ang_rad <span class="op">*</span> R_MERCURY,</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Moon Cell Size"</span>: cell_ang_rad <span class="op">*</span> R_MOON,</span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Venus Cell Size"</span>: cell_ang_rad <span class="op">*</span> R_VENUS,</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>})</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="co">#| export</span></span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> format_resolution_table(df: pd.DataFrame) <span class="op">-&gt;</span> pd.DataFrame:</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Return a copy of the resolution table with int columns formatted with thousand separators and floats rounded to 3 decimals."""</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>    df_fmt <span class="op">=</span> df.copy()</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>    int_cols <span class="op">=</span> df_fmt.select_dtypes(include<span class="op">=</span><span class="st">"int64"</span>).columns</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>    float_cols <span class="op">=</span> df_fmt.select_dtypes(include<span class="op">=</span><span class="st">"float64"</span>).columns</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> int_cols:</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        df_fmt[col] <span class="op">=</span> df_fmt[col].<span class="bu">map</span>(<span class="kw">lambda</span> x: <span class="ss">f"</span><span class="sc">{</span>x<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> col <span class="kw">in</span> float_cols:</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        df_fmt[col] <span class="op">=</span> df_fmt[col].<span class="bu">round</span>(<span class="dv">3</span>)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> df_fmt.set_index(<span class="st">"nside"</span>)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Test: Ensure formatting is correct</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>fmt <span class="op">=</span> format_resolution_table(df_resolution)</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(format_resolution_table(df_resolution).to_markdown()</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>| nside   | Number of Cells   |   Cell Angular Size |   Mercury Cell Size |   Moon Cell Size |   Venus Cell Size |
+|:--------|:------------------|--------------------:|--------------------:|-----------------:|------------------:|
+| 2       | 48                |              29.316 |            1248.31  |          888.964 |          3096.48  |
+| 4       | 192               |              14.658 |             624.153 |          444.482 |          1548.24  |
+| 8       | 768               |               7.329 |             312.076 |          222.241 |           774.121 |
+| 16      | 3,072             |               3.665 |             156.038 |          111.12  |           387.061 |
+| 32      | 12,288            |               1.832 |              78.019 |           55.56  |           193.53  |
+| 64      | 49,152            |               0.916 |              39.01  |           27.78  |            96.765 |
+| 128     | 196,608           |               0.458 |              19.505 |           13.89  |            48.383 |
+| 256     | 786,432           |               0.229 |               9.752 |            6.945 |            24.191 |
+| 512     | 3,145,728         |               0.115 |               4.876 |            3.473 |            12.096 |
+| 1,024   | 12,582,912        |               0.057 |               2.438 |            1.736 |             6.048 |
+| 2,048   | 50,331,648        |               0.029 |               1.219 |            0.868 |             3.024 |
+| 4,096   | 201,326,592       |               0.014 |               0.61  |            0.434 |             1.512 |</code></pre>
+</div>
+</div>
+</section>
 </section>
 <section id="license" class="level2">
 <h2 class="anchored" data-anchor-id="license">License</h2>

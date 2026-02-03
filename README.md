@@ -110,6 +110,67 @@ handles:
 While designed for MASCS, healpyxel is general-purpose and works with
 any planetary science dataset in GeoParquet format.
 
+### Useful Healpix data for those missions
+
+``` python
+import healpy as hp
+import pandas as pd
+import numpy as np
+
+# Mean planetary radii (km)
+R_MERCURY = 2439.7
+R_MOON = 1737.4
+R_VENUS = 6051.8
+
+#| export
+nsides = 2 ** np.arange(1, 13, dtype=np.int64)
+npix = hp.nside2npix(nsides)
+cell_ang_rad = np.sqrt(4 * np.pi / npix)
+cell_ang_deg = np.degrees(cell_ang_rad)
+
+df_resolution = pd.DataFrame({
+    "nside": nsides,
+    "Number of Cells": npix,
+    "Cell Angular Size": cell_ang_deg,
+    "Mercury Cell Size": cell_ang_rad * R_MERCURY,
+    "Moon Cell Size": cell_ang_rad * R_MOON,
+    "Venus Cell Size": cell_ang_rad * R_VENUS,
+})
+
+#| export
+def format_resolution_table(df: pd.DataFrame) -> pd.DataFrame:
+    """Return a copy of the resolution table with int columns formatted with thousand separators and floats rounded to 3 decimals."""
+    df_fmt = df.copy()
+    int_cols = df_fmt.select_dtypes(include="int64").columns
+    float_cols = df_fmt.select_dtypes(include="float64").columns
+    for col in int_cols:
+        df_fmt[col] = df_fmt[col].map(lambda x: f"{x:,}")
+    for col in float_cols:
+        df_fmt[col] = df_fmt[col].round(3)
+    return df_fmt.set_index("nside")
+
+# Test: Ensure formatting is correct
+fmt = format_resolution_table(df_resolution)
+
+print(format_resolution_table(df_resolution).to_markdown()
+)
+```
+
+    | nside   | Number of Cells   |   Cell Angular Size |   Mercury Cell Size |   Moon Cell Size |   Venus Cell Size |
+    |:--------|:------------------|--------------------:|--------------------:|-----------------:|------------------:|
+    | 2       | 48                |              29.316 |            1248.31  |          888.964 |          3096.48  |
+    | 4       | 192               |              14.658 |             624.153 |          444.482 |          1548.24  |
+    | 8       | 768               |               7.329 |             312.076 |          222.241 |           774.121 |
+    | 16      | 3,072             |               3.665 |             156.038 |          111.12  |           387.061 |
+    | 32      | 12,288            |               1.832 |              78.019 |           55.56  |           193.53  |
+    | 64      | 49,152            |               0.916 |              39.01  |           27.78  |            96.765 |
+    | 128     | 196,608           |               0.458 |              19.505 |           13.89  |            48.383 |
+    | 256     | 786,432           |               0.229 |               9.752 |            6.945 |            24.191 |
+    | 512     | 3,145,728         |               0.115 |               4.876 |            3.473 |            12.096 |
+    | 1,024   | 12,582,912        |               0.057 |               2.438 |            1.736 |             6.048 |
+    | 2,048   | 50,331,648        |               0.029 |               1.219 |            0.868 |             3.024 |
+    | 4,096   | 201,326,592       |               0.014 |               0.61  |            0.434 |             1.512 |
+
 ## License
 
 Apache 2.0

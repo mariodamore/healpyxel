@@ -6,8 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
+<meta name="description" content="HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet">
 
-<title>Healpyxel - Generate HEALPix sidecar</title>
+<title>Healpyxel - Geospatial</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,6 +20,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -72,11 +107,11 @@ ul.task-list li input[type="checkbox"] {
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="Healpyxel - Generate HEALPix sidecar">
-<meta property="og:description" content="HEALPix-based spatial aggregation for planetary science data">
+<meta property="og:title" content="Healpyxel - Geospatial">
+<meta property="og:description" content="HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet">
 <meta property="og:site_name" content="Healpyxel">
-<meta name="twitter:title" content="Healpyxel - Generate HEALPix sidecar">
-<meta name="twitter:description" content="HEALPix-based spatial aggregation for planetary science data">
+<meta name="twitter:title" content="Healpyxel - Geospatial">
+<meta name="twitter:description" content="HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -132,7 +167,7 @@ ul.task-list li input[type="checkbox"] {
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00_setup.html">Core Concepts</a></li><li class="breadcrumb-item"><a href="./cli.html">Generate HEALPix sidecar</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">Geospatial</li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -157,13 +192,13 @@ ul.task-list li input[type="checkbox"] {
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true">
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false">
  <span class="menu-text">Core Concepts</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="true" aria-label="Toggle section">
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" aria-expanded="false" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
-      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./00_setup.html" class="sidebar-item-text sidebar-link">
@@ -196,7 +231,7 @@ ul.task-list li input[type="checkbox"] {
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./cli.html" class="sidebar-item-text sidebar-link active">
+  <a href="./cli.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Generate HEALPix sidecar</span></a>
   </div>
 </li>
@@ -259,23 +294,33 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#to_geoparquet_cli" id="toc-to_geoparquet_cli" class="nav-link active" data-scroll-target="#to_geoparquet_cli">to_geoparquet_cli</a></li>
-  <li><a href="#finalize_cli" id="toc-finalize_cli" class="nav-link" data-scroll-target="#finalize_cli">finalize_cli</a></li>
-  <li><a href="#accumulator_cli" id="toc-accumulator_cli" class="nav-link" data-scroll-target="#accumulator_cli">accumulator_cli</a></li>
-  <li><a href="#aggregate_cli" id="toc-aggregate_cli" class="nav-link" data-scroll-target="#aggregate_cli">aggregate_cli</a></li>
-  <li><a href="#sidecar_cli" id="toc-sidecar_cli" class="nav-link" data-scroll-target="#sidecar_cli">sidecar_cli</a></li>
-  <li><a href="#cli-entry-points" id="toc-cli-entry-points" class="nav-link" data-scroll-target="#cli-entry-points">CLI Entry Points</a></li>
+  <li><a href="#core-helpers" id="toc-core-helpers" class="nav-link active" data-scroll-target="#core-helpers">Core helpers</a></li>
+  <li><a href="#polygon-creation-and-antimeridian-handling" id="toc-polygon-creation-and-antimeridian-handling" class="nav-link" data-scroll-target="#polygon-creation-and-antimeridian-handling">Polygon creation and antimeridian handling</a></li>
+  <li><a href="#main-api-build-geodataframe-and-save-geoparquet" id="toc-main-api-build-geodataframe-and-save-geoparquet" class="nav-link" data-scroll-target="#main-api-build-geodataframe-and-save-geoparquet">Main API: build GeoDataFrame and save geoparquet</a>
+  <ul class="collapse">
+  <li><a href="#healpix_to_geodataframe" id="toc-healpix_to_geodataframe" class="nav-link" data-scroll-target="#healpix_to_geodataframe">healpix_to_geodataframe</a></li>
+  <li><a href="#save_healpix_to_geoparquet" id="toc-save_healpix_to_geoparquet" class="nav-link" data-scroll-target="#save_healpix_to_geoparquet">save_healpix_to_geoparquet</a></li>
+  </ul></li>
+  <li><a href="#quick-test" id="toc-quick-test" class="nav-link" data-scroll-target="#quick-test">Quick test</a>
+  <ul class="collapse">
+  <li><a href="#main" id="toc-main" class="nav-link" data-scroll-target="#main">main</a></li>
+  </ul></li>
   </ul>
-<div class="toc-actions"><ul><li><a href="https://github.com/mariodamore/healpyxel/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="cli.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
+<div class="toc-actions"><ul><li><a href="https://github.com/mariodamore/healpyxel/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="geospatial.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content column-body" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00_setup.html">Core Concepts</a></li><li class="breadcrumb-item"><a href="./cli.html">Generate HEALPix sidecar</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Generate HEALPix sidecar</h1>
+<h1 class="title">Geospatial</h1>
 </div>
 
+<div>
+  <div class="description">
+    HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet
+  </div>
+</div>
 
 
 <div class="quarto-title-meta column-body">
@@ -291,51 +336,150 @@ ul.task-list li input[type="checkbox"] {
 
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<div id="1b514e71" class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Debug: test healpy.boundaries shape</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpy <span class="im">as</span> hp</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>nside_test <span class="op">=</span> <span class="dv">32</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>pixels_test <span class="op">=</span> np.arange(<span class="dv">12</span> <span class="op">*</span> nside_test<span class="op">**</span><span class="dv">2</span>, dtype<span class="op">=</span><span class="bu">int</span>)[:<span class="dv">5</span>]  <span class="co"># First 5 pixels</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Testing with nside=</span><span class="sc">{</span>nside_test<span class="sc">}</span><span class="ss">, pixels shape: </span><span class="sc">{</span>pixels_test<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Pixels: </span><span class="sc">{</span>pixels_test<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>xyz <span class="op">=</span> hp.boundaries(nside_test, pixels_test, step<span class="op">=</span><span class="dv">1</span>, nest<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">xyz shape from hp.boundaries: </span><span class="sc">{</span>xyz<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected: (3, 4, </span><span class="sc">{</span><span class="bu">len</span>(pixels_test)<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>x, y, z <span class="op">=</span> xyz[<span class="dv">0</span>], xyz[<span class="dv">1</span>], xyz[<span class="dv">2</span>]</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">x shape: </span><span class="sc">{</span>x<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"y shape: </span><span class="sc">{</span>y<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)  </span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"z shape: </span><span class="sc">{</span>z<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Testing with nside=32, pixels shape: (5,)
+Pixels: [0 1 2 3 4]
+
+xyz shape from hp.boundaries: (5, 3, 4)
+Expected: (3, 4, 5)
+
+x shape: (3, 4)
+y shape: (3, 4)
+z shape: (3, 4)</code></pre>
+</div>
+</div>
+<section id="core-helpers" class="level2">
+<h2 class="anchored" data-anchor-id="core-helpers">Core helpers</h2>
+</section>
+<section id="polygon-creation-and-antimeridian-handling" class="level2">
+<h2 class="anchored" data-anchor-id="polygon-creation-and-antimeridian-handling">Polygon creation and antimeridian handling</h2>
+</section>
+<section id="main-api-build-geodataframe-and-save-geoparquet" class="level2">
+<h2 class="anchored" data-anchor-id="main-api-build-geodataframe-and-save-geoparquet">Main API: build GeoDataFrame and save geoparquet</h2>
 <hr>
-<section id="to_geoparquet_cli" class="level3">
-<h3 class="anchored" data-anchor-id="to_geoparquet_cli">to_geoparquet_cli</h3>
+<section id="healpix_to_geodataframe" class="level3">
+<h3 class="anchored" data-anchor-id="healpix_to_geodataframe">healpix_to_geodataframe</h3>
 <blockquote class="blockquote">
-<pre><code> to_geoparquet_cli ()</code></pre>
+<pre><code> healpix_to_geodataframe (nside:int, order:str='nested',
+                          lon_convention:str='0_360',
+                          pixels:Optional[Iterable[int]]=None,
+                          fix_antimeridian:bool=True,
+                          chunk_size:int=65536)</code></pre>
 </blockquote>
-<p><em>CLI entry point for healpyxel_to_geoparquet command.</em></p>
+<p>*Create a GeoDataFrame of HEALPix cell polygons.</p>
+<p>Args: nside: HEALPix nside order: ‘nested’ or ‘ring’ lon_convention: ‘0_360’ or ‘-180_180’ (affects polygon coordinates) pixels: optional iterable of pixel indices; default = all pixels fix_antimeridian: whether to call <code>antimeridian.fix_polygon</code> on polygons crossing the meridian chunk_size: number of pixels to process per chunk for memory control</p>
+<p>Returns: GeoDataFrame with columns: ‘healpix_id’ and ‘geometry’ (EPSG:4326)*</p>
 <hr>
 </section>
-<section id="finalize_cli" class="level3">
-<h3 class="anchored" data-anchor-id="finalize_cli">finalize_cli</h3>
+<section id="save_healpix_to_geoparquet" class="level3">
+<h3 class="anchored" data-anchor-id="save_healpix_to_geoparquet">save_healpix_to_geoparquet</h3>
 <blockquote class="blockquote">
-<pre><code> finalize_cli ()</code></pre>
+<pre><code> save_healpix_to_geoparquet (nside:int,
+                             output_path:Union[str,pathlib.Path],
+                             order:str='nested',
+                             lon_convention:str='0_360',
+                             fix_antimeridian:bool=True,
+                             chunk_size:int=65536,
+                             parquet_kwargs:Optional[dict]=None)</code></pre>
 </blockquote>
-<p><em>CLI entry point for healpix_finalize command.</em></p>
+<p>*Build HEALPix vector layer and save as GeoParquet. This will create a GeoParquet file containing one polygon per HEALPix cell. For large nsides consider increasing memory or using chunked processing.</p>
+<p>Args: nside: HEALPix nside output_path: path to output geoparquet file order: ‘nested’ or ‘ring’ lon_convention: ‘0_360’ or ‘-180_180’ fix_antimeridian: whether to fix antimeridian-wrapping chunk_size: pixels per chunk when building geometries parquet_kwargs: forwarded to <code>GeoDataFrame.to_parquet</code> Returns: Path to written file*</p>
+</section>
+</section>
+<section id="quick-test" class="level2">
+<h2 class="anchored" data-anchor-id="quick-test">Quick test</h2>
 <hr>
-</section>
-<section id="accumulator_cli" class="level3">
-<h3 class="anchored" data-anchor-id="accumulator_cli">accumulator_cli</h3>
+<section id="main" class="level3">
+<h3 class="anchored" data-anchor-id="main">main</h3>
 <blockquote class="blockquote">
-<pre><code> accumulator_cli ()</code></pre>
+<pre><code> main ()</code></pre>
 </blockquote>
-<p><em>CLI entry point for healpix_accumulator command.</em></p>
-<hr>
-</section>
-<section id="aggregate_cli" class="level3">
-<h3 class="anchored" data-anchor-id="aggregate_cli">aggregate_cli</h3>
-<blockquote class="blockquote">
-<pre><code> aggregate_cli ()</code></pre>
-</blockquote>
-<p><em>CLI entry point for healpix_aggregate command.</em></p>
-<hr>
-</section>
-<section id="sidecar_cli" class="level3">
-<h3 class="anchored" data-anchor-id="sidecar_cli">sidecar_cli</h3>
-<blockquote class="blockquote">
-<pre><code> sidecar_cli ()</code></pre>
-</blockquote>
-<p><em>CLI entry point for healpix_sidecar command.</em></p>
-</section>
-<section id="cli-entry-points" class="level2">
-<h2 class="anchored" data-anchor-id="cli-entry-points">CLI Entry Points</h2>
-<p>These functions are called when using the command-line tools: - <code>healpix_sidecar</code> → <code>sidecar_cli()</code> - <code>healpix_aggregate</code> → <code>aggregate_cli()</code> - <code>healpix_accumulator</code> → <code>accumulator_cli()</code> - <code>healpix_finalize</code> → <code>finalize_cli()</code> - <code>healpyxel_to_geoparquet</code> → <code>to_geoparquet_cli()</code></p>
+<p>*CLI entry point for healpyxel_to_geoparquet.</p>
+<p>Converts aggregate parquet output with HEALPix geometry to GeoParquet. Automatically infers nside from aggregate row count (dense mode) or filename (sparse mode).*</p>
+<div id="f2d7abe1" class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quick integration test using CLI-generated outputs</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co"># This will: find the dense aggregate from the CLI quickstart, infer nside,</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># build HEALPix geometries, join aggregated stats, and write a GeoParquet file.</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>cli_output_dir <span class="op">=</span> Path(<span class="st">'../test_data/derived/cli_quickstart'</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> cli_output_dir.exists():</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">'CLI output directory not found:'</span>, cli_output_dir)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prefer dense aggregate if available, fall back to sparse</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    dense_pattern <span class="op">=</span> <span class="st">'sample_50k_nside*_r1050_dense_aggregate.parquet'</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    sparse_pattern <span class="op">=</span> <span class="st">'sample_50k_nside*_r1050_sparse_aggregate.parquet'</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    dense_files <span class="op">=</span> <span class="bu">list</span>(cli_output_dir.glob(dense_pattern))</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    sparse_files <span class="op">=</span> <span class="bu">list</span>(cli_output_dir.glob(sparse_pattern))</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    agg_path <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dense_files:</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>        agg_path <span class="op">=</span> dense_files[<span class="dv">0</span>]</span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> sparse_files:</span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>        agg_path <span class="op">=</span> sparse_files[<span class="dv">0</span>]</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> agg_path <span class="kw">is</span> <span class="va">None</span>:</span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'No aggregate file found in CLI output; run examples/cli_regrid_sample_50k.sh'</span>)</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Using aggregate file:'</span>, agg_path)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>        agg <span class="op">=</span> pd.read_parquet(agg_path)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Ensure healpix_id is the index</span></span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'healpix_id'</span> <span class="kw">in</span> agg.columns <span class="kw">and</span> agg.index.name <span class="op">!=</span> <span class="st">'healpix_id'</span>:</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>            agg <span class="op">=</span> agg.set_index(<span class="st">'healpix_id'</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Infer nside from length where possible</span></span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>            inferred_nside <span class="op">=</span> hp.npix2nside(<span class="bu">len</span>(agg))</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>            <span class="co"># If sparse, try to extract nside from filename</span></span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a>            m <span class="op">=</span> re.search(<span class="vs">r'nside(\d+)'</span>, agg_path.name)</span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> m:</span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>                inferred_nside <span class="op">=</span> <span class="bu">int</span>(m.group(<span class="dv">1</span>))</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>                <span class="cf">raise</span> <span class="pp">RuntimeError</span>(<span class="st">'Unable to determine nside for '</span> <span class="op">+</span> <span class="bu">str</span>(agg_path))</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f'inferred nside = </span><span class="sc">{</span>inferred_nside<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Build geometries for this nside (may be expensive for large nsides)</span></span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>        gdf_cells <span class="op">=</span> healpix_to_geodataframe(inferred_nside, order<span class="op">=</span><span class="st">'nested'</span>, lon_convention<span class="op">=</span><span class="st">'0_360'</span>, fix_antimeridian<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f'Built cell geometry GeoDataFrame: </span><span class="sc">{</span><span class="bu">len</span>(gdf_cells)<span class="sc">}</span><span class="ss"> cells'</span>)</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Join aggregate stats into geometry frame</span></span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a>        <span class="co"># agg index = healpix_id; gdf index = healpix_id</span></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>        merged <span class="op">=</span> gdf_cells.join(agg, how<span class="op">=</span><span class="st">'left'</span>)</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>        out <span class="op">=</span> cli_output_dir <span class="op">/</span> <span class="ss">f'sample_50k_nside</span><span class="sc">{</span>inferred_nside<span class="sc">}</span><span class="ss">_r1050_geoparquet.geo.parquet'</span></span>
+<span id="cb6-52"><a href="#cb6-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> out.exists():</span>
+<span id="cb6-53"><a href="#cb6-53" aria-hidden="true" tabindex="-1"></a>            out.unlink()</span>
+<span id="cb6-54"><a href="#cb6-54" aria-hidden="true" tabindex="-1"></a>        merged.to_parquet(out, index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb6-55"><a href="#cb6-55" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Wrote GeoParquet:'</span>, out)</span>
+<span id="cb6-56"><a href="#cb6-56" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Basic assertions</span></span>
+<span id="cb6-57"><a href="#cb6-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">len</span>(merged) <span class="op">==</span> hp.nside2npix(inferred_nside)</span>
+<span id="cb6-58"><a href="#cb6-58" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">'Quick test passed: geometry layer has expected npix rows'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>CLI output directory not found: ../test_data/derived/cli_quickstart</code></pre>
+</div>
+</div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

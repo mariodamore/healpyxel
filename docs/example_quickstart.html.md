@@ -152,6 +152,63 @@ else:
     Sample data not found. Generate test data first:
       cd .. && bash create_test_data.sh
 
+## Create Sidecar for Sample Data (CLI)
+
+Below is a complete CLI regridding example that mirrors the notebook
+workflow using `sample_50k.parquet`, with `nside=32`. It writes outputs
+into a dedicated folder to keep the sidecar index stable.
+
+Save the script as `examples/cli_regrid_sample_50k.sh` and run it from
+the repo root:
+
+``` bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+INPUT="$ROOT_DIR/test_data/samples/sample_50k.parquet"
+OUT_DIR="$ROOT_DIR/test_data/derived/cli_quickstart"
+NSIDE=32
+MODE=fuzzy
+LON_CONVENTION=0_360
+
+mkdir -p "$OUT_DIR"
+
+# 1) Create HEALPix sidecar
+healpix_sidecar \
+  --input "$INPUT" \
+  --nside "$NSIDE" \
+  --mode "$MODE" \
+  --lon-convention "$LON_CONVENTION" \
+  --output_dir "$OUT_DIR"
+
+# 2) Aggregate (densified) regridded map
+healpix_aggregate \
+  --input "$INPUT" \
+  --sidecar-dir "$OUT_DIR" \
+  --sidecar-index 0 \
+  --aggregate \
+  --columns r1050 \
+  --aggs mean median std mad robust_std \
+  --min-count 1 \
+  --densify \
+  --output "$OUT_DIR/sample_50k_nside${NSIDE}_r1050_aggregate.parquet"
+```
+
+> If you want to aggregate a different column, replace `r1050` in the
+> script.
+
+``` python
+from pathlib import Path
+from healpyxel.sidecar import build_output_path
+
+assert build_output_path(
+    Path("sample_50k.parquet"),
+    mode="fuzzy",
+    nside=32,
+).name == "sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet"
+```
+
 ## Next Steps
 
 For more detailed examples, see:

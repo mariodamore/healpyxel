@@ -4,8 +4,8 @@
 
 # %% auto 0
 __all__ = ['logger', 'AGG_LOOKUP', 'generate_output_filename', 'extract_nside_from_filename', 'validate_sidecar_metadata',
-           'collect_sidecar_outputs', 'print_parquet_schema', 'print_sidecar_summary', 'print_dry_run_summary',
-           'densify_healpix_aggregates', 'aggregate_by_sidecar', 'parse_arguments', 'process_single_sidecar', 'main']
+           'collect_sidecar_outputs', 'print_dry_run_summary', 'densify_healpix_aggregates', 'aggregate_by_sidecar',
+           'parse_arguments', 'process_single_sidecar', 'main']
 
 # %% ../nbs/02_aggregate.ipynb 2
 #| eval: false
@@ -82,6 +82,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# %% ../nbs/02_aggregate.ipynb 3
+#| eval: false
 # Aggregation function lookup
 def _mad(arr: np.ndarray) -> float:
     """Compute Median Absolute Deviation."""
@@ -163,21 +165,33 @@ def extract_nside_from_filename(filename: str) -> Optional[int]:
     """
     Extract nside value from sidecar filename using regex.
     
+    Conservative: returns None if ambiguous or not found.
+    
     Args:
         filename: Sidecar filename string
         
     Returns:
-        nside value as integer, or None if not found
+        nside value as integer, or None if not found/ambiguous
         
     Example:
         extract_nside_from_filename("data.nside-128.parquet") -> 128
     """
-    match = re.search(r'nside[_-](\d+)', filename, re.IGNORECASE)
-    if match:
-        try:
-            return int(match.group(1))
-        except (ValueError, AttributeError):
-            return None
+    patterns = [
+        r"(?:^|[._-])nside[=_-](\d+)",
+        r"healpix[_-]nside[=_-](\d+)",
+    ]
+
+    values: set[int] = set()
+    for pat in patterns:
+        matches = re.findall(pat, filename, flags=re.IGNORECASE)
+        for m in matches:
+            try:
+                values.add(int(m))
+            except (ValueError, TypeError):
+                continue
+
+    if len(values) == 1:
+        return values.pop()
     return None
 
 
@@ -237,7 +251,8 @@ def validate_sidecar_metadata(
     
     return metadata
 
-
+# %% ../nbs/02_aggregate.ipynb 4
+#| eval: false
 def collect_sidecar_outputs(
     input_parquet: Path,
     output_dir: Path,
@@ -246,8 +261,8 @@ def collect_sidecar_outputs(
     """
     Scan output_dir for sidecar parquet files that match the input file stem.
     
-    Parses metadata from filenames with dot-separated segments and underscore-separated
-    key-value pairs (key-value format).
+    Prefer metadata from .meta.json; fall back to filename parsing if metadata
+    is missing or incomplete.
     
     Args:
         input_parquet: Path to the original parquet file
@@ -257,6 +272,8 @@ def collect_sidecar_outputs(
     Returns:
         DataFrame with columns: file, coalesced, mode, nside, order, n_rows, n_unique_healpix
     """
+    from healpyxel.metadata import HEALPyxelxMetadata
+
     stem = input_parquet.stem
     
     if not output_dir.exists():
@@ -272,53 +289,94 @@ def collect_sidecar_outputs(
         if not p.is_file():
             continue
         
-        name = p.name
-        # Ensure file starts with expected stem + '.'
-        if not name.startswith(f"{stem}."):
+        # Quick filter: skip files with -aggregated in filename
+        if "-aggregated" in p.name:
+            logger.debug(f"Skipping aggregate file: {p.name}")
             continue
         
-        logger.debug(f"Found sidecar candidate: {name}")
+        meta_json = None
+        metadata_path = p.with_suffix('.meta.json')
+        if metadata_path.exists():
+            try:
+                with open(metadata_path, 'r') as f:
+                    meta_json = json.load(f)
+            except Exception as e:
+                logger.warning(f"Could not parse metadata file for {p.name}: {e}")
+                meta_json = None
         
-        # Strip trailing ".parquet"
+        # Validate stage from metadata - only accept sidecars
+        if meta_json:
+            stage = meta_json.get('processing', {}).get('stage') or meta_json.get('file_type')
+            if stage and stage != 'sidecar':
+                logger.debug(f"Skipping non-sidecar file (stage={stage}): {p.name}")
+                continue
+        
+        # Decide if this sidecar belongs to the input file
+        if meta_json:
+            source_file = meta_json.get('processing', {}).get('source_file')
+            if source_file:
+                if Path(source_file).name != input_parquet.name:
+                    logger.debug(f"Skipping {p.name}: source_file mismatch")
+                    continue
+        else:
+            # Fallback to filename stem matching
+            if not p.name.startswith(f"{stem}."):
+                continue
+
+        logger.debug(f"Found sidecar candidate: {p.name}")
+
+        # Initialize row
+        out_row = {"file": str(p), "coalesced": True}
+
+        # Prefer metadata-derived HEALPix info
+        if meta_json:
+            try:
+                hp_meta = HEALPyxelxMetadata.from_dict(meta_json)
+                out_row["nside"] = hp_meta.nside
+                out_row["order"] = hp_meta.order
+                out_row["mode"] = hp_meta.mode
+            except Exception as e:
+                logger.debug(f"Could not parse HEALPix metadata for {p.name}: {e}")
+            
+            file_type = meta_json.get('file_type') or meta_json.get('processing', {}).get('stage')
+            if file_type:
+                out_row["file_type"] = file_type
+
+        # Fallback to filename parsing to fill missing values
+        name = p.name
         if name.lower().endswith(".parquet"):
             base = name[:-len(".parquet")]
         else:
             base = name
         
-        # Tail after the first dot
         tail = base[len(stem) + 1:] if len(base) > len(stem) else ""
-        if not tail:
-            continue
-        
-        meta = {}
-        # Split by '.' then groups by '_' and key/val by '-'
-        for seg in tail.split("."):
-            for group in seg.split("_"):
-                if "-" not in group:
-                    continue
-                k, v = group.split("-", 1)
-                if not k:
-                    continue
-                meta[k] = v
-        
-        # Normalize expected keys
-        out_row = {"file": str(p), "coalesced": True}
-        
-        # Map 'assignment' -> 'mode' for compatibility
-        if "assignment" in meta and "mode" not in meta:
-            out_row["mode"] = meta.pop("assignment")
-        
-        # Copy remaining meta
-        for k, v in meta.items():
-            out_row[k] = v
-        
+        if tail:
+            meta = {}
+            for seg in tail.split("."):
+                for group in seg.split("_"):
+                    if "-" not in group:
+                        continue
+                    k, v = group.split("-", 1)
+                    if not k:
+                        continue
+                    meta[k] = v
+            
+            # Map 'assignment' -> 'mode' for compatibility
+            if "assignment" in meta and "mode" not in meta:
+                meta["mode"] = meta.pop("assignment")
+
+            # Fill only missing fields
+            for k, v in meta.items():
+                if k not in out_row:
+                    out_row[k] = v
+
         # Cast nside to int if present
         if "nside" in out_row:
             try:
                 out_row["nside"] = int(out_row["nside"])
             except Exception:
                 pass
-        
+
         # Optional lightweight stats
         if read_stats:
             n_rows = None
@@ -371,74 +429,8 @@ def collect_sidecar_outputs(
     return df_out
 
 
-def print_parquet_schema(file_path: Path, show_metadata: bool = True) -> None:
-    """
-    Print the schema of a parquet file.
-    
-    Args:
-        file_path: Path to the parquet file
-        show_metadata: Whether to display file metadata
-    """
-    try:
-        pf = pq.ParquetFile(file_path)
-        schema = pf.schema_arrow
-        
-        print(f"\nSchema for: {file_path.name}")
-        print("-" * 80)
-        print(schema)
-        
-        if show_metadata:
-            metadata = pf.schema_arrow.metadata
-            if metadata:
-                print("\nFile Metadata:")
-                print("-" * 80)
-                for k, v in metadata.items():
-                    key_str = k.decode('utf-8') if isinstance(k, bytes) else str(k)
-                    val_str = v.decode('utf-8') if isinstance(v, bytes) else str(v)
-                    print(f"  {key_str}: {val_str}")
-    except Exception as e:
-        logger.error(f"Failed to read schema from {file_path}: {e}")
-
-
-def print_sidecar_summary(sidecars_df: pd.DataFrame, input_file: Path) -> None:
-    """
-    Print a formatted summary table of available sidecar files.
-    
-    Args:
-        sidecars_df: DataFrame from collect_sidecar_outputs()
-        input_file: Original input parquet file path
-    """
-    print(f"\nAvailable Sidecar Files for: {input_file.name}")
-    print("=" * 100)
-    
-    if len(sidecars_df) == 0:
-        print("  (none found)")
-        return
-    
-    # Display columns
-    display_cols = ['mode', 'nside', 'order']
-    if 'n_rows' in sidecars_df.columns:
-        display_cols.extend(['n_rows', 'n_unique_healpix'])
-    
-    # Format output
-    for idx, row in sidecars_df.iterrows():
-        filename = Path(row['file']).name
-        print(f"\n[{idx}] {filename}")
-        for col in display_cols:
-            if col in row:
-                val = row[col]
-                if pd.notna(val):
-                    if col in ('n_rows', 'n_unique_healpix'):
-                        print(f"    {col:20s}: {int(val):,}")
-                    else:
-                        print(f"    {col:20s}: {val}")
-    
-    print("\n" + "=" * 100)
-    print(f"Use --sidecar-index <INDEX> to select a specific sidecar (0-{len(sidecars_df)-1})")
-    print(f"Or use --sidecar-index all to process all sidecars in batch mode")
-    print()
-
-
+# %% ../nbs/02_aggregate.ipynb 5
+#| eval: false
 def print_dry_run_summary(
     input_file: Path,
     sidecar_path: Path,
@@ -472,6 +464,8 @@ def print_dry_run_summary(
     print("\n" + "=" * 80)
 
 
+# %% ../nbs/02_aggregate.ipynb 6
+#| eval: false
 def densify_healpix_aggregates(
     agg_sparse_df: pd.DataFrame,
     nside: int,
@@ -502,6 +496,8 @@ def densify_healpix_aggregates(
     return densified
 
 
+# %% ../nbs/02_aggregate.ipynb 7
+#| eval: false
 def aggregate_by_sidecar(
     original: pd.DataFrame,
     sidecar: pd.DataFrame,
@@ -861,7 +857,8 @@ Examples:
     
     return args
 
-
+# %% ../nbs/02_aggregate.ipynb 8
+#| eval: false
 def process_single_sidecar(
     input_file: Path,
     sidecar_path: Path,
@@ -1042,11 +1039,8 @@ def process_single_sidecar(
             logger.info("Densifying output to full HEALPix grid")
             nside_value = sidecars_df.iloc[sidecar_index].get('nside')
             if nside_value is None or pd.isna(nside_value):
-                # Try fallback: extract from filename
-                nside_value = extract_nside_from_filename(sidecar_path.name)
-                if nside_value is None:
-                    logger.error("Cannot densify: nside not found in sidecar metadata or filename")
-                    raise ValueError("nside required for densification")
+                logger.error("Cannot densify: nside not found in sidecar metadata")
+                raise ValueError("nside required for densification")
             agg_result = densify_healpix_aggregates(agg_result, int(nside_value))
         
         # Save output
@@ -1091,9 +1085,12 @@ def process_single_sidecar(
         agg_result.to_parquet(output_path, index=True)
         
         # Write metadata as separate JSON sidecar
-        metadata_path = output_path.with_suffix('.meta.json')
-        with open(metadata_path, 'w') as f:
-            json.dump(output_metadata, f, indent=2)
+        from healpyxel.metadata import HEALPyxelxMetadata
+        metadata_path = HEALPyxelxMetadata.write_json(
+            output_metadata,
+            output_path,
+            validate=False
+        )
         
         logger.info(f"Wrote metadata to {metadata_path}")
         logger.info(f"Successfully processed sidecar [{sidecar_index}]")
@@ -1111,7 +1108,8 @@ def process_single_sidecar(
     
     return result
 
-
+# %% ../nbs/02_aggregate.ipynb 9
+#| eval: false
 def main():
     """Main entry point for the aggregation CLI."""
     args = parse_arguments()

@@ -77,6 +77,7 @@ else:
     Contents:
       README.md: 0.00 MB
       batches/: 10 files
+      derived/: 1 files
       regions/: 0 files
       samples/: 3 files
       validation/: 2 files
@@ -286,8 +287,8 @@ x = np.linspace(-3* cell_radius, 3*cell_radius, 200)
 plt.figure(figsize=(15,4))
 plt.plot(x, cell_psf(x, 0), label='PSF along dy=0')
 # put vertical lines at +/- cell_diameter
-plt.axvline(cell_diameter, color='r', linestyle='--', label='Cell Diameter ')
-plt.axvline(-cell_diameter, color='r', linestyle='--')
+plt.axvline(cell_radius, color='r', linestyle='--', label='Cell Diameter ')
+plt.axvline(-cell_radius, color='r', linestyle='--')
 plt.title('Gaussian PSF 1D cross-section')
 plt.xlabel('dx')
 plt.ylabel('PSF Value')
@@ -313,7 +314,7 @@ processed_partition = process_partition(
 print(processed_partition.describe())
 ```
 
-    2025-12-18 17:38:39,945 INFO Partition (lon_convention=0_360): processed 3029 geometries, dropped 2 (0.1%) total [pre-filter: 2, post-processing: 0]
+    2026-02-03 13:20:07,357 INFO Partition (lon_convention=0_360): processed 3029 geometries, dropped 2 (0.1%) total [pre-filter: 2, post-processing: 0]
 
              source_id   healpix_id       weight
     count  3539.000000       3539.0  3539.000000
@@ -409,7 +410,7 @@ processed_partition.groupby('healpix_id').agg(len)[['weight']].sort_values(by='w
 processed_partition.groupby('healpix_id').agg(sum)[['weight']].sort_values(by='weight', ascending=False).head(10)
 ```
 
-    /tmp/ipykernel_3388075/3028256981.py:1: FutureWarning: The provided callable <built-in function sum> is currently using DataFrameGroupBy.sum. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "sum" instead.
+    /tmp/ipykernel_3508251/3028256981.py:1: FutureWarning: The provided callable <built-in function sum> is currently using DataFrameGroupBy.sum. In a future version of pandas, the provided callable will be used directly. To keep current behavior pass the string "sum" instead.
       processed_partition.groupby('healpix_id').agg(sum)[['weight']].sort_values(by='weight', ascending=False).head(10)
 
 <div>

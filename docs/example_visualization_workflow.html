@@ -308,6 +308,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#healpix-metadata" id="toc-healpix-metadata" class="nav-link" data-scroll-target="#healpix-metadata">HEALPix Metadata</a></li>
   </ul></li>
   <li><a href="#visualize-healpix-map" id="toc-visualize-healpix-map" class="nav-link" data-scroll-target="#visualize-healpix-map">Visualize HEALPix Map</a></li>
+  <li><a href="#generate-data-in-cli-and-visualize" id="toc-generate-data-in-cli-and-visualize" class="nav-link" data-scroll-target="#generate-data-in-cli-and-visualize">Generate data in CLI and Visualize</a>
+  <ul class="collapse">
+  <li><a href="#load-cli-generated-products" id="toc-load-cli-generated-products" class="nav-link" data-scroll-target="#load-cli-generated-products">Load CLI-Generated Products</a></li>
+  <li><a href="#load-sparse-aggregated-map" id="toc-load-sparse-aggregated-map" class="nav-link" data-scroll-target="#load-sparse-aggregated-map">Load Sparse Aggregated Map</a></li>
+  <li><a href="#load-dense-aggregated-map" id="toc-load-dense-aggregated-map" class="nav-link" data-scroll-target="#load-dense-aggregated-map">Load Dense Aggregated Map</a></li>
+  <li><a href="#visualize-cli-generated-maps" id="toc-visualize-cli-generated-maps" class="nav-link" data-scroll-target="#visualize-cli-generated-maps">Visualize CLI-Generated Maps</a></li>
+  </ul></li>
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/mariodamore/healpyxel/issues/new" class="toc-action"><i class="bi bi-github"></i>Report an issue</a></li></ul></div><div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="example_visualization_workflow.html.md"><i class="bi bi-file-code"></i>CommonMark</a></li></ul></div></nav>
     </div>
@@ -379,9 +386,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 Contents:
   README.md: 0.00 MB
-  batches/: 11 files
+  batches/: 10 files
+  derived/: 1 files
   regions/: 0 files
-  samples/: 4 files
+  samples/: 3 files
   validation/: 2 files</code></pre>
 </div>
 </div>
@@ -453,55 +461,55 @@ First few rows:</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>1221107223201068</td>
+<td>1310408274001158</td>
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>2</td>
+<td>1</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>5.927996</td>
-<td>59.658302</td>
-<td>1901453.4</td>
-<td>884.02386</td>
-<td>2738.6200</td>
-<td>25.221247</td>
-<td>52.641087</td>
-<td>77.85977</td>
-<td>129.176030</td>
+<td>5.186568</td>
+<td>272.40450</td>
+<td>1567133.40</td>
+<td>1006.63727</td>
+<td>1982.1799</td>
+<td>43.049232</td>
+<td>34.814793</td>
+<td>77.85916</td>
+<td>109.019295</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>1124821221900340</td>
+<td>1335313413800913</td>
 <td>0</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>0.317725</td>
-<td>303.638760</td>
-<td>1062135.2</td>
-<td>599.24713</td>
-<td>2256.7527</td>
-<td>56.044827</td>
-<td>21.791897</td>
-<td>77.82958</td>
-<td>97.918365</td>
-<td>b"\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
+<td>-60.939438</td>
+<td>71.77686</td>
+<td>13564574.00</td>
+<td>4064.49850</td>
+<td>4249.2210</td>
+<td>64.178116</td>
+<td>37.690910</td>
+<td>101.84035</td>
+<td>111.930336</td>
+<td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>1221902412000176</td>
+<td>1224306405800836</td>
 <td>0</td>
 <td>2</td>
 <td>2</td>
@@ -512,44 +520,44 @@ First few rows:</code></pre>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>-68.457260</td>
-<td>23.021687</td>
-<td>22254792.0</td>
-<td>4192.15530</td>
-<td>6759.2153</td>
-<td>68.652030</td>
-<td>33.230824</td>
-<td>101.83984</td>
-<td>107.450775</td>
+<td>5.613894</td>
+<td>54.23045</td>
+<td>1755143.50</td>
+<td>1013.51886</td>
+<td>2204.9104</td>
+<td>53.815990</td>
+<td>24.053764</td>
+<td>77.86254</td>
+<td>99.559425</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>1308423281701252</td>
+<td>1421301274400732</td>
 <td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>1</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>6.530286</td>
-<td>240.178450</td>
-<td>1333903.5</td>
-<td>859.48000</td>
-<td>1976.0538</td>
-<td>53.991188</td>
-<td>23.853260</td>
-<td>77.83787</td>
-<td>99.408930</td>
+<td>-41.672714</td>
+<td>324.49740</td>
+<td>23309360.00</td>
+<td>6511.20950</td>
+<td>4558.0470</td>
+<td>52.841824</td>
+<td>46.625698</td>
+<td>99.40995</td>
+<td>121.833626</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>1334901094500334</td>
+<td>1310308273500668</td>
 <td>0</td>
 <td>0</td>
 <td>0</td>
@@ -560,15 +568,15 @@ First few rows:</code></pre>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>3.555044</td>
-<td>51.978970</td>
-<td>1012146.3</td>
-<td>604.04944</td>
-<td>2133.4424</td>
-<td>61.469143</td>
-<td>16.375393</td>
-<td>77.83818</td>
-<td>94.556915</td>
+<td>26.975400</td>
+<td>284.81708</td>
+<td>905292.56</td>
+<td>480.38028</td>
+<td>2399.4622</td>
+<td>56.780300</td>
+<td>21.083624</td>
+<td>77.85945</td>
+<td>97.433360</td>
 <td>b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00...</td>
 </tr>
 </tbody>
@@ -643,40 +651,84 @@ First few rows:</code></pre>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>samples/sample_50k.parquet</td>
-<td>18.907251</td>
+<td>18.891136</td>
 <td>50000</td>
-<td>-75.011170</td>
-<td>74.860380</td>
-<td>0.023469</td>
-<td>359.96622</td>
+<td>-74.986440</td>
+<td>74.946884</td>
+<td>0.020273</td>
+<td>359.96555</td>
 <td>sample_50k</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>samples/sample_5k.parquet</td>
-<td>1.938233</td>
+<td>1.941895</td>
 <td>5000</td>
-<td>-74.987915</td>
-<td>74.925750</td>
-<td>0.068102</td>
-<td>359.82980</td>
+<td>-74.954390</td>
+<td>74.846540</td>
+<td>0.274960</td>
+<td>359.80890</td>
 <td>sample_5k</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>samples/sample_25k.parquet</td>
-<td>9.599403</td>
+<td>9.614980</td>
 <td>25000</td>
-<td>-74.999180</td>
-<td>74.782600</td>
-<td>0.044146</td>
-<td>359.95227</td>
+<td>-74.934560</td>
+<td>74.767715</td>
+<td>0.057941</td>
+<td>359.97324</td>
 <td>sample_25k</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
+<td>derived/cli_quickstart/sample_50k.cell-healpix...</td>
+<td>0.430335</td>
+<td>54931</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k.cell-healpix_assignment-fuzzy_nside...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>derived/cli_quickstart/sample_50k-aggregated.c...</td>
+<td>0.552613</td>
+<td>12288</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k-aggregated.cell-healpix_assignment-...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>derived/cli_quickstart/sample_50k-aggregated.c...</td>
+<td>1.302203</td>
+<td>49152</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k-aggregated.cell-healpix_assignment-...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>derived/cli_quickstart/sample_50k.cell-healpix...</td>
+<td>0.525922</td>
+<td>59592</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>sample_50k.cell-healpix_assignment-fuzzy_nside...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
 <td>validation/high_quality_subset.parquet</td>
-<td>9.039520</td>
+<td>9.039313</td>
 <td>25121</td>
 <td>-74.992330</td>
 <td>74.683150</td>
@@ -685,9 +737,9 @@ First few rows:</code></pre>
 <td>high_quality_subset</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
+<td data-quarto-table-cell-role="th">8</td>
 <td>validation/combined_batch_001_003.parquet</td>
-<td>3.963549</td>
+<td>3.963343</td>
 <td>10890</td>
 <td>-74.627014</td>
 <td>74.447170</td>
@@ -696,9 +748,9 @@ First few rows:</code></pre>
 <td>combined_batch_001_003</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
+<td data-quarto-table-cell-role="th">9</td>
 <td>batches/batch_009.parquet</td>
-<td>1.613872</td>
+<td>1.613665</td>
 <td>4417</td>
 <td>-74.822310</td>
 <td>74.647300</td>
@@ -707,9 +759,9 @@ First few rows:</code></pre>
 <td>batch_009</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
+<td data-quarto-table-cell-role="th">10</td>
 <td>batches/batch_003.parquet</td>
-<td>1.373711</td>
+<td>1.373512</td>
 <td>3734</td>
 <td>-73.450960</td>
 <td>74.447170</td>
@@ -718,9 +770,9 @@ First few rows:</code></pre>
 <td>batch_003</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
+<td data-quarto-table-cell-role="th">11</td>
 <td>batches/batch_007.parquet</td>
-<td>1.530560</td>
+<td>1.530362</td>
 <td>4174</td>
 <td>-73.332790</td>
 <td>74.656006</td>
@@ -729,9 +781,9 @@ First few rows:</code></pre>
 <td>batch_007</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
+<td data-quarto-table-cell-role="th">12</td>
 <td>batches/batch_010.parquet</td>
-<td>1.800152</td>
+<td>1.799953</td>
 <td>4931</td>
 <td>-74.797844</td>
 <td>74.683150</td>
@@ -740,9 +792,9 @@ First few rows:</code></pre>
 <td>batch_010</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
+<td data-quarto-table-cell-role="th">13</td>
 <td>batches/batch_004.parquet</td>
-<td>1.463713</td>
+<td>1.463505</td>
 <td>3990</td>
 <td>-74.927130</td>
 <td>74.425640</td>
@@ -751,9 +803,9 @@ First few rows:</code></pre>
 <td>batch_004</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">10</td>
+<td data-quarto-table-cell-role="th">14</td>
 <td>batches/batch_006.parquet</td>
-<td>1.425115</td>
+<td>1.424916</td>
 <td>3885</td>
 <td>-74.992330</td>
 <td>74.492300</td>
@@ -762,9 +814,9 @@ First few rows:</code></pre>
 <td>batch_006</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">11</td>
+<td data-quarto-table-cell-role="th">15</td>
 <td>batches/batch_008.parquet</td>
-<td>1.636130</td>
+<td>1.635924</td>
 <td>4482</td>
 <td>-74.920740</td>
 <td>74.619770</td>
@@ -773,9 +825,9 @@ First few rows:</code></pre>
 <td>batch_008</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">12</td>
+<td data-quarto-table-cell-role="th">16</td>
 <td>batches/batch_001.parquet</td>
-<td>1.117720</td>
+<td>1.117513</td>
 <td>3029</td>
 <td>-74.627014</td>
 <td>74.381710</td>
@@ -784,9 +836,9 @@ First few rows:</code></pre>
 <td>batch_001</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">13</td>
+<td data-quarto-table-cell-role="th">17</td>
 <td>batches/batch_005.parquet</td>
-<td>1.655594</td>
+<td>1.655387</td>
 <td>4502</td>
 <td>-74.632195</td>
 <td>74.596970</td>
@@ -795,9 +847,9 @@ First few rows:</code></pre>
 <td>batch_005</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">14</td>
+<td data-quarto-table-cell-role="th">18</td>
 <td>batches/batch_002.parquet</td>
-<td>1.513315</td>
+<td>1.513108</td>
 <td>4127</td>
 <td>-73.357796</td>
 <td>74.422920</td>
@@ -887,7 +939,6 @@ Loaded 50000 rows
 Columns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'geometry']
 
 Converting WKB geometry to GeoDataFrame...
-CRS: EPSG:4326
 CRS: EPSG:4326</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -924,55 +975,55 @@ CRS: EPSG:4326</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>1221107223201068</td>
+<td>1310408274001158</td>
 <td>0</td>
 <td>1</td>
 <td>1</td>
-<td>2</td>
+<td>1</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>5.927996</td>
-<td>59.658302</td>
-<td>1901453.4</td>
-<td>884.02386</td>
-<td>2738.6200</td>
-<td>25.221247</td>
-<td>52.641087</td>
-<td>77.85977</td>
-<td>129.176030</td>
-<td>POLYGON ((59.63697 5.9037, 59.66616 5.92117, 5...</td>
+<td>5.186568</td>
+<td>272.40450</td>
+<td>1567133.4</td>
+<td>1006.63727</td>
+<td>1982.1799</td>
+<td>43.049232</td>
+<td>34.814793</td>
+<td>77.85916</td>
+<td>109.019295</td>
+<td>POLYGON ((272.39758 5.16433, 272.41583 5.18307...</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>1124821221900340</td>
+<td>1335313413800913</td>
 <td>0</td>
-<td>1</td>
-<td>1</td>
-<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
 <td>9</td>
 <td>1</td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>0.317725</td>
-<td>303.638760</td>
-<td>1062135.2</td>
-<td>599.24713</td>
-<td>2256.7527</td>
-<td>56.044827</td>
-<td>21.791897</td>
-<td>77.82958</td>
-<td>97.918365</td>
-<td>POLYGON ((303.6493 0.29339, 303.64523 0.32052,...</td>
+<td>-60.939438</td>
+<td>71.77686</td>
+<td>13564574.0</td>
+<td>4064.49850</td>
+<td>4249.2210</td>
+<td>64.178116</td>
+<td>37.690910</td>
+<td>101.84035</td>
+<td>111.930336</td>
+<td>POLYGON ((71.72596 -60.89612, 71.69186 -60.963...</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>1221902412000176</td>
+<td>1224306405800836</td>
 <td>0</td>
 <td>2</td>
 <td>2</td>
@@ -983,16 +1034,16 @@ CRS: EPSG:4326</code></pre>
 <td>0</td>
 <td>0</td>
 <td>...</td>
-<td>-68.457260</td>
-<td>23.021687</td>
-<td>22254792.0</td>
-<td>4192.15530</td>
-<td>6759.2153</td>
-<td>68.652030</td>
-<td>33.230824</td>
-<td>101.83984</td>
-<td>107.450775</td>
-<td>POLYGON ((23.04131 -68.53648, 23.15511 -68.452...</td>
+<td>5.613894</td>
+<td>54.23045</td>
+<td>1755143.5</td>
+<td>1013.51886</td>
+<td>2204.9104</td>
+<td>53.815990</td>
+<td>24.053764</td>
+<td>77.86254</td>
+<td>99.559425</td>
+<td>POLYGON ((54.24406 5.63592, 54.22025 5.62014, ...</td>
 </tr>
 </tbody>
 </table>
@@ -1027,17 +1078,18 @@ CRS: EPSG:4326</code></pre>
 <span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Show first few assignments</span></span>
 <span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>sidecar_df.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>2025-12-12 13:02:29,798 INFO Partition (lon_convention=0_360): processed 50000 geometries, dropped 17 (0.0%) total [pre-filter: 17, post-processing: 0]</code></pre>
+<pre><code>2026-02-03 13:18:50,894 INFO Partition (lon_convention=0_360): processed 50000 geometries, dropped 12 (0.0%) total [pre-filter: 12, post-processing: 0]</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Created sidecar with 54888 assignments
-Unique geometries: 49983
-Unique HEALPix cells: 10825
+<pre><code>Created sidecar with 54931 assignments
+Unique geometries: 49988
+Unique HEALPix cells: 10860
 
-Sidecar columns: ['source_id', 'healpix_id']
+Sidecar columns: ['source_id', 'healpix_id', 'weight']
 Sidecar dtypes:
-source_id      int64
-healpix_id    UInt64
+source_id       int64
+healpix_id     UInt64
+weight        float64
 dtype: object</code></pre>
 </div>
 <div class="cell-output cell-output-display">
@@ -1050,58 +1102,69 @@ dtype: object</code></pre>
 <th data-quarto-table-cell-role="th"></th>
 <th data-quarto-table-cell-role="th">source_id</th>
 <th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th">weight</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
 <td>0</td>
-<td>5815</td>
+<td>7943</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
 <td>1</td>
-<td>7536</td>
+<td>8287</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
 <td>2</td>
-<td>8333</td>
+<td>5819</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
 <td>3</td>
-<td>7906</td>
+<td>11685</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
 <td>4</td>
-<td>5805</td>
+<td>3618</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>4</td>
-<td>5807</td>
+<td>5</td>
+<td>3805</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>5</td>
-<td>9771</td>
+<td>6</td>
+<td>9522</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>5</td>
-<td>9857</td>
+<td>7</td>
+<td>10975</td>
+<td>1.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
-<td>6</td>
-<td>7355</td>
+<td>8</td>
+<td>1820</td>
+<td>1.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
-<td>7</td>
-<td>12212</td>
+<td>9</td>
+<td>3710</td>
+<td>1.0</td>
 </tr>
 </tbody>
 </table>
@@ -1130,10 +1193,10 @@ dtype: object</code></pre>
   Median cells per geometry: 1
 
 Distribution of assignments per geometry:
-1    45380
-2     4327
-3      250
-4       26
+1    45331
+2     4396
+3      236
+4       25
 Name: count, dtype: int64</code></pre>
 </div>
 </div>
@@ -1145,7 +1208,7 @@ Name: count, dtype: int64</code></pre>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"File size: </span><span class="sc">{</span>sidecar_output<span class="sc">.</span>stat()<span class="sc">.</span>st_size <span class="op">/</span> <span class="dv">1024</span><span class="sc">:.2f}</span><span class="ss"> KB"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Saved sidecar to: /tmp/sample_50k_sidecar_nside32_fuzzy.parquet
-File size: 440.74 KB</code></pre>
+File size: 441.63 KB</code></pre>
 </div>
 </div>
 </section>
@@ -1166,7 +1229,7 @@ File size: 440.74 KB</code></pre>
 <span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Available columns: </span><span class="sc">{</span><span class="bu">list</span>(gdf.columns)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>✓ Column 'r1050' found in the data
-  Range: [-0.003, 0.174]
+  Range: [-0.050, 0.325]
   Missing values: 0 / 50000</code></pre>
 </div>
 </div>
@@ -1194,31 +1257,21 @@ File size: 440.74 KB</code></pre>
 <span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a><span class="co"># Show first few rows</span></span>
 <span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>aggregated.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>2025-12-12 13:02:30,012 INFO Starting aggregation for 1 column(s): ['r1050']
-2025-12-12 13:02:30,012 INFO Aggregation functions: ['mean', 'median', 'std', 'mad', 'robust_std']
-2025-12-12 13:02:30,021 INFO Creating source_id column from DataFrame index
-2025-12-12 13:02:30,012 INFO Aggregation functions: ['mean', 'median', 'std', 'mad', 'robust_std']
-2025-12-12 13:02:30,021 INFO Creating source_id column from DataFrame index
-2025-12-12 13:02:30,055 INFO Sidecar source_id overlap: 49983/49983 (100.0%)
-2025-12-12 13:02:30,055 INFO Merging sidecar with original data
-2025-12-12 13:02:30,060 INFO Grouping by healpix_id and computing aggregations
-2025-12-12 13:02:30,055 INFO Sidecar source_id overlap: 49983/49983 (100.0%)
-2025-12-12 13:02:30,055 INFO Merging sidecar with original data
-2025-12-12 13:02:30,060 INFO Grouping by healpix_id and computing aggregations
-2025-12-12 13:02:30,127 INFO Processing 10825 HEALPix cells
-2025-12-12 13:02:30,127 INFO Processing 10825 HEALPix cells
-2025-12-12 13:02:33,399 INFO Creating output DataFrame with 10825 cells
-2025-12-12 13:02:33,423 INFO Aggregation complete. Output shape: (10825, 6)
-2025-12-12 13:02:33,423 INFO Aggregation complete. Output shape: (10825, 6)</code></pre>
+<pre><code>2026-02-03 13:18:51,041 INFO Creating source_id column from DataFrame index
+2026-02-03 13:18:51,074 INFO Sidecar source_id overlap: 49988/49988 (100.0%)
+2026-02-03 13:18:51,075 INFO Merging sidecar with original data
+2026-02-03 13:18:51,080 INFO Grouping by healpix_id and computing aggregations
+2026-02-03 13:18:51,159 INFO Processing 10860 HEALPix cells
+2026-02-03 13:18:54,635 INFO Aggregation complete: 10860 cells with data</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"2ef1c5c964424a4793b5269f7a5db7e8","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"2a40ed3fa88c4ac5a9addaf952b29e45","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Aggregated data shape: (10825, 6)
-Number of HEALPix cells with data: 10825
+<pre><code>Aggregated data shape: (10860, 6)
+Number of HEALPix cells with data: 10860
 
 Aggregated columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_std', 'n_sources']</code></pre>
 </div>
@@ -1250,93 +1303,93 @@ Aggregated columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>0.047764</td>
-<td>0.047652</td>
-<td>0.001116</td>
-<td>0.000877</td>
-<td>0.001300</td>
+<td>0.048616</td>
+<td>0.047857</td>
+<td>0.003759</td>
+<td>0.002672</td>
+<td>0.003962</td>
 <td>4</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>0.055255</td>
-<td>0.055561</td>
-<td>0.009401</td>
-<td>0.001885</td>
-<td>0.002795</td>
-<td>5</td>
+<td>0.051467</td>
+<td>0.052283</td>
+<td>0.002976</td>
+<td>0.001888</td>
+<td>0.002799</td>
+<td>6</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0.050887</td>
-<td>0.051560</td>
-<td>0.003475</td>
-<td>0.002050</td>
-<td>0.003039</td>
-<td>5</td>
+<td>0.049697</td>
+<td>0.049118</td>
+<td>0.003637</td>
+<td>0.002289</td>
+<td>0.003394</td>
+<td>6</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>0.052687</td>
-<td>0.053003</td>
-<td>0.001374</td>
-<td>0.001186</td>
-<td>0.001759</td>
+<td>0.059066</td>
+<td>0.063241</td>
+<td>0.007149</td>
+<td>0.001711</td>
+<td>0.002537</td>
 <td>3</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>0.048042</td>
-<td>0.048304</td>
-<td>0.003802</td>
-<td>0.003442</td>
-<td>0.005103</td>
-<td>4</td>
+<td>0.051262</td>
+<td>0.051523</td>
+<td>0.006552</td>
+<td>0.002510</td>
+<td>0.003721</td>
+<td>9</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>0.052645</td>
-<td>0.052189</td>
-<td>0.004026</td>
-<td>0.003416</td>
-<td>0.005065</td>
-<td>4</td>
+<td>0.047092</td>
+<td>0.047639</td>
+<td>0.008176</td>
+<td>0.003183</td>
+<td>0.004719</td>
+<td>7</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>0.058018</td>
-<td>0.056681</td>
-<td>0.003631</td>
-<td>0.000435</td>
-<td>0.000645</td>
-<td>5</td>
+<td>0.058219</td>
+<td>0.058195</td>
+<td>0.002682</td>
+<td>0.002040</td>
+<td>0.003024</td>
+<td>6</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>0.048398</td>
-<td>0.048118</td>
-<td>0.002235</td>
-<td>0.001603</td>
-<td>0.002377</td>
-<td>4</td>
+<td>0.053656</td>
+<td>0.054208</td>
+<td>0.008577</td>
+<td>0.006288</td>
+<td>0.009323</td>
+<td>8</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
-<td>0.048196</td>
-<td>0.049001</td>
-<td>0.001647</td>
-<td>0.001294</td>
-<td>0.001918</td>
-<td>5</td>
+<td>0.037711</td>
+<td>0.037711</td>
+<td>0.008823</td>
+<td>0.008823</td>
+<td>0.013080</td>
+<td>2</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
-<td>0.052534</td>
-<td>0.052957</td>
-<td>0.002989</td>
-<td>0.003007</td>
-<td>0.004458</td>
-<td>3</td>
+<td>0.041094</td>
+<td>0.041094</td>
+<td>0.012205</td>
+<td>0.012205</td>
+<td>0.018096</td>
+<td>2</td>
 </tr>
 </tbody>
 </table>
@@ -1363,40 +1416,40 @@ Aggregated columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1
 <pre><code>Summary statistics for aggregated HEALPix cells:
 
          r1050_mean  r1050_median     r1050_std     r1050_mad  \
-count  10825.000000  10825.000000  10825.000000  10825.000000   
-mean       0.054775      0.054660      0.004834      0.003116   
-std        0.008045      0.008020      0.004080      0.003007   
-min        0.019774      0.019774      0.000000      0.000000   
-25%        0.049531      0.049424      0.001914      0.000998   
-50%        0.053805      0.053680      0.004271      0.002541   
-75%        0.059047      0.058956      0.006892      0.004357   
-max        0.129722      0.129722      0.050240      0.050240   
+count  10860.000000  10860.000000  10860.000000  10860.000000   
+mean       0.054837      0.054731      0.004838      0.003076   
+std        0.008117      0.008069      0.004290      0.002981   
+min        0.008949      0.008949      0.000000      0.000000   
+25%        0.049472      0.049385      0.001861      0.000960   
+50%        0.053936      0.053849      0.004238      0.002508   
+75%        0.059213      0.059099      0.006812      0.004329   
+max        0.141338      0.141338      0.133480      0.032018   
 
        r1050_robust_std     n_sources  
-count      10825.000000  10825.000000  
-mean           0.004620      5.070485  
-std            0.004458      4.811633  
+count      10860.000000  10860.000000  
+mean           0.004561      5.058103  
+std            0.004420      4.835600  
 min            0.000000      1.000000  
-25%            0.001479      2.000000  
-50%            0.003767      4.000000  
-75%            0.006459      6.000000  
-max            0.074486     85.000000  
+25%            0.001424      2.000000  
+50%            0.003718      4.000000  
+75%            0.006418      6.000000  
+max            0.047470     98.000000  
 
 
 Distribution of source counts per HEALPix cell:
-count    10825.000000
-mean         5.070485
-std          4.811633
+count    10860.000000
+mean         5.058103
+std          4.835600
 min          1.000000
 25%          2.000000
 50%          4.000000
 75%          6.000000
-max         85.000000
+max         98.000000
 Name: n_sources, dtype: float64
 
-Cells with only 1 source: 1612
-Cells with 2-5 sources: 5641
-Cells with 5+ sources: 3572</code></pre>
+Cells with only 1 source: 1644
+Cells with 2-5 sources: 5696
+Cells with 5+ sources: 3520</code></pre>
 </div>
 </div>
 </section>
@@ -1490,14 +1543,14 @@ Cells with 5+ sources: 3572</code></pre>
 <span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Show first few rows including empty cells</span></span>
 <span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a>aggregated_dense.head(<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>2025-12-12 13:02:33,586 INFO Densified to 12288 cells (added 1463 empty cells)</code></pre>
+<pre><code>2026-02-03 13:18:55,069 INFO Densified from 10860 to 12288 cells (nside=32)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Sparse aggregated cells: 10825
+<pre><code>Sparse aggregated cells: 10860
 Dense HEALPix grid cells: 12288 (expected: 12288)
 
-Empty cells (no data): 1463
-Cells with data: 10825</code></pre>
+Empty cells (no data): 1428
+Cells with data: 10860</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -1527,93 +1580,93 @@ Cells with data: 10825</code></pre>
 <tbody>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">0</td>
-<td>0.047764</td>
-<td>0.047652</td>
-<td>0.001116</td>
-<td>0.000877</td>
-<td>0.001300</td>
-<td>4</td>
+<td>0.048616</td>
+<td>0.047857</td>
+<td>0.003759</td>
+<td>0.002672</td>
+<td>0.003962</td>
+<td>4.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
-<td>0.055255</td>
-<td>0.055561</td>
-<td>0.009401</td>
-<td>0.001885</td>
-<td>0.002795</td>
-<td>5</td>
+<td>0.051467</td>
+<td>0.052283</td>
+<td>0.002976</td>
+<td>0.001888</td>
+<td>0.002799</td>
+<td>6.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
-<td>0.050887</td>
-<td>0.051560</td>
-<td>0.003475</td>
-<td>0.002050</td>
-<td>0.003039</td>
-<td>5</td>
+<td>0.049697</td>
+<td>0.049118</td>
+<td>0.003637</td>
+<td>0.002289</td>
+<td>0.003394</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
-<td>0.052687</td>
-<td>0.053003</td>
-<td>0.001374</td>
-<td>0.001186</td>
-<td>0.001759</td>
-<td>3</td>
+<td>0.059066</td>
+<td>0.063241</td>
+<td>0.007149</td>
+<td>0.001711</td>
+<td>0.002537</td>
+<td>3.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
-<td>0.048042</td>
-<td>0.048304</td>
-<td>0.003802</td>
-<td>0.003442</td>
-<td>0.005103</td>
-<td>4</td>
+<td>0.051262</td>
+<td>0.051523</td>
+<td>0.006552</td>
+<td>0.002510</td>
+<td>0.003721</td>
+<td>9.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
-<td>0.052645</td>
-<td>0.052189</td>
-<td>0.004026</td>
-<td>0.003416</td>
-<td>0.005065</td>
-<td>4</td>
+<td>0.047092</td>
+<td>0.047639</td>
+<td>0.008176</td>
+<td>0.003183</td>
+<td>0.004719</td>
+<td>7.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
-<td>0.058018</td>
-<td>0.056681</td>
-<td>0.003631</td>
-<td>0.000435</td>
-<td>0.000645</td>
-<td>5</td>
+<td>0.058219</td>
+<td>0.058195</td>
+<td>0.002682</td>
+<td>0.002040</td>
+<td>0.003024</td>
+<td>6.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
-<td>0.048398</td>
-<td>0.048118</td>
-<td>0.002235</td>
-<td>0.001603</td>
-<td>0.002377</td>
-<td>4</td>
+<td>0.053656</td>
+<td>0.054208</td>
+<td>0.008577</td>
+<td>0.006288</td>
+<td>0.009323</td>
+<td>8.0</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
-<td>0.048196</td>
-<td>0.049001</td>
-<td>0.001647</td>
-<td>0.001294</td>
-<td>0.001918</td>
-<td>5</td>
+<td>0.037711</td>
+<td>0.037711</td>
+<td>0.008823</td>
+<td>0.008823</td>
+<td>0.013080</td>
+<td>2.0</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
-<td>0.052534</td>
-<td>0.052957</td>
-<td>0.002989</td>
-<td>0.003007</td>
-<td>0.004458</td>
-<td>3</td>
+<td>0.041094</td>
+<td>0.041094</td>
+<td>0.012205</td>
+<td>0.012205</td>
+<td>0.018096</td>
+<td>2.0</td>
 </tr>
 </tbody>
 </table>
@@ -1644,8 +1697,8 @@ Cells with data: 10825</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>HEALPix map prepared:
   Total pixels: 12288
-  Valid pixels: 10825
-  Invalid pixels: 1463</code></pre>
+  Valid pixels: 10860
+  Invalid pixels: 1428</code></pre>
 </div>
 </div>
 <div id="72e877af" class="cell">
@@ -1656,11 +1709,9 @@ Cells with data: 10825</code></pre>
 <span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                         cmap<span class="op">=</span><span class="st">'Spectral_r'</span>,flip<span class="op">=</span><span class="st">'geo'</span>, norm<span class="op">=</span><span class="st">'None'</span>, xsize<span class="op">=</span><span class="dv">2500</span>)</span>
 <span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>healpy.visufunc.graticule()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>2025-12-12 13:02:34,529 INFO 0.0 180.0 -180.0 180.0
-2025-12-12 13:02:34,529 INFO The interval between parallels is 30 deg -0.00'.
-2025-12-12 13:02:34,529 INFO The interval between meridians is 30 deg -0.00'.
-2025-12-12 13:02:34,529 INFO The interval between parallels is 30 deg -0.00'.
-2025-12-12 13:02:34,529 INFO The interval between meridians is 30 deg -0.00'.</code></pre>
+<pre><code>2026-02-03 13:18:56,234 INFO 0.0 180.0 -180.0 180.0
+2026-02-03 13:18:56,235 INFO The interval between parallels is 30 deg -0.00'.
+2026-02-03 13:18:56,236 INFO The interval between meridians is 30 deg -0.00'.</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -1719,12 +1770,438 @@ Cells with data: 10825</code></pre>
 <span id="cb39-42"><a href="#cb39-42" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb39-43"><a href="#cb39-43" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="ss">f'HEALPix Map: </span><span class="sc">{</span>output_column<span class="sc">}</span><span class="ss"> (nside=</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">)'</span>)<span class="op">;</span></span>
 <span id="cb39-44"><a href="#cb39-44" aria-hidden="true" tabindex="-1"></a><span class="co"># plt.tight_layout()</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-error">
-<pre><code>NameError: name 'healpy' is not defined</code></pre>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="81_example_visualization_workflow_files/figure-html/cell-21-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="generate-data-in-cli-and-visualize" class="level2">
+<h2 class="anchored" data-anchor-id="generate-data-in-cli-and-visualize">Generate data in CLI and Visualize</h2>
+<p>The same data generated here can be produced with the script in <code>examples/cli_regrid_sample_50k.sh</code> :</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/usr/bin/env bash</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="bu">set</span> <span class="at">-euo</span> pipefail</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a><span class="co"># define variables</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a><span class="va">ROOT_DIR</span><span class="op">=</span><span class="st">"</span><span class="va">$(</span><span class="bu">cd</span> <span class="st">"</span><span class="va">$(</span><span class="fu">dirname</span> <span class="st">"</span><span class="va">${BASH_SOURCE</span><span class="op">[</span><span class="dv">0</span><span class="op">]</span><span class="va">}</span><span class="st">"</span><span class="va">)</span><span class="st">/.."</span> <span class="kw">&amp;&amp;</span> <span class="bu">pwd</span><span class="va">)</span><span class="st">"</span></span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a><span class="va">INPUT</span><span class="op">=</span><span class="st">"</span><span class="va">$ROOT_DIR</span><span class="st">/test_data/samples/sample_50k.parquet"</span></span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a><span class="va">OUT_DIR</span><span class="op">=</span><span class="st">"</span><span class="va">$ROOT_DIR</span><span class="st">/test_data/derived/cli_quickstart"</span></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="va">NSIDE</span><span class="op">=</span>32</span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a><span class="va">MODE</span><span class="op">=</span>fuzzy</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a><span class="va">LON_CONVENTION</span><span class="op">=</span>0_360</span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a><span class="co"># generate output directly</span></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> <span class="st">"</span><span class="va">$OUT_DIR</span><span class="st">"</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 2) Aggregate sparse regridded map</span></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a><span class="ex">healpix_aggregate</span> <span class="dt">\</span></span>
+<span id="cb40-16"><a href="#cb40-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> <span class="st">"</span><span class="va">$INPUT</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb40-17"><a href="#cb40-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-dir</span> <span class="st">"</span><span class="va">$OUT_DIR</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb40-18"><a href="#cb40-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-index</span> 0 <span class="dt">\</span></span>
+<span id="cb40-19"><a href="#cb40-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggregate</span> <span class="dt">\</span></span>
+<span id="cb40-20"><a href="#cb40-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r1050 <span class="dt">\</span></span>
+<span id="cb40-21"><a href="#cb40-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggs</span> mean median std mad robust_std <span class="dt">\</span></span>
+<span id="cb40-22"><a href="#cb40-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">--min-count</span> 1 <span class="dt">\</span></span>
+<span id="cb40-23"><a href="#cb40-23" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output</span> <span class="st">"</span><span class="va">$OUT_DIR</span><span class="st">/sample_50k_nside</span><span class="va">${NSIDE}</span><span class="st">_r1050_sparse_aggregate.parquet"</span></span>
+<span id="cb40-24"><a href="#cb40-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 3) Aggregate (densified) regridded map</span></span>
+<span id="cb40-25"><a href="#cb40-25" aria-hidden="true" tabindex="-1"></a><span class="ex">healpix_aggregate</span> <span class="dt">\</span></span>
+<span id="cb40-26"><a href="#cb40-26" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> <span class="st">"</span><span class="va">$INPUT</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb40-27"><a href="#cb40-27" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-dir</span> <span class="st">"</span><span class="va">$OUT_DIR</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb40-28"><a href="#cb40-28" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-index</span> 0 <span class="dt">\</span></span>
+<span id="cb40-29"><a href="#cb40-29" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggregate</span> <span class="dt">\</span></span>
+<span id="cb40-30"><a href="#cb40-30" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r1050 <span class="dt">\</span></span>
+<span id="cb40-31"><a href="#cb40-31" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggs</span> mean median std mad robust_std <span class="dt">\</span></span>
+<span id="cb40-32"><a href="#cb40-32" aria-hidden="true" tabindex="-1"></a>  <span class="at">--min-count</span> 1 <span class="dt">\</span></span>
+<span id="cb40-33"><a href="#cb40-33" aria-hidden="true" tabindex="-1"></a>  <span class="at">--densify</span> <span class="dt">\</span></span>
+<span id="cb40-34"><a href="#cb40-34" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output</span> <span class="st">"</span><span class="va">$OUT_DIR</span><span class="st">/sample_50k_nside</span><span class="va">${NSIDE}</span><span class="st">_r1050_dense_aggregate.parquet"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="f695db77" class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rich</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Define paths to CLI outputs</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>cli_output_dir <span class="op">=</span> Path(<span class="st">'../test_data/derived/cli_quickstart'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="load-cli-generated-products" class="level3">
+<h3 class="anchored" data-anchor-id="load-cli-generated-products">Load CLI-Generated Products</h3>
+<p>Load the sidecar and aggregated maps created by the CLI script above.</p>
+<div id="34dec0b4" class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load sidecar metadata</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>sidecar_meta_path <span class="op">=</span> cli_output_dir <span class="op">/</span> <span class="st">'sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json'</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sidecar_meta_path.exists():</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(sidecar_meta_path, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>        sidecar_metadata <span class="op">=</span> json.load(f)</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Sidecar Metadata:"</span>)</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"="</span><span class="op">*</span><span class="dv">60</span>)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(sidecar_metadata)</span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Sidecar metadata not found: </span><span class="sc">{</span>sidecar_meta_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run the CLI script first: bash examples/cli_regrid_sample_50k.sh"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sidecar Metadata:
+============================================================
+{'processing': {'stage': 'sidecar', 'timestamp': '2026-02-03T12:06:33.952423Z', 'source_file': '/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet', 'output_file': '/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet'}, 'healpix': {'nside': 32, 'mode': 'fuzzy', 'order': 'nested', 'npix': 12288}, 'coordinates': {'lon_convention': '0_360', 'lon_range': [0, 360], 'lat_range': [-90, 90]}, 'processing_params': {'ncores': 15, 'coalesced': True, 'data_psf': 'none', 'data_psf_sigma_level': 2.0, 'cell_psf': 'none', 'cell_psf_sigma_level': 2.0, 'psf_combine': 'multiply', 'psf_normalize': True}}</code></pre>
+</div>
+</div>
+<div id="b3fe4f70" class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load sidecar parquet file using metadata</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sidecar_meta_path.exists():</span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract output file path from metadata</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>    sidecar_path <span class="op">=</span> Path(sidecar_metadata[<span class="st">'processing'</span>][<span class="st">'output_file'</span>])</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sidecar_path.exists():</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>        sidecar_cli <span class="op">=</span> pd.read_parquet(sidecar_path)</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Sidecar DataFrame:"</span>)</span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Shape: </span><span class="sc">{</span>sidecar_cli<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Columns: </span><span class="sc">{</span><span class="bu">list</span>(sidecar_cli.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Dtypes:</span><span class="ch">\n</span><span class="sc">{</span>sidecar_cli<span class="sc">.</span>dtypes<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  Unique sources: </span><span class="sc">{</span>sidecar_cli[<span class="st">'source_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Unique HEALPix cells: </span><span class="sc">{</span>sidecar_cli[<span class="st">'healpix_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-15"><a href="#cb44-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Total assignments: </span><span class="sc">{</span><span class="bu">len</span>(sidecar_cli)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-16"><a href="#cb44-16" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb44-17"><a href="#cb44-17" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Check for weight column</span></span>
+<span id="cb44-18"><a href="#cb44-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'weight'</span> <span class="kw">in</span> sidecar_cli.columns:</span>
+<span id="cb44-19"><a href="#cb44-19" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  Has 'weight' column: Yes"</span>)</span>
+<span id="cb44-20"><a href="#cb44-20" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"    Weight range: [</span><span class="sc">{</span>sidecar_cli[<span class="st">'weight'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.6f}</span><span class="ss">, </span><span class="sc">{</span>sidecar_cli[<span class="st">'weight'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.6f}</span><span class="ss">]"</span>)</span>
+<span id="cb44-21"><a href="#cb44-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb44-22"><a href="#cb44-22" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  Has 'weight' column: No"</span>)</span>
+<span id="cb44-23"><a href="#cb44-23" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb44-24"><a href="#cb44-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  First few rows:"</span>)</span>
+<span id="cb44-25"><a href="#cb44-25" aria-hidden="true" tabindex="-1"></a>        display(sidecar_cli.head(<span class="dv">10</span>))</span>
+<span id="cb44-26"><a href="#cb44-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb44-27"><a href="#cb44-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Sidecar file not found: </span><span class="sc">{</span>sidecar_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-28"><a href="#cb44-28" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb44-29"><a href="#cb44-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Sidecar metadata not found: </span><span class="sc">{</span>sidecar_meta_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb44-30"><a href="#cb44-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run the CLI script first: bash examples/cli_regrid_sample_50k.sh"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sidecar DataFrame:
+  Shape: (54931, 3)
+  Columns: ['source_id', 'healpix_id', 'weight']
+  Dtypes:
+source_id       int64
+healpix_id     uint64
+weight        float64
+dtype: object
+
+  Unique sources: 49988
+  Unique HEALPix cells: 10860
+  Total assignments: 54931
+
+  Has 'weight' column: Yes
+    Weight range: [1.000000, 1.000000]
+
+  First few rows:</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>7943</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>8287</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2</td>
+<td>5819</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>11685</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>3618</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>5</td>
+<td>3805</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>6</td>
+<td>9522</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>7</td>
+<td>10975</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>8</td>
+<td>1820</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>9</td>
+<td>3710</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="load-sparse-aggregated-map" class="level3">
+<h3 class="anchored" data-anchor-id="load-sparse-aggregated-map">Load Sparse Aggregated Map</h3>
+<p>The sparse map contains only cells with data. We’ll load it and densify it for visualization.</p>
+<div id="2c8b9de6" class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load sparse aggregate using metadata</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.metadata <span class="im">import</span> HEALPyxelxMetadata</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>sparse_agg_meta_path <span class="op">=</span> cli_output_dir <span class="op">/</span> <span class="st">'sample_50k_nside32_r1050_sparse_aggregate.meta.json'</span></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sparse_agg_meta_path.exists():</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Read and validate metadata</span></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(sparse_agg_meta_path, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>        sparse_meta <span class="op">=</span> json.load(f)</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Validate metadata structure</span></span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>    sparse_metadata <span class="op">=</span> HEALPyxelxMetadata.from_dict(sparse_meta)</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Sparse Aggregate Metadata validated:"</span>)</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  File type: </span><span class="sc">{</span>sparse_metadata<span class="sc">.</span>file_type<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  HEALPix nside: </span><span class="sc">{</span>sparse_metadata<span class="sc">.</span>nside<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-15"><a href="#cb46-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  HEALPix order: </span><span class="sc">{</span>sparse_metadata<span class="sc">.</span>order<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-16"><a href="#cb46-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb46-17"><a href="#cb46-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract output file path from metadata</span></span>
+<span id="cb46-18"><a href="#cb46-18" aria-hidden="true" tabindex="-1"></a>    sparse_agg_path <span class="op">=</span> Path(sparse_meta[<span class="st">'processing'</span>][<span class="st">'output_file'</span>])</span>
+<span id="cb46-19"><a href="#cb46-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb46-20"><a href="#cb46-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sparse_agg_path.exists():</span>
+<span id="cb46-21"><a href="#cb46-21" aria-hidden="true" tabindex="-1"></a>        sparse_agg <span class="op">=</span> pd.read_parquet(sparse_agg_path)</span>
+<span id="cb46-22"><a href="#cb46-22" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Verify index</span></span>
+<span id="cb46-23"><a href="#cb46-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> sparse_agg.index.name <span class="op">==</span> <span class="st">'healpix_id'</span>, <span class="ss">f"Expected index 'healpix_id', got </span><span class="sc">{</span>sparse_agg<span class="sc">.</span>index<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb46-24"><a href="#cb46-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-25"><a href="#cb46-25" aria-hidden="true" tabindex="-1"></a>        <span class="co">######## </span><span class="al">WARNING</span><span class="co"> ######## </span></span>
+<span id="cb46-26"><a href="#cb46-26" aria-hidden="true" tabindex="-1"></a>        <span class="co"># When you call .set_index('healpix_id') on a DataFrame where healpix_id is already the index, </span></span>
+<span id="cb46-27"><a href="#cb46-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># pandas creates a new integer index and moves the old index to a column, causing chaos.</span></span>
+<span id="cb46-28"><a href="#cb46-28" aria-hidden="true" tabindex="-1"></a>        <span class="co"># sparse_agg = pd.read_parquet(sparse_agg_path).set_index('healpix_id')</span></span>
+<span id="cb46-29"><a href="#cb46-29" aria-hidden="true" tabindex="-1"></a>        <span class="co">#########################</span></span>
+<span id="cb46-30"><a href="#cb46-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-31"><a href="#cb46-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Sparse Aggregated Map:"</span>)</span>
+<span id="cb46-32"><a href="#cb46-32" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Shape: </span><span class="sc">{</span>sparse_agg<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-33"><a href="#cb46-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Columns: </span><span class="sc">{</span><span class="bu">list</span>(sparse_agg.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-34"><a href="#cb46-34" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Index name: </span><span class="sc">{</span>sparse_agg<span class="sc">.</span>index<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-35"><a href="#cb46-35" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  Statistics:"</span>)</span>
+<span id="cb46-36"><a href="#cb46-36" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Cells with data: </span><span class="sc">{</span><span class="bu">len</span>(sparse_agg)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-37"><a href="#cb46-37" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Expected cells (12*nside²): </span><span class="sc">{</span><span class="dv">12</span> <span class="op">*</span> <span class="dv">32</span><span class="op">**</span><span class="dv">2</span><span class="sc">}</span><span class="ss"> = 12,288"</span>)</span>
+<span id="cb46-38"><a href="#cb46-38" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Coverage: </span><span class="sc">{</span><span class="bu">len</span>(sparse_agg) <span class="op">/</span> (<span class="dv">12</span> <span class="op">*</span> <span class="dv">32</span><span class="op">**</span><span class="dv">2</span>) <span class="op">*</span> <span class="dv">100</span><span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
+<span id="cb46-39"><a href="#cb46-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb46-40"><a href="#cb46-40" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  First few rows:"</span>)</span>
+<span id="cb46-41"><a href="#cb46-41" aria-hidden="true" tabindex="-1"></a>        display(sparse_agg.head(<span class="dv">10</span>))</span>
+<span id="cb46-42"><a href="#cb46-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-43"><a href="#cb46-43" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Densify the sparse map with proper alignment</span></span>
+<span id="cb46-44"><a href="#cb46-44" aria-hidden="true" tabindex="-1"></a>        <span class="im">from</span> healpyxel.aggregate <span class="im">import</span> densify_healpix_aggregates</span>
+<span id="cb46-45"><a href="#cb46-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-46"><a href="#cb46-46" aria-hidden="true" tabindex="-1"></a>        sparse_agg_dense <span class="op">=</span> densify_healpix_aggregates(</span>
+<span id="cb46-47"><a href="#cb46-47" aria-hidden="true" tabindex="-1"></a>            agg_sparse_df<span class="op">=</span>sparse_agg,</span>
+<span id="cb46-48"><a href="#cb46-48" aria-hidden="true" tabindex="-1"></a>            nside<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb46-49"><a href="#cb46-49" aria-hidden="true" tabindex="-1"></a>            healpix_col<span class="op">=</span><span class="st">'healpix_id'</span></span>
+<span id="cb46-50"><a href="#cb46-50" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb46-51"><a href="#cb46-51" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb46-52"><a href="#cb46-52" aria-hidden="true" tabindex="-1"></a>        <span class="co"># CRITICAL: Sort by healpix_id and reset index to align with pixel positions</span></span>
+<span id="cb46-53"><a href="#cb46-53" aria-hidden="true" tabindex="-1"></a>        sparse_agg_dense <span class="op">=</span> sparse_agg_dense.sort_index()</span>
+<span id="cb46-54"><a href="#cb46-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-55"><a href="#cb46-55" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Verify alignment</span></span>
+<span id="cb46-56"><a href="#cb46-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">len</span>(sparse_agg_dense) <span class="op">==</span> <span class="dv">12</span> <span class="op">*</span> <span class="dv">32</span><span class="op">**</span><span class="dv">2</span>, <span class="ss">f"Expected </span><span class="sc">{</span><span class="dv">12</span><span class="op">*</span><span class="dv">32</span><span class="op">**</span><span class="dv">2</span><span class="sc">}</span><span class="ss">, got </span><span class="sc">{</span><span class="bu">len</span>(sparse_agg_dense)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb46-57"><a href="#cb46-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> sparse_agg_dense.index.equals(pd.RangeIndex(<span class="dv">0</span>, <span class="dv">12</span> <span class="op">*</span> <span class="dv">32</span><span class="op">**</span><span class="dv">2</span>)), <span class="st">"Index not 0..12287"</span></span>
+<span id="cb46-58"><a href="#cb46-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-59"><a href="#cb46-59" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"✓ Sparse densified aligned: </span><span class="sc">{</span><span class="bu">len</span>(sparse_agg_dense)<span class="sc">}</span><span class="ss"> rows, index 0..</span><span class="sc">{</span><span class="bu">len</span>(sparse_agg_dense)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-60"><a href="#cb46-60" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  After densification:"</span>)</span>
+<span id="cb46-61"><a href="#cb46-61" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Total cells: </span><span class="sc">{</span><span class="bu">len</span>(sparse_agg_dense)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-62"><a href="#cb46-62" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Empty cells: </span><span class="sc">{</span>sparse_agg_dense[<span class="st">'r1050_median'</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-63"><a href="#cb46-63" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Cells with data: </span><span class="sc">{</span>sparse_agg_dense[<span class="st">'r1050_median'</span>]<span class="sc">.</span>notna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-64"><a href="#cb46-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb46-65"><a href="#cb46-65" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Sparse aggregate file not found: </span><span class="sc">{</span>sparse_agg_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-66"><a href="#cb46-66" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb46-67"><a href="#cb46-67" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Sparse aggregate metadata not found: </span><span class="sc">{</span>sparse_agg_meta_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb46-68"><a href="#cb46-68" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run the CLI script first: bash examples/cli_regrid_sample_50k.sh"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sparse aggregate metadata not found: ../test_data/derived/cli_quickstart/sample_50k_nside32_r1050_sparse_aggregate.meta.json
+Run the CLI script first: bash examples/cli_regrid_sample_50k.sh</code></pre>
+</div>
+</div>
+</section>
+<section id="load-dense-aggregated-map" class="level3">
+<h3 class="anchored" data-anchor-id="load-dense-aggregated-map">Load Dense Aggregated Map</h3>
+<p>The dense map already includes all HEALPix cells (with NaN for empty cells).</p>
+<div id="05287190" class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load dense aggregate using metadata</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.metadata <span class="im">import</span> HEALPyxelxMetadata</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>dense_agg_meta_path <span class="op">=</span> cli_output_dir <span class="op">/</span> <span class="st">'sample_50k_nside32_r1050_dense_aggregate.meta.json'</span></span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> dense_agg_meta_path.exists():</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Read and validate metadata</span></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">with</span> <span class="bu">open</span>(dense_agg_meta_path, <span class="st">'r'</span>) <span class="im">as</span> f:</span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a>        dense_meta <span class="op">=</span> json.load(f)</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Validate metadata structure</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a>    dense_metadata <span class="op">=</span> HEALPyxelxMetadata.from_dict(dense_meta)</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Dense Aggregate Metadata validated:"</span>)</span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  File type: </span><span class="sc">{</span>dense_metadata<span class="sc">.</span>file_type<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  HEALPix nside: </span><span class="sc">{</span>dense_metadata<span class="sc">.</span>nside<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  HEALPix order: </span><span class="sc">{</span>dense_metadata<span class="sc">.</span>order<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract output file path from metadata</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>    dense_agg_path <span class="op">=</span> Path(dense_meta[<span class="st">'processing'</span>][<span class="st">'output_file'</span>])</span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> dense_agg_path.exists():</span>
+<span id="cb48-21"><a href="#cb48-21" aria-hidden="true" tabindex="-1"></a>        dense_agg <span class="op">=</span> pd.read_parquet(dense_agg_path)</span>
+<span id="cb48-22"><a href="#cb48-22" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb48-23"><a href="#cb48-23" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Dense Aggregated Map:"</span>)</span>
+<span id="cb48-24"><a href="#cb48-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Shape: </span><span class="sc">{</span>dense_agg<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-25"><a href="#cb48-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Columns: </span><span class="sc">{</span><span class="bu">list</span>(dense_agg.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-26"><a href="#cb48-26" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Index name: </span><span class="sc">{</span>dense_agg<span class="sc">.</span>index<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-27"><a href="#cb48-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  Statistics:"</span>)</span>
+<span id="cb48-28"><a href="#cb48-28" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Total cells: </span><span class="sc">{</span><span class="bu">len</span>(dense_agg)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-29"><a href="#cb48-29" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Expected cells (12*nside²): </span><span class="sc">{</span><span class="dv">12</span> <span class="op">*</span> <span class="dv">32</span><span class="op">**</span><span class="dv">2</span><span class="sc">}</span><span class="ss"> = 12,288"</span>)</span>
+<span id="cb48-30"><a href="#cb48-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Empty cells: </span><span class="sc">{</span>dense_agg[<span class="st">'r1050_median'</span>]<span class="sc">.</span>isna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-31"><a href="#cb48-31" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"    Cells with data: </span><span class="sc">{</span>dense_agg[<span class="st">'r1050_median'</span>]<span class="sc">.</span>notna()<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-32"><a href="#cb48-32" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb48-33"><a href="#cb48-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  First 10 rows (including empty cells):"</span>)</span>
+<span id="cb48-34"><a href="#cb48-34" aria-hidden="true" tabindex="-1"></a>        display(dense_agg.head(<span class="dv">10</span>))</span>
+<span id="cb48-35"><a href="#cb48-35" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb48-36"><a href="#cb48-36" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Ensure dense_agg is also sorted and reindexed (should already be, but verify)</span></span>
+<span id="cb48-37"><a href="#cb48-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> dense_agg.index.name <span class="op">==</span> <span class="st">'healpix_id'</span>:</span>
+<span id="cb48-38"><a href="#cb48-38" aria-hidden="true" tabindex="-1"></a>            dense_agg <span class="op">=</span> dense_agg.sort_index()</span>
+<span id="cb48-39"><a href="#cb48-39" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb48-40"><a href="#cb48-40" aria-hidden="true" tabindex="-1"></a>        <span class="cf">assert</span> <span class="bu">len</span>(dense_agg) <span class="op">==</span> <span class="dv">12</span> <span class="op">*</span> <span class="dv">32</span><span class="op">**</span><span class="dv">2</span> <span class="kw">and</span> dense_agg.index.equals(pd.RangeIndex(<span class="dv">0</span>, <span class="dv">12</span><span class="op">*</span><span class="dv">32</span><span class="op">**</span><span class="dv">2</span>)), <span class="op">\</span></span>
+<span id="cb48-41"><a href="#cb48-41" aria-hidden="true" tabindex="-1"></a>            <span class="st">"dense_agg alignment failed"</span></span>
+<span id="cb48-42"><a href="#cb48-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-43"><a href="#cb48-43" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"✓ Dense agg aligned: </span><span class="sc">{</span><span class="bu">len</span>(dense_agg)<span class="sc">}</span><span class="ss"> rows"</span>)</span>
+<span id="cb48-44"><a href="#cb48-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-45"><a href="#cb48-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Verify densification: compare with sparse densified version</span></span>
+<span id="cb48-46"><a href="#cb48-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">'sparse_agg_dense'</span> <span class="kw">in</span> <span class="bu">locals</span>():</span>
+<span id="cb48-47"><a href="#cb48-47" aria-hidden="true" tabindex="-1"></a>            <span class="co"># Compare non-NaN values</span></span>
+<span id="cb48-48"><a href="#cb48-48" aria-hidden="true" tabindex="-1"></a>            sparse_valid <span class="op">=</span> sparse_agg_dense[<span class="st">'r1050_median'</span>].notna()</span>
+<span id="cb48-49"><a href="#cb48-49" aria-hidden="true" tabindex="-1"></a>            dense_valid <span class="op">=</span> dense_agg[<span class="st">'r1050_median'</span>].notna()</span>
+<span id="cb48-50"><a href="#cb48-50" aria-hidden="true" tabindex="-1"></a>            </span>
+<span id="cb48-51"><a href="#cb48-51" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  Validation:"</span>)</span>
+<span id="cb48-52"><a href="#cb48-52" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"    Densified sparse matches dense: </span><span class="sc">{</span>(sparse_valid <span class="op">==</span> dense_valid)<span class="sc">.</span><span class="bu">all</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-53"><a href="#cb48-53" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (sparse_valid <span class="op">==</span> dense_valid).<span class="bu">all</span>():</span>
+<span id="cb48-54"><a href="#cb48-54" aria-hidden="true" tabindex="-1"></a>                <span class="co"># Check if values are identical</span></span>
+<span id="cb48-55"><a href="#cb48-55" aria-hidden="true" tabindex="-1"></a>                matching_cells <span class="op">=</span> sparse_agg_dense.loc[sparse_valid, <span class="st">'r1050_median'</span>].values <span class="op">==</span> dense_agg.loc[dense_valid, <span class="st">'r1050_median'</span>].values</span>
+<span id="cb48-56"><a href="#cb48-56" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f"    Values match: </span><span class="sc">{</span>matching_cells<span class="sc">.</span><span class="bu">all</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-57"><a href="#cb48-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb48-58"><a href="#cb48-58" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Dense aggregate file not found: </span><span class="sc">{</span>dense_agg_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-59"><a href="#cb48-59" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb48-60"><a href="#cb48-60" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Dense aggregate metadata not found: </span><span class="sc">{</span>dense_agg_meta_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb48-61"><a href="#cb48-61" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run the CLI script first: bash examples/cli_regrid_sample_50k.sh"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dense aggregate metadata not found: ../test_data/derived/cli_quickstart/sample_50k_nside32_r1050_dense_aggregate.meta.json
+Run the CLI script first: bash examples/cli_regrid_sample_50k.sh</code></pre>
+</div>
+</div>
+</section>
+<section id="visualize-cli-generated-maps" class="level3">
+<h3 class="anchored" data-anchor-id="visualize-cli-generated-maps">Visualize CLI-Generated Maps</h3>
+<p>Create HEALPix visualizations using the dense aggregated map from CLI.</p>
+<div id="3dd89fff" class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">'dense_agg'</span> <span class="kw">in</span> <span class="bu">locals</span>() <span class="kw">and</span> <span class="st">'sparse_agg_dense'</span> <span class="kw">in</span> <span class="bu">locals</span>():</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare HEALPix maps for visualization (both dense and sparse-densified)</span></span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> healpyxel.visualization <span class="im">import</span> prepare_healpix_map</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> healpy</span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> skyproj</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>    output_col <span class="op">=</span> <span class="st">'r1050_median'</span></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    nside_cli <span class="op">=</span> <span class="dv">32</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare dense map</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>    healpix_map_dense, valid_pix_dense, invalid_pix_dense, mappable_dense <span class="op">=</span> prepare_healpix_map(</span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a>        dense_agg.reset_index(),</span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>        output_column<span class="op">=</span>output_col,</span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>        equalize<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>        percentile_cutoff<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'Spectral_r'</span></span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb50-18"><a href="#cb50-18" aria-hidden="true" tabindex="-1"></a>    healpix_map_dense[invalid_pix_dense] <span class="op">=</span> healpy.UNSEEN</span>
+<span id="cb50-19"><a href="#cb50-19" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-20"><a href="#cb50-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Prepare sparse-densified map</span></span>
+<span id="cb50-21"><a href="#cb50-21" aria-hidden="true" tabindex="-1"></a>    healpix_map_sparse, valid_pix_sparse, invalid_pix_sparse, mappable_sparse <span class="op">=</span> prepare_healpix_map(</span>
+<span id="cb50-22"><a href="#cb50-22" aria-hidden="true" tabindex="-1"></a>        sparse_agg_dense,</span>
+<span id="cb50-23"><a href="#cb50-23" aria-hidden="true" tabindex="-1"></a>        output_column<span class="op">=</span>output_col,</span>
+<span id="cb50-24"><a href="#cb50-24" aria-hidden="true" tabindex="-1"></a>        equalize<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-25"><a href="#cb50-25" aria-hidden="true" tabindex="-1"></a>        percentile_cutoff<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb50-26"><a href="#cb50-26" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'Spectral_r'</span></span>
+<span id="cb50-27"><a href="#cb50-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb50-28"><a href="#cb50-28" aria-hidden="true" tabindex="-1"></a>    healpix_map_sparse[invalid_pix_sparse] <span class="op">=</span> healpy.UNSEEN</span>
+<span id="cb50-29"><a href="#cb50-29" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-30"><a href="#cb50-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Prepared HEALPix maps for comparison:"</span>)</span>
+<span id="cb50-31"><a href="#cb50-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Dense map - Valid pixels: </span><span class="sc">{</span>valid_pix_dense<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb50-32"><a href="#cb50-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Sparse (densified) map - Valid pixels: </span><span class="sc">{</span>valid_pix_sparse<span class="sc">.</span><span class="bu">sum</span>()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb50-33"><a href="#cb50-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Maps are identical: </span><span class="sc">{</span>np<span class="sc">.</span>allclose(healpix_map_dense[valid_pix_dense], healpix_map_sparse[valid_pix_sparse], equal_nan<span class="op">=</span><span class="va">True</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb50-34"><a href="#cb50-34" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-35"><a href="#cb50-35" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create visualization with 2 rows</span></span>
+<span id="cb50-36"><a href="#cb50-36" aria-hidden="true" tabindex="-1"></a>    fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">10</span>))</span>
+<span id="cb50-37"><a href="#cb50-37" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-38"><a href="#cb50-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Top: Dense aggregate (CLI --densify)</span></span>
+<span id="cb50-39"><a href="#cb50-39" aria-hidden="true" tabindex="-1"></a>    sp_dense <span class="op">=</span> skyproj.MollweideSkyproj(ax<span class="op">=</span>axes[<span class="dv">0</span>], lon_0<span class="op">=-</span><span class="dv">180</span>, longitude_ticks<span class="op">=</span><span class="st">'symmetric'</span>)</span>
+<span id="cb50-40"><a href="#cb50-40" aria-hidden="true" tabindex="-1"></a>    _ <span class="op">=</span> sp_dense.draw_hpxmap(</span>
+<span id="cb50-41"><a href="#cb50-41" aria-hidden="true" tabindex="-1"></a>        healpix_map_dense,</span>
+<span id="cb50-42"><a href="#cb50-42" aria-hidden="true" tabindex="-1"></a>        nest<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-43"><a href="#cb50-43" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'Spectral_r'</span>,</span>
+<span id="cb50-44"><a href="#cb50-44" aria-hidden="true" tabindex="-1"></a>        zoom<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-45"><a href="#cb50-45" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb50-46"><a href="#cb50-46" aria-hidden="true" tabindex="-1"></a>    fig.colorbar(mappable_dense, ax<span class="op">=</span>sp_dense.ax, orientation<span class="op">=</span><span class="st">'vertical'</span>, label<span class="op">=</span>output_col, fraction<span class="op">=</span><span class="fl">0.046</span>, pad<span class="op">=</span><span class="fl">0.04</span>)</span>
+<span id="cb50-47"><a href="#cb50-47" aria-hidden="true" tabindex="-1"></a>    sp_dense.ax.set_title(<span class="ss">f'Dense Aggregate (CLI --densify) — nside=</span><span class="sc">{</span>nside_cli<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb50-48"><a href="#cb50-48" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-49"><a href="#cb50-49" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Bottom: Sparse aggregate (manually densified)</span></span>
+<span id="cb50-50"><a href="#cb50-50" aria-hidden="true" tabindex="-1"></a>    sp_sparse <span class="op">=</span> skyproj.MollweideSkyproj(ax<span class="op">=</span>axes[<span class="dv">1</span>], lon_0<span class="op">=-</span><span class="dv">180</span>, longitude_ticks<span class="op">=</span><span class="st">'symmetric'</span>)</span>
+<span id="cb50-51"><a href="#cb50-51" aria-hidden="true" tabindex="-1"></a>    _ <span class="op">=</span> sp_sparse.draw_hpxmap(</span>
+<span id="cb50-52"><a href="#cb50-52" aria-hidden="true" tabindex="-1"></a>        healpix_map_sparse,</span>
+<span id="cb50-53"><a href="#cb50-53" aria-hidden="true" tabindex="-1"></a>        nest<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-54"><a href="#cb50-54" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'Spectral_r'</span>,</span>
+<span id="cb50-55"><a href="#cb50-55" aria-hidden="true" tabindex="-1"></a>        zoom<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb50-56"><a href="#cb50-56" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb50-57"><a href="#cb50-57" aria-hidden="true" tabindex="-1"></a>    fig.colorbar(mappable_sparse, ax<span class="op">=</span>sp_sparse.ax, orientation<span class="op">=</span><span class="st">'vertical'</span>, label<span class="op">=</span>output_col, fraction<span class="op">=</span><span class="fl">0.046</span>, pad<span class="op">=</span><span class="fl">0.04</span>)</span>
+<span id="cb50-58"><a href="#cb50-58" aria-hidden="true" tabindex="-1"></a>    sp_sparse.ax.set_title(<span class="ss">f'Sparse Aggregate (manually densified) — nside=</span><span class="sc">{</span>nside_cli<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb50-59"><a href="#cb50-59" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb50-60"><a href="#cb50-60" aria-hidden="true" tabindex="-1"></a>    plt.suptitle(<span class="ss">f'CLI-Generated HEALPix Maps Comparison: </span><span class="sc">{</span>output_col<span class="sc">}</span><span class="ss">'</span>, y<span class="op">=</span><span class="fl">0.98</span>)</span>
+<span id="cb50-61"><a href="#cb50-61" aria-hidden="true" tabindex="-1"></a>    plt.tight_layout()</span>
+<span id="cb50-62"><a href="#cb50-62" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb50-63"><a href="#cb50-63" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Dense and/or sparse aggregate not loaded. Run CLI script first."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dense and/or sparse aggregate not loaded. Run CLI script first.</code></pre>
 </div>
 </div>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

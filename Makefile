@@ -10,7 +10,7 @@ install: ## Install package in normal mode
 	pip install .
 
 install-dev: ## Install package in editable/development mode with all dependencies
-	pip install -e ".[dev,tdigest,duckdb]"
+	pip install -e ".[dev]"
 
 install-hooks: install-dev ## Install package in dev mode and setup nbdev git hooks
 	nbdev_install_hooks

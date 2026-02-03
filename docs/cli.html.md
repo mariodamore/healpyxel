@@ -5,6 +5,14 @@
 
 ------------------------------------------------------------------------
 
+### to_geoparquet_cli
+
+>      to_geoparquet_cli ()
+
+*CLI entry point for healpyxel_to_geoparquet command.*
+
+------------------------------------------------------------------------
+
 ### finalize_cli
 
 >      finalize_cli ()
@@ -40,4 +48,5 @@
 These functions are called when using the command-line tools: -
 `healpix_sidecar` → `sidecar_cli()` - `healpix_aggregate` →
 `aggregate_cli()` - `healpix_accumulator` → `accumulator_cli()` -
-`healpix_finalize` → `finalize_cli()`
+`healpix_finalize` → `finalize_cli()` - `healpyxel_to_geoparquet` →
+`to_geoparquet_cli()`
