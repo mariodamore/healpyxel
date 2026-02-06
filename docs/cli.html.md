@@ -43,10 +43,18 @@
 
 *CLI entry point for healpix_sidecar command.*
 
+------------------------------------------------------------------------
+
+### cache_cli
+
+>      cache_cli ()
+
+*CLI entry point for healpyxel-cache command.*
+
 ## CLI Entry Points
 
 These functions are called when using the command-line tools: -
 `healpix_sidecar` → `sidecar_cli()` - `healpix_aggregate` →
 `aggregate_cli()` - `healpix_accumulator` → `accumulator_cli()` -
 `healpix_finalize` → `finalize_cli()` - `healpyxel_to_geoparquet` →
-`to_geoparquet_cli()`
+`to_geoparquet_cli()` - `healpyxel-cache` → `cache_cli()`

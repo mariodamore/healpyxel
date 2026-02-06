@@ -1,8 +1,8 @@
 {
   "processing": {
     "stage": "aggregate",
-    "timestamp": "2026-02-03T12:07:12.620547Z",
-    "source_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet",
+    "timestamp": "2026-02-05T15:00:43.191296Z",
+    "source_file": "../../samples/sample_50k.parquet",
     "sidecar_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet",
     "output_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet"
   },
@@ -19,13 +19,13 @@
     ],
     "filter_query": null,
     "min_count": 1,
-    "densified": true,
-    "n_cells_with_data": 49152,
+    "densified": false,
+    "n_cells_with_data": 27990,
     "columns_loaded": [
       "r1050"
     ],
     "output_shape": {
-      "rows": 49152,
+      "rows": 27990,
       "cols": 6
     }
   },
@@ -37,7 +37,7 @@
   "sidecar_metadata": {
     "processing": {
       "stage": "sidecar",
-      "timestamp": "2026-02-03T12:06:50.813933Z",
+      "timestamp": "2026-02-05T14:36:22.550667Z",
       "source_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet",
       "output_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet"
     },

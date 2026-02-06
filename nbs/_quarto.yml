@@ -4,9 +4,10 @@ project:
 format:
   html:
     logo: logo_cutout_128.png
+    respect-user-color-scheme: true
     theme: 
+      light: default
       dark: darkly
-      light: cosmo
     css: styles.css
     toc: true
     keep-md: true
@@ -43,8 +44,14 @@ website:
     collapse-level: 1
     contents:
       - index.ipynb
-      # - 00_core.ipynb
-      - section: Core Concepts
+      - section: Examples
+        contents:
+          - 80_example_quickstart.ipynb
+          - 81_example_visualization_workflow.ipynb
+          - 82_example_visualization_psf.ipynb
+          - 83_example_accumulation.ipynb
+          - 90_example_streaming.ipynb
+      - section: API Reference
         contents:
         - 00_setup.ipynb
         - 01_sidecar.ipynb
@@ -53,12 +60,6 @@ website:
         - 04_finalize.ipynb
         - 05_cli.ipynb
         - 06_visualization.ipynb
-      - section: Examples
-        contents:
-          - 80_example_quickstart.ipynb
-          - 81_example_visualization_workflow.ipynb
-          - 82_example_visualization_psf.ipynb
-          - 83_example_accumulation.ipynb
-          - 90_example_streaming.ipynb
+        - 07_geospatial.ipynb
 
 metadata-files: [nbdev.yml]

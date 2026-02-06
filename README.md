@@ -22,79 +22,464 @@ pip install healpyxel
 ### Optional Dependencies
 
 ``` bash
-# For percentile tracking
-pip install healpyxel[tdigest]
+# For geospatial operations (sidecar generation)
+pip install healpyxel[geospatial]
 
-# For parallel processing
-pip install healpyxel[dask]
+# For streaming/incremental statistics (accumulator)
+pip install healpyxel[streaming]
 
-# For efficient I/O
-pip install healpyxel[duckdb]
+# For visualization (maps, plots)
+pip install healpyxel[viz]
 
-# All extras
-pip install healpyxel[dev,tdigest,dask,duckdb]
+# Development tools (nbdev, testing, linting)
+pip install healpyxel[dev]
+
+# All optional dependencies
+pip install healpyxel[all]
 ```
+
+**Extras breakdown:** - `geospatial`: geopandas, shapely,
+dask-geopandas, antimeridian (required for `healpyxel_sidecar`) -
+`streaming`: tdigest (percentile tracking in `healpyxel_accumulator`) -
+`viz`: matplotlib, scikit-image, skyproj (mapping workflows) - `dev`:
+All of the above + nbdev, pytest, black, ruff, mypy - `all`: Installs
+geospatial + streaming + viz (excludes dev tools)
 
 ## Quick Start
 
 ### Batch Processing
 
+see [below](#cli-workflow)
+
 ``` bash
 # 1. Generate HEALPix sidecar (SPLIT)
-healpyxel-sidecar --input observations.parquet --nside 64 128 --mode fuzzy
+healpyxel_sidecar \
+  --input observations.parquet \
+  --nside 64 128 \
+  --mode fuzzy \
+  --output-dir output/
 
 # 2. Aggregate by HEALPix cells (APPLY)
-healpyxel-aggregate observations.parquet --sidecar-index 0 \
-  --columns r750 r950 --aggs median robust_std --output results.parquet
+healpyxel_aggregate \
+  --input observations.parquet \
+  --sidecar-dir output/ \
+  --sidecar-index 0 \
+  --aggregate \
+  --columns r750 r950 \
+  --aggs median robust_std \
+  --min-count 3
+
+# 3. Convert to GeoParquet (for visualization)
+healpyxel_to_geoparquet \
+  --aggregate-path output/observations-aggregated.*.parquet \
+  --output-dir output/ \
+  --lon-convention -180_180
+
+# 4. Cache HEALPix geometry (optional, speeds up visualization)
+healpyxel_cache --nside 64 128 --order nested --lon-convention 0_360
 ```
 
-### Streaming Processing
+### Streaming Processing - WORK IN PROGRESS
 
 ``` bash
 # Day 1: Initialize accumulator
-healpyxel-accumulate --input day001.parquet \
+healpyxel_accumulate --input day001.parquet \
   --columns r750 r950 --state-output state_v001.parquet
 
 # Day 2+: Incremental updates
-healpyxel-accumulate --input day002.parquet \
+healpyxel_accumulate --input day002.parquet \
   --columns r750 r950 \
   --state-input state_v001.parquet --state-output state_v002.parquet
 
 # Finalize to statistics
-healpyxel-finalize --state state_v030.parquet --output mosaic.parquet \
+healpyxel_finalize --state state_v030.parquet --output mosaic.parquet \
   --percentiles 25 50 75 --densify --nside 512
 ```
 
+## CLI Workflow
+
+This section explan a full CLI workflow on a test sample 50k data,
+including the outputs produced at each stage.
+
+The same workflow is done completely in python with healpyxel API in
+[Examples\>Visualization](example_visualization_workflow.html) section.
+
+All input/output are in this repsitory:
+
+- script is at
+  [examples/cli_regrid_sample_50k.sh](examples/cli_regrid_sample_50k.sh)
+- input are at
+  [test_data/samples/sample_50k.parquet](test_data/samples/sample_50k.parquet)
+- ouput are in
+  [test_data/derived/cli_quickstart](test_data/derived/cli_quickstart)
+
+<!-- -->
+
+    Original files excerpt (transposed for clarity):
+    Sidecar Metadata:
+    Unique sources: 49988
+      Unique HEALPix cells: 10860
+      Total assignments: 54931
+
+      Sidecar Data:
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | lat_center | lon_center | surface    | width      | length    | ang_incidence | ang_emission | ang_phase | azimuth    | geometry                                          |
+|-----|------------|------------|------------|------------|-----------|---------------|--------------|-----------|------------|---------------------------------------------------|
+| 0   | 5.186568   | 272.40450  | 1567133.4  | 1006.63727 | 1982.1799 | 43.049232     | 34.814793    | 77.85916  | 109.019295 | POLYGON ((272.39758 5.16433, 272.41583 5.18307... |
+| 1   | -60.939438 | 71.77686   | 13564574.0 | 4064.49850 | 4249.2210 | 64.178116     | 37.690910    | 101.84035 | 111.930336 | POLYGON ((71.72596 -60.89612, 71.69186 -60.963... |
+| 2   | 5.613894   | 54.23045   | 1755143.5  | 1013.51886 | 2204.9104 | 53.815990     | 24.053764    | 77.86254  | 99.559425  | POLYGON ((54.24406 5.63592, 54.22025 5.62014, ... |
+| 3   | -41.672714 | 324.49740  | 23309360.0 | 6511.20950 | 4558.0470 | 52.841824     | 46.625698    | 99.40995  | 121.833626 | POLYGON ((324.54932 -41.70964, 324.56927 -41.6... |
+
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | source_id | healpix_id | weight |
+|-----|-----------|------------|--------|
+| 0   | 0         | 7943       | 1.0    |
+| 1   | 1         | 8287       | 1.0    |
+| 2   | 2         | 5819       | 1.0    |
+| 3   | 3         | 11685      | 1.0    |
+| 4   | 4         | 3618       | 1.0    |
+| 5   | 5         | 3805       | 1.0    |
+| 6   | 6         | 9522       | 1.0    |
+| 7   | 7         | 10975      | 1.0    |
+| 8   | 8         | 1820       | 1.0    |
+| 9   | 9         | 3710       | 1.0    |
+
+</div>
+
+![](index_files/figure-commonmark/cell-2-output-4.png)
+
+### 1) Create HEALPix sidecar(s)
+
+Those files link each row in the input parquet file to the HEALPix cells
+at the requested **nside** resolution; see [Useful Healpix data for Moon
+Venus Mercury](#useful-healpix-data-for-moon-venus-mercury) for some
+cells data. Refer to `healpyxel_sidecar --help` for full options. The
+`--mode` flag is especially important: - `fuzzy`: assign each input
+record to every cell it touches - `strict`: assign only records fully
+contained within a cell
+
+``` bash
+healpyxel_sidecar \
+  --input "test_data/samples/sample_50k.parquet" \
+  --nside 32 64 \
+  --mode fuzzy \
+  --lon-convention 0_360 \
+  --output_dir "test_data/derived/cli_quickstart"
+```
+
+**Outputs**
+
+- sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet
+- sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json
+- sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet
+- sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json
+
+<!-- -->
+
+    Nside 32: 54931 assignments, 10860 unique cells
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|     | source_id | healpix_id | weight |
+|-----|-----------|------------|--------|
+| 0   | 0         | 7943       | 1.0    |
+| 1   | 1         | 8287       | 1.0    |
+| 2   | 2         | 5819       | 1.0    |
+| 3   | 3         | 11685      | 1.0    |
+| 4   | 4         | 3618       | 1.0    |
+
+</div>
+
+``` python
+# original_df['geometry'] = original_df.geometry.apply(
+#     lambda geom: geom.buffer(0) if geom and not geom.is_valid else geom
+# )
+```
+
+![](index_files/figure-commonmark/cell-5-output-1.png)
+
+### 2) Aggregate sparse regridded map(s)
+
+Now we need to aggregate initial data on the cells, refer to
+`healpyxel_aggregate --help` for all the option. Some flag are
+particurarly useful:
+
+- `--schema` : show input parquet schema, useful to look which data are
+  there to aggregate.
+- `--list-sidecars` : list available sidecar for an input files, they
+  are addressed by index.
+- `--sidecar-schema INDEX` : show schema for specific sidecar file
+- `--aggs mean` : aggregation functions (choices: mean, median, std,
+  min, max, mad, robust_std).
+
+Example :
+
+- input file contains columns A (you can check it with
+  `healpyxel_aggregate -i input --schema`)
+- `--agg mean median std`
+- this produce un output the columns `A_mean`, `A_median` and `A_std`
+  created appling those function on all input files rows listd in the
+  sidecar file for a single HEALPix cell
+
+``` bash
+healpyxel_aggregate \
+  --input "test_data/samples/sample_50k.parquet" \
+  --sidecar-dir "test_data/derived/cli_quickstart" \
+  --sidecar-index all \
+  --aggregate \
+  --columns r1050 \
+  --aggs mean median std mad robust_std \
+```
+
+This produces sparse output : only cells with actual values are written
+in ouput.
+
+**Outputs** -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json
+
+    Nside 32: 10860 unique cells
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|            | r1050_mean | r1050_median | r1050_std | r1050_mad | r1050_robust_std | n_sources |
+|------------|------------|--------------|-----------|-----------|------------------|-----------|
+| healpix_id |            |              |           |           |                  |           |
+| 0          | 0.048616   | 0.047857     | 0.003759  | 0.002672  | 0.003962         | 4         |
+| 1          | 0.051467   | 0.052283     | 0.002976  | 0.001888  | 0.002799         | 6         |
+| 2          | 0.049697   | 0.049118     | 0.003637  | 0.002289  | 0.003394         | 6         |
+| 3          | 0.059066   | 0.063241     | 0.007149  | 0.001711  | 0.002537         | 3         |
+| 4          | 0.051262   | 0.051523     | 0.006552  | 0.002510  | 0.003721         | 9         |
+
+</div>
+
+### 3) Aggregate densified regridded map(s)
+
+``` bash
+healpyxel_aggregate \
+  --input "test_data/samples/sample_50k.parquet" \
+  --sidecar-dir "test_data/derived/cli_quickstart" \
+  --sidecar-index all \
+  --aggregate \
+  --columns r1050 \
+  --aggs mean median std mad robust_std \
+  --densify
+```
+
+This produces dense output : all HEALPix cells are writeen in ouput,
+empty one as filled with Nan.
+
+**Outputs** -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json
+
+    Nside 32: 12288 unique cells <- densified , 1428 additional empty cells filled in by densification
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|            | r1050_mean | r1050_median | r1050_std | r1050_mad | r1050_robust_std | n_sources |
+|------------|------------|--------------|-----------|-----------|------------------|-----------|
+| healpix_id |            |              |           |           |                  |           |
+| 29         | 0.046644   | 0.046644     | 0.000000  | 0.000000  | 0.000000         | 1.0       |
+| 30         | NaN        | NaN          | NaN       | NaN       | NaN              | NaN       |
+| 31         | 0.040205   | 0.040986     | 0.009636  | 0.007137  | 0.010581         | 4.0       |
+| 32         | 0.054966   | 0.054413     | 0.003162  | 0.002148  | 0.003184         | 8.0       |
+| 33         | 0.054424   | 0.055591     | 0.004131  | 0.003358  | 0.004979         | 8.0       |
+| 34         | 0.057463   | 0.057463     | 0.001704  | 0.001704  | 0.002526         | 2.0       |
+| 35         | 0.050470   | 0.057635     | 0.017546  | 0.004688  | 0.006951         | 4.0       |
+| 36         | 0.054052   | 0.053640     | 0.004915  | 0.002833  | 0.004200         | 6.0       |
+| 37         | 0.056132   | 0.056019     | 0.002281  | 0.002128  | 0.003155         | 4.0       |
+| 38         | 0.060452   | 0.060592     | 0.002127  | 0.001878  | 0.002784         | 4.0       |
+| 39         | 0.060708   | 0.070030     | 0.014303  | 0.001562  | 0.002316         | 3.0       |
+| 40         | 0.041480   | 0.041480     | 0.000000  | 0.000000  | 0.000000         | 1.0       |
+| 41         | 0.028736   | 0.028736     | 0.000000  | 0.000000  | 0.000000         | 1.0       |
+| 42         | 0.070738   | 0.070655     | 0.009835  | 0.011921  | 0.017674         | 3.0       |
+| 43         | 0.062058   | 0.061658     | 0.009862  | 0.008409  | 0.012467         | 8.0       |
+| 44         | NaN        | NaN          | NaN       | NaN       | NaN              | NaN       |
+| 45         | 0.053895   | 0.054106     | 0.001107  | 0.001026  | 0.001521         | 3.0       |
+
+</div>
+
+### 4) Convert aggregated maps to GeoParquet
+
+This convert each aggregated file to a geoparquet.
+
+``` bash
+for f in "test_data/derived/cli_quickstart"/*-aggregated*parquet; do
+  healpyxel_to_geoparquet -a "$f" -d "test_data/derived/cli_quickstart" -l -180_180 -f
+done
+```
+
+**Outputs** -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.geo.parquet -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.geo.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.parquet
+
+    Nside 32: 10860 unique cells
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+|            | geometry                                          | r1050_mean | r1050_median | r1050_std | r1050_mad | r1050_robust_std | n_sources |
+|------------|---------------------------------------------------|------------|--------------|-----------|-----------|------------------|-----------|
+| healpix_id |                                                   |            |              |           |           |                  |           |
+| 0          | POLYGON ((45 2.38802, 43.59375 1.19375, 45 0, ... | 0.048616   | 0.047857     | 0.003759  | 0.002672  | 0.003962         | 4         |
+| 1          | POLYGON ((46.40625 3.58332, 45 2.38802, 46.406... | 0.051467   | 0.052283     | 0.002976  | 0.001888  | 0.002799         | 6         |
+| 2          | POLYGON ((43.59375 3.58332, 42.1875 2.38802, 4... | 0.049697   | 0.049118     | 0.003637  | 0.002289  | 0.003394         | 6         |
+| 3          | POLYGON ((45 4.78019, 43.59375 3.58332, 45 2.3... | 0.059066   | 0.063241     | 0.007149  | 0.001711  | 0.002537         | 3         |
+| 4          | POLYGON ((47.8125 4.78019, 46.40625 3.58332, 4... | 0.051262   | 0.051523     | 0.006552  | 0.002510  | 0.003721         | 9         |
+
+</div>
+
+![](index_files/figure-commonmark/cell-9-output-1.png)
+
 ## Python API
+
+Minimal end-to-end python API example, each level works on previous one
+output.
+
+- `initial data` → <!-- raw observations (GeoDataFrame/DataFrame) -->
+- `sidecar` : generate data \<\> healpix grid connections →
+  <!-- maps source_id to healpix_id -->
+- `aggregate` → <!-- per-cell statistics on value columns -->
+- `attach geometry` → <!-- add HEALPix cell polygons -->
+- `accumulate` → <!-- streaming state update (count/mean/m2/tdigest) -->
+- `finalize` <!-- final statistics from state -->
+
+minimal code, a more detailed explanation is in
+[Examples\>Visualization](example_visualization_workflow.html) section.
+
+------------------------------------------------------------------------
 
 ``` python
 from healpyxel import sidecar, aggregate, accumulator, finalize
+from healpyxel.geospatial import healpix_to_geodataframe
 
-# Generate sidecar
+# Minimal API sanity checks (nbdev-friendly)
+assert hasattr(sidecar, "generate")
+assert hasattr(aggregate, "by_sidecar")
+assert hasattr(accumulator, "update_state")
+assert hasattr(finalize, "from_state")
+assert callable(healpix_to_geodataframe)
+
+# 1) Sidecar (split)
 sidecar_df = sidecar.generate(
     gdf,
     nside=64,
-    mode='fuzzy'
+    mode="fuzzy",
+    order="nested",
+    lon_convention="0_360",
 )
 
-# Aggregate
-result = aggregate.by_sidecar(
+# 2) Aggregate (apply)
+agg_df = aggregate.by_sidecar(
     original=df,
     sidecar=sidecar_df,
-    value_columns=['r750', 'r950'],
-    aggs=['median', 'robust_std']
+    value_columns=["r750", "r950"],
+    aggs=["median", "robust_std"],
+    min_count=3,
+)
+
+# 2b) Attach geometry to step-2 products (geospatial)
+cells_gdf = healpix_to_geodataframe(
+    nside=64,
+    order="nested",
+    lon_convention="0_360",
+    pixels=agg_df["healpix_id"].to_numpy(),
+    fix_antimeridian=True,
+    cache_mode="use",
+).reset_index(drop=False)
+
+agg_geo_gdf = cells_gdf.merge(agg_df, on="healpix_id", how="left")
+
+# 3) Accumulator (streaming apply)
+state_df = accumulator.update_state(
+    batch=df,
+    sidecar=sidecar_df,
+    value_columns=["r750", "r950"],
+    state=None,
+)
+
+# 4) Finalize (combine)
+final_df = finalize.from_state(
+    state=state_df,
+    aggs=["mean", "std", "median", "robust_std"],
 )
 ```
-
-## Documentation
-
-See the [full documentation](https://mariodamore.github.io/healpyxel)
-for:
-
-- Detailed tutorials
-- API reference
-- Performance optimization tips
-- Example workflows
 
 ## Developed for MESSENGER/MASCS
 
@@ -110,66 +495,40 @@ handles:
 While designed for MASCS, healpyxel is general-purpose and works with
 any planetary science dataset in GeoParquet format.
 
-### Useful Healpix data for those missions
+### Useful Healpix data for Moon Venus Mercury
 
-``` python
-import healpy as hp
-import pandas as pd
-import numpy as np
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 
-# Mean planetary radii (km)
-R_MERCURY = 2439.7
-R_MOON = 1737.4
-R_VENUS = 6051.8
+|       | Number of Cells | Cell Angular Size (deg) | Mercury Cell Size (km) | Moon Cell Size (km) | Venus Cell Size (km) |
+|-------|-----------------|-------------------------|------------------------|---------------------|----------------------|
+| nside |                 |                         |                        |                     |                      |
+| 1     | 12              | 58.632                  | 2496.610               | 1777.928            | 6192.969             |
+| 2     | 48              | 29.316                  | 1248.305               | 888.964             | 3096.484             |
+| 4     | 192             | 14.658                  | 624.153                | 444.482             | 1548.242             |
+| 8     | 768             | 7.329                   | 312.076                | 222.241             | 774.121              |
+| 16    | 3,072           | 3.665                   | 156.038                | 111.120             | 387.061              |
+| 32    | 12,288          | 1.832                   | 78.019                 | 55.560              | 193.530              |
+| 64    | 49,152          | 0.916                   | 39.010                 | 27.780              | 96.765               |
+| 128   | 196,608         | 0.458                   | 19.505                 | 13.890              | 48.383               |
+| 256   | 786,432         | 0.229                   | 9.752                  | 6.945               | 24.191               |
+| 512   | 3,145,728       | 0.115                   | 4.876                  | 3.473               | 12.096               |
+| 1,024 | 12,582,912      | 0.057                   | 2.438                  | 1.736               | 6.048                |
+| 2,048 | 50,331,648      | 0.029                   | 1.219                  | 0.868               | 3.024                |
+| 4,096 | 201,326,592     | 0.014                   | 0.610                  | 0.434               | 1.512                |
+| 8,192 | 805,306,368     | 0.007                   | 0.305                  | 0.217               | 0.756                |
 
-#| export
-nsides = 2 ** np.arange(1, 13, dtype=np.int64)
-npix = hp.nside2npix(nsides)
-cell_ang_rad = np.sqrt(4 * np.pi / npix)
-cell_ang_deg = np.degrees(cell_ang_rad)
-
-df_resolution = pd.DataFrame({
-    "nside": nsides,
-    "Number of Cells": npix,
-    "Cell Angular Size": cell_ang_deg,
-    "Mercury Cell Size": cell_ang_rad * R_MERCURY,
-    "Moon Cell Size": cell_ang_rad * R_MOON,
-    "Venus Cell Size": cell_ang_rad * R_VENUS,
-})
-
-#| export
-def format_resolution_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Return a copy of the resolution table with int columns formatted with thousand separators and floats rounded to 3 decimals."""
-    df_fmt = df.copy()
-    int_cols = df_fmt.select_dtypes(include="int64").columns
-    float_cols = df_fmt.select_dtypes(include="float64").columns
-    for col in int_cols:
-        df_fmt[col] = df_fmt[col].map(lambda x: f"{x:,}")
-    for col in float_cols:
-        df_fmt[col] = df_fmt[col].round(3)
-    return df_fmt.set_index("nside")
-
-# Test: Ensure formatting is correct
-fmt = format_resolution_table(df_resolution)
-
-print(format_resolution_table(df_resolution).to_markdown()
-)
-```
-
-    | nside   | Number of Cells   |   Cell Angular Size |   Mercury Cell Size |   Moon Cell Size |   Venus Cell Size |
-    |:--------|:------------------|--------------------:|--------------------:|-----------------:|------------------:|
-    | 2       | 48                |              29.316 |            1248.31  |          888.964 |          3096.48  |
-    | 4       | 192               |              14.658 |             624.153 |          444.482 |          1548.24  |
-    | 8       | 768               |               7.329 |             312.076 |          222.241 |           774.121 |
-    | 16      | 3,072             |               3.665 |             156.038 |          111.12  |           387.061 |
-    | 32      | 12,288            |               1.832 |              78.019 |           55.56  |           193.53  |
-    | 64      | 49,152            |               0.916 |              39.01  |           27.78  |            96.765 |
-    | 128     | 196,608           |               0.458 |              19.505 |           13.89  |            48.383 |
-    | 256     | 786,432           |               0.229 |               9.752 |            6.945 |            24.191 |
-    | 512     | 3,145,728         |               0.115 |               4.876 |            3.473 |            12.096 |
-    | 1,024   | 12,582,912        |               0.057 |               2.438 |            1.736 |             6.048 |
-    | 2,048   | 50,331,648        |               0.029 |               1.219 |            0.868 |             3.024 |
-    | 4,096   | 201,326,592       |               0.014 |               0.61  |            0.434 |             1.512 |
+</div>
 
 ## License
 

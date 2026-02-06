@@ -4,8 +4,9 @@
 
 # %% auto 0
 __all__ = ['logger', 'AGG_LOOKUP', 'generate_output_filename', 'extract_nside_from_filename', 'validate_sidecar_metadata',
-           'collect_sidecar_outputs', 'print_dry_run_summary', 'densify_healpix_aggregates', 'aggregate_by_sidecar',
-           'parse_arguments', 'process_single_sidecar', 'main']
+           'collect_sidecar_outputs', 'print_parquet_schema', 'print_sidecar_summary', 'print_dry_run_summary',
+           'densify_healpix_aggregates', 'aggregate_by_sidecar', 'CustomFormatter', 'parse_arguments',
+           'process_single_sidecar', 'main']
 
 # %% ../nbs/02_aggregate.ipynb 2
 #| eval: false
@@ -116,17 +117,19 @@ AGG_LOOKUP: Dict[str, Callable] = {
 def generate_output_filename(
     input_file: Path,
     sidecar_file: Path,
-    output_dir: Optional[Path] = None
+    output_dir: Optional[Path] = None,
+    densified: bool = False
 ) -> Path:
     """
     Generate output filename that matches the parseable structure of the sidecar.
     
-    Pattern: <stem>-aggregated.<sidecar_suffix>.parquet
+    Pattern: <stem>-aggregated[-densified].<sidecar_suffix>.parquet
     
     Args:
         input_file: Original input parquet file
         sidecar_file: Sidecar file being used
         output_dir: Optional output directory (default: same as sidecar_file)
+        densified: If True, append '-densified' marker to filename
         
     Returns:
         Path to output file
@@ -134,7 +137,8 @@ def generate_output_filename(
     Example:
         input: mascs_data_MeSS.parquet
         sidecar: mascs_data_MeSS.cell-healpix_assignment-strict_nside-64_order-nested.parquet
-        output: mascs_data_MeSS-aggregated.cell-healpix_assignment-strict_nside-64_order-nested.parquet
+        sparse output: mascs_data_MeSS-aggregated.cell-healpix_assignment-strict_nside-64_order-nested.parquet
+        densified output: mascs_data_MeSS-aggregated-densified.cell-healpix_assignment-strict_nside-64_order-nested.parquet
     """
     input_stem = input_file.stem
     sidecar_name = sidecar_file.name
@@ -151,8 +155,9 @@ def generate_output_filename(
         logger.warning(f"Sidecar name doesn't start with expected stem '{input_stem}'")
         sidecar_suffix = sidecar_file.stem
     
-    # Build output filename
-    output_name = f"{input_stem}-aggregated.{sidecar_suffix}.parquet"
+    # Build output filename with densification marker
+    densify_marker = "-densified" if densified else ""
+    output_name = f"{input_stem}-aggregated{densify_marker}.{sidecar_suffix}.parquet"
     
     # Use output_dir if specified, otherwise use sidecar directory
     if output_dir is None:
@@ -289,6 +294,16 @@ def collect_sidecar_outputs(
         if not p.is_file():
             continue
         
+        # Skip the original input file itself
+        try:
+            if p.resolve() == input_parquet.resolve():
+                logger.debug(f"Skipping original input file: {p.name}")
+                continue
+        except Exception:
+            if p.name == input_parquet.name:
+                logger.debug(f"Skipping original input file: {p.name}")
+                continue
+        
         # Quick filter: skip files with -aggregated in filename
         if "-aggregated" in p.name:
             logger.debug(f"Skipping aggregate file: {p.name}")
@@ -349,6 +364,11 @@ def collect_sidecar_outputs(
         else:
             base = name
         
+        # Guard: plain input file (no suffix) is not a sidecar
+        if not meta_json and base == stem:
+            logger.debug(f"Skipping base input file without sidecar suffix: {p.name}")
+            continue
+        
         tail = base[len(stem) + 1:] if len(base) > len(stem) else ""
         if tail:
             meta = {}
@@ -406,7 +426,7 @@ def collect_sidecar_outputs(
                 "order",
                 "n_rows",
                 "n_unique_healpix",
-            ]
+            ],
         )
     
     df_out = pd.DataFrame(rows)
@@ -430,6 +450,78 @@ def collect_sidecar_outputs(
 
 
 # %% ../nbs/02_aggregate.ipynb 5
+#| eval: false
+def print_parquet_schema(file_path: Path, show_metadata: bool = True) -> None:
+    """
+    Print the schema of a parquet file.
+    
+    Args:
+        file_path: Path to the parquet file
+        show_metadata: Whether to display file metadata
+    """
+    try:
+        pf = pq.ParquetFile(file_path)
+        schema = pf.schema_arrow
+        
+        print(f"\nSchema for: {file_path.name}")
+        print("-" * 80)
+        print(schema)
+        
+        if show_metadata:
+            metadata = pf.schema_arrow.metadata
+            if metadata:
+                print("\nFile Metadata:")
+                print("-" * 80)
+                for k, v in metadata.items():
+                    key_str = k.decode('utf-8') if isinstance(k, bytes) else str(k)
+                    val_str = v.decode('utf-8') if isinstance(v, bytes) else str(v)
+                    print(f"  {key_str}: {val_str}")
+    except Exception as e:
+        logger.error(f"Failed to read schema from {file_path}: {e}")
+
+
+def print_sidecar_summary(sidecars_df: pd.DataFrame, input_file: Path) -> None:
+    """
+    Print a formatted summary table of available sidecar files.
+    
+    Args:
+        sidecars_df: DataFrame from collect_sidecar_outputs()
+        input_file: Original input parquet file path
+    """
+    print(f"\nAvailable Sidecar Files for: {input_file.name}")
+    print("=" * 100)
+    
+    if len(sidecars_df) == 0:
+        print("  (none found)")
+        return
+    
+    # Display columns
+    display_cols = ['mode', 'nside', 'order']
+    if 'n_rows' in sidecars_df.columns:
+        display_cols.extend(['n_rows', 'n_unique_healpix'])
+    
+    # Format output
+    for idx, row in sidecars_df.iterrows():
+        filename = Path(row['file']).name
+        print(f"\n[{idx}] {filename}")
+        for col in display_cols:
+            if col in row:
+                val = row[col]
+                if pd.notna(val):
+                    if col in ('n_rows', 'n_unique_healpix'):
+                        print(f"    {col:20s}: {int(val):,}")
+                    else:
+                        print(f"    {col:20s}: {val}")
+    
+    print("\n" + "=" * 100)
+    print(f"Use --sidecar-index <INDEX> to select a specific sidecar (0-{len(sidecars_df)-1})")
+    print(f"Or use --sidecar-index all to process all sidecars in batch mode")
+    print()
+
+
+
+
+# %% ../nbs/02_aggregate.ipynb 6
 #| eval: false
 def print_dry_run_summary(
     input_file: Path,
@@ -464,7 +556,7 @@ def print_dry_run_summary(
     print("\n" + "=" * 80)
 
 
-# %% ../nbs/02_aggregate.ipynb 6
+# %% ../nbs/02_aggregate.ipynb 7
 #| eval: false
 def densify_healpix_aggregates(
     agg_sparse_df: pd.DataFrame,
@@ -496,14 +588,14 @@ def densify_healpix_aggregates(
     return densified
 
 
-# %% ../nbs/02_aggregate.ipynb 7
+# %% ../nbs/02_aggregate.ipynb 8
 #| eval: false
 def aggregate_by_sidecar(
     original: pd.DataFrame,
     sidecar: pd.DataFrame,
     value_columns: Sequence[str],
     aggs: Optional[Sequence[str]] = None,
-    min_count: int = 0,
+    min_count: int = 1,
     source_id_col: str = "source_id",
     healpix_col: str = "healpix_id",
     sentinel_threshold: float = 1e30,
@@ -524,6 +616,13 @@ def aggregate_by_sidecar(
     Returns:
         Aggregated DataFrame with healpix_id as index
     """
+    
+    if min_count == 0:
+        logger.warning(
+            "min_count=0 detected: cells with zero sources will produce NaN statistics. "
+            "This is rarely correct. Consider --min-count 2 or higher for robust aggregation."
+        )
+
     if aggs is None:
         aggs = ['mean', 'median', 'std', 'robust_std']
     
@@ -661,151 +760,86 @@ def aggregate_by_sidecar(
     return result
 
 
+
+# %% ../nbs/02_aggregate.ipynb 9
+#| eval: false
+class CustomFormatter(argparse.RawDescriptionHelpFormatter):
+    def __init__(self, prog):
+        # Set the width here (120) while keeping RawDescription features
+        super().__init__(prog, width=120)
+
 def parse_arguments() -> argparse.Namespace:
-    """Parse command-line arguments."""
+    """Parse command-line arguments with educational help text."""
     parser = argparse.ArgumentParser(
-        description="Aggregate spatial data by HEALPix cells using sidecar files",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description="Aggregate spatial data by HEALPix cells using sidecar files (split-apply-combine workflow)",
+        formatter_class=CustomFormatter,
         epilog="""
-Examples:
-  # List available sidecar files
-  %(prog)s -i data.parquet --list-sidecars
-  
-  # Aggregate using specific sidecar
-  %(prog)s -i data.parquet --sidecar-index 0 --aggregate --columns reflectance radiance
-  
-  # Batch process all sidecars
-  %(prog)s -i data.parquet --sidecar-index all --aggregate --columns reflectance radiance
-  
-  # Process specific sidecars with error handling
-  %(prog)s -i data.parquet --sidecar-index 0 2 4 --aggregate --columns value --stop-on-error
+EXAMPLES:
+
+  # Inspect input file schema
+  %(prog)s -i data.parquet --schema
+
+  # List available sidecar files with statistics
+  %(prog)s -i data.parquet --list-sidecars --stats
+
+  # Single sidecar aggregation with robust statistics
+  %(prog)s -i data.parquet --sidecar-index 0 --aggregate \\
+    --columns reflectance radiance --aggs mean median robust_std \\
+    --min-count 2
+
+  # Batch process all sidecars and densify output
+  %(prog)s -i data.parquet --sidecar-index all --aggregate \\
+    --columns value --densify -y
+
+  # Filter data before aggregation (only observations with QA > 0.8)
+  %(prog)s -i data.parquet --sidecar-index 0 --aggregate \\
+    --columns value --filter 'qa_flag > 0.8'
+
+  # Use DuckDB for efficient loading of large files (default behavior)
+  %(prog)s -i data.parquet --sidecar-index 0 --aggregate \\
+    --columns reflectance --use-duckdb
+
+  # Process with Dask for parallel aggregation (8 partitions)
+  %(prog)s -i data.parquet --sidecar-index all --aggregate \\
+    --columns value --use-dask --dask-npartitions 8
+
+  # Dry-run: preview what would be done without writing
+  %(prog)s -i data.parquet --sidecar-index 0 --aggregate \\
+    --columns value --dry-run
+
+  # Verbose logging for debugging failed aggregations
+  %(prog)s -i data.parquet --sidecar-index 0 --aggregate \\
+    --columns value --verbose
+
+  # Batch process with per-sidecar error tolerance (skip failures)
+  %(prog)s -i data.parquet --sidecar-index all --aggregate \\
+    --columns value
+  # vs. stop on first error:
+  %(prog)s -i data.parquet --sidecar-index all --aggregate \\
+    --columns value --stop-on-error
         """
     )
     
-    # Input/Output
+    # =========================================================================
+    # INPUT/OUTPUT
+    # =========================================================================
     parser.add_argument(
         '-i', '--input',
         type=Path,
         required=True,
         metavar='FILE',
-        help='Input parquet file'
+        help='Input parquet file with observational data (required). '
+             'Must contain a "source_id" column and value columns specified by --columns.'
     )
     
     parser.add_argument(
-        '-d','--sidecar-dir',
+        '-d', '--sidecar-dir',
         type=Path,
         default=None,
         metavar='DIR',
-        help='Directory containing sidecar files (default: same as input file)'
-    )
-    
-    # Schema inspection
-    parser.add_argument(
-        '--schema',
-        action='store_true',
-        help='Show parquet schema and exit'
-    )
-    
-    parser.add_argument(
-        '--list-sidecars',
-        action='store_true',
-        help='List available sidecar files and exit'
-    )
-    
-    parser.add_argument(
-        '--sidecar-schema',
-        type=int,
-        metavar='INDEX',
-        help='Show schema for specific sidecar file'
-    )
-    
-    parser.add_argument(
-        '--stats',
-        action='store_true',
-        help='Compute statistics when listing sidecars (slower)'
-    )
-    
-    # Aggregation options
-    parser.add_argument(
-        '--sidecar-index',
-        type=str,
-        nargs='+',
-        metavar='INDEX',
-        help='Sidecar index(es) to process: "all" for all sidecars, or space-separated integers (e.g., "0 2 4")'
-    )
-    
-    parser.add_argument(
-        '--stop-on-error',
-        action='store_true',
-        help='Stop batch processing when an error occurs (default: continue with next sidecar)'
-    )
-    
-    parser.add_argument(
-        '--aggregate',
-        action='store_true',
-        help='Perform aggregation'
-    )
-    
-    parser.add_argument(
-        '--columns',
-        nargs='+',
-        metavar='COL',
-        help='Column names to aggregate (required for --aggregate)'
-    )
-    
-    parser.add_argument(
-        '--aggs',
-        nargs='+',
-        metavar='AGG',
-        choices=list(AGG_LOOKUP.keys()),
-        help=f"Aggregation functions (choices: {', '.join(AGG_LOOKUP.keys())}). Default: mean median std robust_std"
-    )
-    
-    parser.add_argument(
-        '--filter',
-        type=str,
-        metavar='EXPR',
-        help="Pandas query expression to filter data (e.g., '(b != 3) and (c != 3)')"
-    )
-    
-    parser.add_argument(
-        '--min-count',
-        type=int,
-        default=0,
-        metavar='N',
-        help='Minimum sources per cell (default: 0)'
-    )
-    
-    parser.add_argument(
-        '--densify',
-        action='store_true',
-        help='Densify output to include all HEALPix cells (fills empty cells with NaN/NA)'
-    )
-    
-    parser.add_argument(
-        '--use-duckdb',
-        action='store_true',
-        default=True,
-        help='Use DuckDB for efficient column selection and filtering (default: True)'
-    )
-    
-    parser.add_argument(
-        '--no-duckdb',
-        action='store_true',
-        help='Disable DuckDB and use pandas/dask for loading'
-    )
-    
-    parser.add_argument(
-        '--use-dask',
-        action='store_true',
-        help='Use Dask for parallel processing of aggregation (works with DuckDB)'
-    )
-    
-    parser.add_argument(
-        '--dask-npartitions',
-        type=int,
-        metavar='N',
-        help='Number of Dask partitions (default: auto-detect from CPU count)'
+        help='Directory containing sidecar files (default: same directory as input file). '
+             'Sidecars are HEALPix cell assignments generated by `healpix_sidecar`. '
+             'Script auto-detects files matching input stem and .meta.json metadata.'
     )
     
     parser.add_argument(
@@ -815,28 +849,237 @@ Examples:
         const=None,
         default=None,
         metavar='FILE',
-        help='Output parquet file or directory (default: auto-generated from sidecar)'
+        help='Output parquet file or directory (default: auto-generated from sidecar metadata). '
+             'If directory, filename is auto-generated as: '
+             '<input_stem>-aggregated[-densified].<sidecar_suffix>.parquet. '
+             'Auto-naming ensures consistent filenames across batch runs.'
+    )
+    
+    # =========================================================================
+    # SCHEMA INSPECTION (Read-only queries; no aggregation performed)
+    # =========================================================================
+    parser.add_argument(
+        '--schema',
+        action='store_true',
+        help='Display schema of input parquet file (column names, types, metadata) and exit. '
+             'Use this to verify columns exist before running --aggregate. '
+             'Shows Arrow schema and file-level metadata (e.g., pandas index info).'
+    )
+    
+    parser.add_argument(
+        '--list-sidecars',
+        action='store_true',
+        help='Scan sidecar directory and display available sidecars with metadata. '
+             'Shows: mode (e.g., "strict"), nside (HEALPix resolution), order ("nested"/"ring"). '
+             'Optionally read row counts with --stats. Use to choose sidecar via --sidecar-index.'
+    )
+    
+    parser.add_argument(
+        '--sidecar-schema',
+        type=int,
+        metavar='INDEX',
+        help='Display schema of specific sidecar file by index (0-based). '
+             'First run --list-sidecars to see available indices and metadata. '
+             'Useful for verifying sidecar structure before aggregation.'
+    )
+    
+    parser.add_argument(
+        '--stats',
+        action='store_true',
+        help='When used with --list-sidecars, compute and display row counts and '
+             'unique HEALPix cell counts for each sidecar (slower, requires reading files). '
+             'Helps estimate output size and coverage before aggregation.'
+    )
+    
+    # =========================================================================
+    # AGGREGATION CONTROL
+    # =========================================================================
+    parser.add_argument(
+        '--sidecar-index',
+        type=str,
+        nargs='+',
+        metavar='INDEX',
+        help='Select which sidecar(s) to process. Three modes:\n'
+             '  --sidecar-index all           Process all sidecars in batch mode\n'
+             '  --sidecar-index 0             Process single sidecar (index 0)\n'
+             '  --sidecar-index 0 2 4         Process specific sidecars (batch mode)\n'
+             'Required for --aggregate. Use --list-sidecars to see available indices.\n'
+             'Batch mode processes all specified sidecars sequentially, aggregating '
+             'by different HEALPix resolutions in one command.'
+    )
+    
+    parser.add_argument(
+        '--aggregate',
+        action='store_true',
+        help='Perform aggregation (required flag to enable processing). '
+             'Must be paired with --sidecar-index and --columns. '
+             'Without this flag, only schema inspection operations run.'
+    )
+    
+    parser.add_argument(
+        '--columns',
+        nargs='+',
+        metavar='COL',
+        help='Value columns to aggregate (space-separated; required for --aggregate). '
+             'Example: --columns reflectance radiance emission. '
+             'Each column will have aggregation functions applied (mean, median, std, etc.). '
+             'Columns must exist in input parquet file (verify with --schema first).'
+    )
+    
+    # =========================================================================
+    # AGGREGATION STATISTICS
+    # =========================================================================
+    parser.add_argument(
+        '--aggs',
+        nargs='+',
+        metavar='AGG',
+        choices=list(AGG_LOOKUP.keys()),
+        help=f"Aggregation functions to compute (space-separated; default: mean median std robust_std). "
+             f"Choices: {', '.join(AGG_LOOKUP.keys())}. "
+             f"Robust options (mad, robust_std) recommended for outlier-prone data. "
+             f"Each function produces one output column per value column: "
+             f"<column>_<agg> (e.g., reflectance_mad, reflectance_robust_std)."
+    )
+    
+    parser.add_argument(
+        '--min-count',
+        type=int,
+        default=1,
+        metavar='N',
+        help='Minimum observations per HEALPix cell for valid aggregation (default: 1). '
+             'Cells with fewer than N observations output NaN for all statistics. '
+             'Domain guidance:\n'
+             '  min-count 1   — Include any cell touched by data (permissive)\n'
+             '  min-count 2-3 — Recommended for robust_std/MAD (handle outliers)\n'
+             '  min-count 5+  — Strict validation (reject sparse cells)\n'
+             '  min-count 0   — RARE: explicitly allow NaN-only cells (use only if you '
+             'understand the consequence). Default changed from 0→1 to prevent silent '
+             'propagation of empty cells.'
+    )
+    
+    parser.add_argument(
+        '--filter',
+        type=str,
+        metavar='EXPR',
+        help='Pandas query expression to filter observations before aggregation '
+             '(e.g., --filter "(qa_flag > 0.8) and (wavelength < 1000)"). '
+             'Applied during data load, reducing I/O and memory footprint. '
+             'Boolean operators: and, or, not. Parentheses required. '
+             'Column names must match input parquet exactly (case-sensitive). '
+             'Useful for quality filtering, spectral selection, or temporal subsetting. '
+             'Filtering happens *before* aggregation, so min-count applies to filtered data.'
+    )
+    
+    parser.add_argument(
+        '--densify',
+        action='store_true',
+        help='Densify output to include all HEALPix cells (0 to 12*nside²-1), '
+             'filling unobserved cells with NaN. Output shape: n_pixels × n_aggregations. '
+             'Enables uniform grids for visualization and downstream analysis (e.g., map-making). '
+             'Trade-off: sparse output (only observed cells) is smaller; '
+             'dense output is larger but suitable for rasterization and numpy operations. '
+             'Requires nside from sidecar metadata (auto-detected).'
+    )
+    
+    # =========================================================================
+    # DATA LOADING BACKENDS
+    # =========================================================================
+    parser.add_argument(
+        '--use-duckdb',
+        action='store_true',
+        default=True,
+        help='Use DuckDB for efficient data loading (default: enabled). '
+             'DuckDB performs column projection and WHERE filtering at the parquet '
+             'layer, reducing memory and I/O. Recommended for large files (>1GB). '
+             'If DuckDB unavailable, falls back to pandas/dask automatically. '
+             'See --no-duckdb to disable.'
+    )
+    
+    parser.add_argument(
+        '--no-duckdb',
+        action='store_true',
+        help='Disable DuckDB and use pandas/dask for data loading instead. '
+             'Use if DuckDB is unavailable or causes issues. '
+             'Pandas will load full columns into memory; less efficient for wide tables '
+             'or large files. Dask (if enabled) provides parallel reads as fallback.'
+    )
+    
+    parser.add_argument(
+        '--use-dask',
+        action='store_true',
+        help='Use Dask for parallel aggregation of large datasets (works with/without DuckDB). '
+             'Dask partitions HEALPix groupby operations across CPU cores, '
+             'speeding up aggregation of cells with many observations per partition. '
+             'Trade-off: overhead for small datasets (<100k rows); beneficial for >1M rows. '
+             'Combine with --dask-npartitions to control parallelism. '
+             'Requires: pip install dask[dataframe].'
+    )
+    
+    parser.add_argument(
+        '--dask-npartitions',
+        type=int,
+        metavar='N',
+        help='Number of Dask partitions for parallel processing (default: CPU count - 1). '
+             'Each partition processes a subset of rows independently, then results merge. '
+             'Tuning guidance:\n'
+             '  N = CPU cores     — Start here (good I/O balance)\n'
+             '  N = 2 × CPU cores — For I/O-bound workloads (network storage)\n'
+             '  N = 1             — Debug mode (no parallelism, easier tracing)\n'
+             'Requires --use-dask. Ignored if Dask unavailable.'
+    )
+    
+    # =========================================================================
+    # BATCH PROCESSING & ERROR HANDLING
+    # =========================================================================
+    parser.add_argument(
+        '--stop-on-error',
+        action='store_true',
+        help='Stop batch processing on first error (default: skip failed sidecar, continue). '
+             'Default behavior: collect errors and report summary. '
+             'Use --stop-on-error for strict validation (e.g., CI/CD pipelines). '
+             'Batch results logged at end with success/error counts and paths.'
+    )
+    
+    parser.add_argument(
+        '-y', '--yes',
+        action='store_true',
+        help='Skip overwrite prompts and force output file write (non-interactive mode). '
+             'Use in batch scripts/cron jobs to avoid hanging on existing output files. '
+             'Without -y, user is prompted before overwriting.'
     )
     
     parser.add_argument(
         '-n', '--dry-run',
         action='store_true',
-        help='Show what would be done without executing'
+        help='Show what would be done without modifying files (preview mode). '
+             'Prints: input/output paths, columns, aggregations, filters, backend config. '
+             'Useful for validating command-line arguments before committing to long runs. '
+             'No parquet files are written in dry-run mode.'
     )
     
-    # Logging options
+    # =========================================================================
+    # LOGGING & VERBOSITY
+    # =========================================================================
     parser.add_argument(
         '-v', '--verbose',
         action='store_true',
-        help='Enable verbose (debug) logging'
+        help='Enable debug-level logging (default: INFO). '
+             'Prints detailed progress: cell-by-cell statistics, column type coercions, '
+             'source_id overlap analysis, metadata parsing. '
+             'Use when debugging data quality issues or tracing slow aggregations.'
     )
     
     parser.add_argument(
         '-q', '--quiet',
         action='store_true',
-        help='Suppress all output except errors'
+        help='Suppress all output except errors (default: INFO level). '
+             'Useful for production runs where you only want to see failures. '
+             'Combines well with --yes for silent batch execution.'
     )
     
+    # =========================================================================
+    # PARSE & POST-PROCESSING
+    # =========================================================================
     args = parser.parse_args()
     
     # Set default sidecar_dir if not provided
@@ -846,10 +1089,8 @@ Examples:
     # Validate --sidecar-index format: "all" string or list of integers
     if args.sidecar_index is not None:
         if len(args.sidecar_index) == 1 and args.sidecar_index[0].lower() == 'all':
-            # Valid: single "all" keyword
             args.sidecar_index = ['all']
         else:
-            # Must be list of integers
             try:
                 args.sidecar_index = [int(idx) for idx in args.sidecar_index]
             except ValueError:
@@ -857,7 +1098,7 @@ Examples:
     
     return args
 
-# %% ../nbs/02_aggregate.ipynb 8
+# %% ../nbs/02_aggregate.ipynb 10
 #| eval: false
 def process_single_sidecar(
     input_file: Path,
@@ -894,22 +1135,32 @@ def process_single_sidecar(
     try:
         logger.info(f"Processing sidecar [{sidecar_index}]: {sidecar_path.name}")
         
-        # Determine output path
+        # Determine output path with densification marker
         if args.output is None:
             output_dir = args.sidecar_dir if args.sidecar_dir.exists() else Path.cwd()
-            output_path = generate_output_filename(input_file, sidecar_path, output_dir)
+            output_path = generate_output_filename(input_file, sidecar_path, output_dir, densified=args.densify)
             logger.info(f"Generated output filename: {output_path}")
         elif args.output.is_dir():
-            output_path = generate_output_filename(input_file, sidecar_path, args.output)
+            output_path = generate_output_filename(input_file, sidecar_path, args.output, densified=args.densify)
             logger.info(f"Output is directory, using: {output_path}")
         elif args.output.suffix == '':
             args.output.mkdir(parents=True, exist_ok=True)
-            output_path = generate_output_filename(input_file, sidecar_path, args.output)
+            output_path = generate_output_filename(input_file, sidecar_path, args.output, densified=args.densify)
             logger.info(f"Output has no extension (directory), using: {output_path}")
         else:
             output_path = args.output
         
         result['output_path'] = str(output_path)
+        
+        # Check for existing file and prompt for overwrite
+        if output_path.exists() and not args.yes:
+            logger.warning(f"Output file already exists: {output_path.name}")
+            response = input("Overwrite? [y/N] ").strip().lower()
+            if response != 'y':
+                result['status'] = 'skipped'
+                result['error'] = "User declined overwrite"
+                logger.info("Skipping this sidecar")
+                return result
         
         # Dry run: show what would be done
         if args.dry_run:
@@ -1098,6 +1349,8 @@ def process_single_sidecar(
         result['metadata_path'] = str(metadata_path)
         result['n_cells'] = len(agg_result)
         
+        return result
+    
     except Exception as e:
         logger.error(f"Failed to process sidecar [{sidecar_index}]: {e}")
         result['status'] = 'error'
@@ -1105,13 +1358,24 @@ def process_single_sidecar(
         
         if args.stop_on_error:
             raise
-    
-    return result
 
-# %% ../nbs/02_aggregate.ipynb 9
+# %% ../nbs/02_aggregate.ipynb 11
 #| eval: false
+def _is_interactive_session() -> bool:
+    """Return True when running inside IPython/Jupyter."""
+    try:
+        get_ipython  # type: ignore[name-defined]
+        return True
+    except Exception:
+        return False
+
+
 def main():
     """Main entry point for the aggregation CLI."""
+    if _is_interactive_session():
+        logger.info("Interactive session detected; skipping CLI argument parsing.")
+        return
+    
     args = parse_arguments()
     
     # Configure logging level
@@ -1301,4 +1565,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

@@ -32,7 +32,9 @@ The project uses **nbdev** (literate programming) where Jupyter notebooks in `nb
 
 ## Architecture: The Four-Phase Pipeline
 
-The system follows a split-apply-combine pattern across four main modules:
+The system follows a split-apply-combine pattern across four main processing modules, plus supporting utilities:
+
+### Core Processing Modules (01–04)
 
 1. **Sidecar** ([01_sidecar.ipynb](nbs/01_sidecar.ipynb)): Maps geometries to HEALPix cells. Supports "fuzzy" mode (polygon overlap with weights) and multiple NSIDE resolutions. Uses `dask-geopandas` for lazy loading.
 
@@ -43,6 +45,14 @@ The system follows a split-apply-combine pattern across four main modules:
 4. **Finalize** ([04_finalize.ipynb](nbs/04_finalize.ipynb)): Converts accumulator state into final statistics maps. Supports densification (upsampling to higher NSIDE).
 
 All four are exposed as CLI commands via [05_cli.ipynb](nbs/05_cli.ipynb): `healpix_sidecar`, `healpix_aggregate`, `healpix_accumulator`, `healpix_finalize`.
+
+### Foundation & Support Modules (00–00b, 06–07)
+
+- **Core** ([00_core.ipynb](nbs/00_core.ipynb)): Low-level utilities—robust statistics (MAD, robust_std), HEALPix helpers, data validation.
+- **Setup** ([00_setup.ipynb](nbs/00_setup.ipynb)): Environment configuration and initialization.
+- **Metadata** ([00b_metadata.ipynb](nbs/00b_metadata.ipynb)): Metadata schema definitions and handling for observation data.
+- **Visualization** ([06_visualization.ipynb](nbs/06_visualization.ipynb)): Map rendering and post-processing (HEALPix maps to FITS, PNG, etc.). Supports multiple projections.
+- **Geospatial** ([07_geospatial.ipynb](nbs/07_geospatial.ipynb)): Geometry utilities, antimeridian fixes, shapely operations.
 
 ## Critical nbdev Workflow
 
@@ -146,11 +156,21 @@ Visualization ([06_visualization.ipynb](nbs/06_visualization.ipynb)) requires: `
 
 ## Documentation
 
-Docs are in `docs/` (auto-generated). The homepage is [index.ipynb](nbs/index.ipynb). Examples:
+Docs are in `docs/` (auto-generated). The homepage is [index.ipynb](nbs/index.ipynb).
+
+### Tutorial Notebooks (80–89)
+Basic examples for common workflows:
 - [80_example_quickstart.ipynb](nbs/80_example_quickstart.ipynb) — Basic batch workflow
-- [81_example_visualization_workflow.ipynb](nbs/81_example_visualization_workflow.ipynb) — Creating maps
-- [83_example_accumulation.ipynb](nbs/83_example_accumulation.ipynb) — Streaming workflow
-- [90_example_streaming.ipynb](nbs/90_example_streaming.ipynb) — End-to-end streaming
+- [81_example_visualization_workflow.ipynb](nbs/81_example_visualization_workflow.ipynb) — Creating maps from aggregated data
+- [82_example_visualization_psf.ipynb](nbs/82_example_visualization_psf.ipynb) — PSF (Point Spread Function) visualization
+- [83_example_accumulation.ipynb](nbs/83_example_accumulation.ipynb) — Streaming workflow with accumulator
+
+### Advanced Examples (90+)
+Complex end-to-end workflows:
+- [90_example_streaming.ipynb](nbs/90_example_streaming.ipynb) — Multi-batch streaming pipeline
+
+### Supporting Notebooks
+- [logo_generation.ipynb](nbs/logo_generation.ipynb) — Logo and branding assets (not exported to module)
 
 Notebooks prefixed `80-89` are tutorials, `90+` are advanced examples.
 
@@ -160,8 +180,16 @@ Notebooks prefixed `80-89` are tutorials, `90+` are advanced examples.
 - [pyproject.toml](pyproject.toml) — Modern Python packaging (mirrors settings.ini)
 - [Makefile](Makefile) — Convenient targets for nbdev workflows
 - [nbs/_quarto.yml](nbs/_quarto.yml) — Quarto documentation config
+- [nbs/nbdev.yml](nbs/nbdev.yml) — nbdev notebook-specific settings
+- [nbs/sidebar.yml](nbs/sidebar.yml) — Documentation sidebar structure
 
 When updating dependencies, change [settings.ini](settings.ini) first, then run `nbdev_prepare` to sync [pyproject.toml](pyproject.toml).
+
+## Processed & Build Artifacts
+
+- `_proc/` — Built HTML and markdown from notebooks (auto-generated, do not edit)
+- `docs/` — Published documentation (auto-generated from `_proc/`)
+- `.pytest_cache/`, `healpyxel.egg-info/` — Build artifacts
 
 ## Migration Status
 

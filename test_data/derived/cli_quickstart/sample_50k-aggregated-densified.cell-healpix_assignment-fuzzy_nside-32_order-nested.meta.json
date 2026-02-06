@@ -1,0 +1,77 @@
+{
+  "processing": {
+    "stage": "aggregate",
+    "timestamp": "2026-02-05T15:00:53.553135Z",
+    "source_file": "../../samples/sample_50k.parquet",
+    "sidecar_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet",
+    "output_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet"
+  },
+  "aggregation": {
+    "value_columns": [
+      "r1050"
+    ],
+    "aggregations": [
+      "mean",
+      "median",
+      "std",
+      "mad",
+      "robust_std"
+    ],
+    "filter_query": null,
+    "min_count": 1,
+    "densified": true,
+    "n_cells_with_data": 12288,
+    "columns_loaded": [
+      "r1050"
+    ],
+    "output_shape": {
+      "rows": 12288,
+      "cols": 6
+    }
+  },
+  "backend": {
+    "used_duckdb": true,
+    "used_dask": false,
+    "dask_npartitions": null
+  },
+  "sidecar_metadata": {
+    "processing": {
+      "stage": "sidecar",
+      "timestamp": "2026-02-05T14:36:06.101366Z",
+      "source_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet",
+      "output_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet"
+    },
+    "healpix": {
+      "nside": 32,
+      "mode": "fuzzy",
+      "order": "nested",
+      "npix": 12288
+    },
+    "coordinates": {
+      "lon_convention": "0_360",
+      "lon_range": [
+        0,
+        360
+      ],
+      "lat_range": [
+        -90,
+        90
+      ]
+    },
+    "processing_params": {
+      "ncores": 15,
+      "coalesced": true,
+      "data_psf": "none",
+      "data_psf_sigma_level": 2.0,
+      "cell_psf": "none",
+      "cell_psf_sigma_level": 2.0,
+      "psf_combine": "multiply",
+      "psf_normalize": true
+    }
+  },
+  "_legacy": {
+    "healpix_mode": "fuzzy",
+    "healpix_nside": "32",
+    "healpix_order": "nested"
+  }
+}

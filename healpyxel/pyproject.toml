@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "healpyxel"
+version = "0.1.0"
+description = "A project for processing and analyzing data."
+authors = ["Your Name <youremail@example.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+# Add any additional dependencies here
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

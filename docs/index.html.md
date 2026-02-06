@@ -22,79 +22,910 @@ pip install healpyxel
 ### Optional Dependencies
 
 ``` bash
-# For percentile tracking
-pip install healpyxel[tdigest]
+# For geospatial operations (sidecar generation)
+pip install healpyxel[geospatial]
 
-# For parallel processing
-pip install healpyxel[dask]
+# For streaming/incremental statistics (accumulator)
+pip install healpyxel[streaming]
 
-# For efficient I/O
-pip install healpyxel[duckdb]
+# For visualization (maps, plots)
+pip install healpyxel[viz]
 
-# All extras
-pip install healpyxel[dev,tdigest,dask,duckdb]
+# Development tools (nbdev, testing, linting)
+pip install healpyxel[dev]
+
+# All optional dependencies
+pip install healpyxel[all]
 ```
+
+**Extras breakdown:** - `geospatial`: geopandas, shapely,
+dask-geopandas, antimeridian (required for `healpyxel_sidecar`) -
+`streaming`: tdigest (percentile tracking in `healpyxel_accumulator`) -
+`viz`: matplotlib, scikit-image, skyproj (mapping workflows) - `dev`:
+All of the above + nbdev, pytest, black, ruff, mypy - `all`: Installs
+geospatial + streaming + viz (excludes dev tools)
 
 ## Quick Start
 
 ### Batch Processing
 
+see [below](#cli-workflow)
+
 ``` bash
 # 1. Generate HEALPix sidecar (SPLIT)
-healpyxel-sidecar --input observations.parquet --nside 64 128 --mode fuzzy
+healpyxel_sidecar \
+  --input observations.parquet \
+  --nside 64 128 \
+  --mode fuzzy \
+  --output-dir output/
 
 # 2. Aggregate by HEALPix cells (APPLY)
-healpyxel-aggregate observations.parquet --sidecar-index 0 \
-  --columns r750 r950 --aggs median robust_std --output results.parquet
+healpyxel_aggregate \
+  --input observations.parquet \
+  --sidecar-dir output/ \
+  --sidecar-index 0 \
+  --aggregate \
+  --columns r750 r950 \
+  --aggs median robust_std \
+  --min-count 3
+
+# 3. Convert to GeoParquet (for visualization)
+healpyxel_to_geoparquet \
+  --aggregate-path output/observations-aggregated.*.parquet \
+  --output-dir output/ \
+  --lon-convention -180_180
+
+# 4. Cache HEALPix geometry (optional, speeds up visualization)
+healpyxel_cache --nside 64 128 --order nested --lon-convention 0_360
 ```
 
-### Streaming Processing
+### Streaming Processing - WORK IN PROGRESS
 
 ``` bash
 # Day 1: Initialize accumulator
-healpyxel-accumulate --input day001.parquet \
+healpyxel_accumulate --input day001.parquet \
   --columns r750 r950 --state-output state_v001.parquet
 
 # Day 2+: Incremental updates
-healpyxel-accumulate --input day002.parquet \
+healpyxel_accumulate --input day002.parquet \
   --columns r750 r950 \
   --state-input state_v001.parquet --state-output state_v002.parquet
 
 # Finalize to statistics
-healpyxel-finalize --state state_v030.parquet --output mosaic.parquet \
+healpyxel_finalize --state state_v030.parquet --output mosaic.parquet \
   --percentiles 25 50 75 --densify --nside 512
 ```
 
+## CLI Workflow
+
+This section explan a full CLI workflow on a test sample 50k data,
+including the outputs produced at each stage.
+
+The same workflow is done completely in python with healpyxel API in
+[Examples\>Visualization](example_visualization_workflow.html) section.
+
+All input/output are in this repsitory:
+
+- script is at
+  [examples/cli_regrid_sample_50k.sh](examples/cli_regrid_sample_50k.sh)
+- input are at
+  [test_data/samples/sample_50k.parquet](test_data/samples/sample_50k.parquet)
+- ouput are in
+  [test_data/derived/cli_quickstart](test_data/derived/cli_quickstart)
+
+<!-- -->
+
+    Original files excerpt (transposed for clarity):
+    Sidecar Metadata:
+    Unique sources: 49988
+      Unique HEALPix cells: 10860
+      Total assignments: 54931
+
+      Sidecar Data:
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">lat_center</th>
+<th data-quarto-table-cell-role="th">lon_center</th>
+<th data-quarto-table-cell-role="th">surface</th>
+<th data-quarto-table-cell-role="th">width</th>
+<th data-quarto-table-cell-role="th">length</th>
+<th data-quarto-table-cell-role="th">ang_incidence</th>
+<th data-quarto-table-cell-role="th">ang_emission</th>
+<th data-quarto-table-cell-role="th">ang_phase</th>
+<th data-quarto-table-cell-role="th">azimuth</th>
+<th data-quarto-table-cell-role="th">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>5.186568</td>
+<td>272.40450</td>
+<td>1567133.4</td>
+<td>1006.63727</td>
+<td>1982.1799</td>
+<td>43.049232</td>
+<td>34.814793</td>
+<td>77.85916</td>
+<td>109.019295</td>
+<td>POLYGON ((272.39758 5.16433, 272.41583 5.18307...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>-60.939438</td>
+<td>71.77686</td>
+<td>13564574.0</td>
+<td>4064.49850</td>
+<td>4249.2210</td>
+<td>64.178116</td>
+<td>37.690910</td>
+<td>101.84035</td>
+<td>111.930336</td>
+<td>POLYGON ((71.72596 -60.89612, 71.69186 -60.963...</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>5.613894</td>
+<td>54.23045</td>
+<td>1755143.5</td>
+<td>1013.51886</td>
+<td>2204.9104</td>
+<td>53.815990</td>
+<td>24.053764</td>
+<td>77.86254</td>
+<td>99.559425</td>
+<td>POLYGON ((54.24406 5.63592, 54.22025 5.62014, ...</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>-41.672714</td>
+<td>324.49740</td>
+<td>23309360.0</td>
+<td>6511.20950</td>
+<td>4558.0470</td>
+<td>52.841824</td>
+<td>46.625698</td>
+<td>99.40995</td>
+<td>121.833626</td>
+<td>POLYGON ((324.54932 -41.70964, 324.56927 -41.6...</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>7943</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>8287</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2</td>
+<td>5819</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>11685</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>3618</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>5</td>
+<td>3805</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>6</td>
+<td>9522</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>7</td>
+<td>10975</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>8</td>
+<td>1820</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">9</td>
+<td>9</td>
+<td>3710</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+![](index_files/figure-commonmark/cell-2-output-4.png)
+
+### 1) Create HEALPix sidecar(s)
+
+Those files link each row in the input parquet file to the HEALPix cells
+at the requested **nside** resolution; see [Useful Healpix data for Moon
+Venus Mercury](#useful-healpix-data-for-moon-venus-mercury) for some
+cells data. Refer to `healpyxel_sidecar --help` for full options. The
+`--mode` flag is especially important: - `fuzzy`: assign each input
+record to every cell it touches - `strict`: assign only records fully
+contained within a cell
+
+``` bash
+healpyxel_sidecar \
+  --input "test_data/samples/sample_50k.parquet" \
+  --nside 32 64 \
+  --mode fuzzy \
+  --lon-convention 0_360 \
+  --output_dir "test_data/derived/cli_quickstart"
+```
+
+**Outputs**
+
+- sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet
+- sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json
+- sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet
+- sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json
+
+<!-- -->
+
+    Nside 32: 54931 assignments, 10860 unique cells
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0</td>
+<td>7943</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>1</td>
+<td>8287</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>2</td>
+<td>5819</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>3</td>
+<td>11685</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>4</td>
+<td>3618</td>
+<td>1.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+``` python
+# original_df['geometry'] = original_df.geometry.apply(
+#     lambda geom: geom.buffer(0) if geom and not geom.is_valid else geom
+# )
+```
+
+![](index_files/figure-commonmark/cell-5-output-1.png)
+
+### 2) Aggregate sparse regridded map(s)
+
+Now we need to aggregate initial data on the cells, refer to
+`healpyxel_aggregate --help` for all the option. Some flag are
+particurarly useful:
+
+- `--schema` : show input parquet schema, useful to look which data are
+  there to aggregate.
+- `--list-sidecars` : list available sidecar for an input files, they
+  are addressed by index.
+- `--sidecar-schema INDEX` : show schema for specific sidecar file
+- `--aggs mean` : aggregation functions (choices: mean, median, std,
+  min, max, mad, robust_std).
+
+Example :
+
+- input file contains columns A (you can check it with
+  `healpyxel_aggregate -i input --schema`)
+- `--agg mean median std`
+- this produce un output the columns `A_mean`, `A_median` and `A_std`
+  created appling those function on all input files rows listd in the
+  sidecar file for a single HEALPix cell
+
+``` bash
+healpyxel_aggregate \
+  --input "test_data/samples/sample_50k.parquet" \
+  --sidecar-dir "test_data/derived/cli_quickstart" \
+  --sidecar-index all \
+  --aggregate \
+  --columns r1050 \
+  --aggs mean median std mad robust_std \
+```
+
+This produces sparse output : only cells with actual values are written
+in ouput.
+
+**Outputs** -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json
+
+    Nside 32: 10860 unique cells
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">r1050_mean</th>
+<th data-quarto-table-cell-role="th">r1050_median</th>
+<th data-quarto-table-cell-role="th">r1050_std</th>
+<th data-quarto-table-cell-role="th">r1050_mad</th>
+<th data-quarto-table-cell-role="th">r1050_robust_std</th>
+<th data-quarto-table-cell-role="th">n_sources</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>0.048616</td>
+<td>0.047857</td>
+<td>0.003759</td>
+<td>0.002672</td>
+<td>0.003962</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>0.051467</td>
+<td>0.052283</td>
+<td>0.002976</td>
+<td>0.001888</td>
+<td>0.002799</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>0.049697</td>
+<td>0.049118</td>
+<td>0.003637</td>
+<td>0.002289</td>
+<td>0.003394</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>0.059066</td>
+<td>0.063241</td>
+<td>0.007149</td>
+<td>0.001711</td>
+<td>0.002537</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>0.051262</td>
+<td>0.051523</td>
+<td>0.006552</td>
+<td>0.002510</td>
+<td>0.003721</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+### 3) Aggregate densified regridded map(s)
+
+``` bash
+healpyxel_aggregate \
+  --input "test_data/samples/sample_50k.parquet" \
+  --sidecar-dir "test_data/derived/cli_quickstart" \
+  --sidecar-index all \
+  --aggregate \
+  --columns r1050 \
+  --aggs mean median std mad robust_std \
+  --densify
+```
+
+This produces dense output : all HEALPix cells are writeen in ouput,
+empty one as filled with Nan.
+
+**Outputs** -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json
+
+    Nside 32: 12288 unique cells <- densified , 1428 additional empty cells filled in by densification
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">r1050_mean</th>
+<th data-quarto-table-cell-role="th">r1050_median</th>
+<th data-quarto-table-cell-role="th">r1050_std</th>
+<th data-quarto-table-cell-role="th">r1050_mad</th>
+<th data-quarto-table-cell-role="th">r1050_robust_std</th>
+<th data-quarto-table-cell-role="th">n_sources</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">29</td>
+<td>0.046644</td>
+<td>0.046644</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">30</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">31</td>
+<td>0.040205</td>
+<td>0.040986</td>
+<td>0.009636</td>
+<td>0.007137</td>
+<td>0.010581</td>
+<td>4.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">32</td>
+<td>0.054966</td>
+<td>0.054413</td>
+<td>0.003162</td>
+<td>0.002148</td>
+<td>0.003184</td>
+<td>8.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">33</td>
+<td>0.054424</td>
+<td>0.055591</td>
+<td>0.004131</td>
+<td>0.003358</td>
+<td>0.004979</td>
+<td>8.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">34</td>
+<td>0.057463</td>
+<td>0.057463</td>
+<td>0.001704</td>
+<td>0.001704</td>
+<td>0.002526</td>
+<td>2.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">35</td>
+<td>0.050470</td>
+<td>0.057635</td>
+<td>0.017546</td>
+<td>0.004688</td>
+<td>0.006951</td>
+<td>4.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">36</td>
+<td>0.054052</td>
+<td>0.053640</td>
+<td>0.004915</td>
+<td>0.002833</td>
+<td>0.004200</td>
+<td>6.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">37</td>
+<td>0.056132</td>
+<td>0.056019</td>
+<td>0.002281</td>
+<td>0.002128</td>
+<td>0.003155</td>
+<td>4.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">38</td>
+<td>0.060452</td>
+<td>0.060592</td>
+<td>0.002127</td>
+<td>0.001878</td>
+<td>0.002784</td>
+<td>4.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">39</td>
+<td>0.060708</td>
+<td>0.070030</td>
+<td>0.014303</td>
+<td>0.001562</td>
+<td>0.002316</td>
+<td>3.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">40</td>
+<td>0.041480</td>
+<td>0.041480</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">41</td>
+<td>0.028736</td>
+<td>0.028736</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>0.000000</td>
+<td>1.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">42</td>
+<td>0.070738</td>
+<td>0.070655</td>
+<td>0.009835</td>
+<td>0.011921</td>
+<td>0.017674</td>
+<td>3.0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">43</td>
+<td>0.062058</td>
+<td>0.061658</td>
+<td>0.009862</td>
+<td>0.008409</td>
+<td>0.012467</td>
+<td>8.0</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">44</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+<td>NaN</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">45</td>
+<td>0.053895</td>
+<td>0.054106</td>
+<td>0.001107</td>
+<td>0.001026</td>
+<td>0.001521</td>
+<td>3.0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+### 4) Convert aggregated maps to GeoParquet
+
+This convert each aggregated file to a geoparquet.
+
+``` bash
+for f in "test_data/derived/cli_quickstart"/*-aggregated*parquet; do
+  healpyxel_to_geoparquet -a "$f" -d "test_data/derived/cli_quickstart" -l -180_180 -f
+done
+```
+
+**Outputs** -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.geo.parquet -
+sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.geo.parquet -
+sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.parquet
+
+    Nside 32: 10860 unique cells
+
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">geometry</th>
+<th data-quarto-table-cell-role="th">r1050_mean</th>
+<th data-quarto-table-cell-role="th">r1050_median</th>
+<th data-quarto-table-cell-role="th">r1050_std</th>
+<th data-quarto-table-cell-role="th">r1050_mad</th>
+<th data-quarto-table-cell-role="th">r1050_robust_std</th>
+<th data-quarto-table-cell-role="th">n_sources</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>POLYGON ((45 2.38802, 43.59375 1.19375, 45 0, ...</td>
+<td>0.048616</td>
+<td>0.047857</td>
+<td>0.003759</td>
+<td>0.002672</td>
+<td>0.003962</td>
+<td>4</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>POLYGON ((46.40625 3.58332, 45 2.38802, 46.406...</td>
+<td>0.051467</td>
+<td>0.052283</td>
+<td>0.002976</td>
+<td>0.001888</td>
+<td>0.002799</td>
+<td>6</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>POLYGON ((43.59375 3.58332, 42.1875 2.38802, 4...</td>
+<td>0.049697</td>
+<td>0.049118</td>
+<td>0.003637</td>
+<td>0.002289</td>
+<td>0.003394</td>
+<td>6</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>POLYGON ((45 4.78019, 43.59375 3.58332, 45 2.3...</td>
+<td>0.059066</td>
+<td>0.063241</td>
+<td>0.007149</td>
+<td>0.001711</td>
+<td>0.002537</td>
+<td>3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>POLYGON ((47.8125 4.78019, 46.40625 3.58332, 4...</td>
+<td>0.051262</td>
+<td>0.051523</td>
+<td>0.006552</td>
+<td>0.002510</td>
+<td>0.003721</td>
+<td>9</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+![](index_files/figure-commonmark/cell-9-output-1.png)
+
 ## Python API
+
+Minimal end-to-end python API example, each level works on previous one
+output.
+
+- `initial data` → <!-- raw observations (GeoDataFrame/DataFrame) -->
+- `sidecar` : generate data \<\> healpix grid connections →
+  <!-- maps source_id to healpix_id -->
+- `aggregate` → <!-- per-cell statistics on value columns -->
+- `attach geometry` → <!-- add HEALPix cell polygons -->
+- `accumulate` → <!-- streaming state update (count/mean/m2/tdigest) -->
+- `finalize` <!-- final statistics from state -->
+
+minimal code, a more detailed explanation is in
+[Examples\>Visualization](example_visualization_workflow.html) section.
+
+------------------------------------------------------------------------
 
 ``` python
 from healpyxel import sidecar, aggregate, accumulator, finalize
+from healpyxel.geospatial import healpix_to_geodataframe
 
-# Generate sidecar
+# Minimal API sanity checks (nbdev-friendly)
+assert hasattr(sidecar, "generate")
+assert hasattr(aggregate, "by_sidecar")
+assert hasattr(accumulator, "update_state")
+assert hasattr(finalize, "from_state")
+assert callable(healpix_to_geodataframe)
+
+# 1) Sidecar (split)
 sidecar_df = sidecar.generate(
     gdf,
     nside=64,
-    mode='fuzzy'
+    mode="fuzzy",
+    order="nested",
+    lon_convention="0_360",
 )
 
-# Aggregate
-result = aggregate.by_sidecar(
+# 2) Aggregate (apply)
+agg_df = aggregate.by_sidecar(
     original=df,
     sidecar=sidecar_df,
-    value_columns=['r750', 'r950'],
-    aggs=['median', 'robust_std']
+    value_columns=["r750", "r950"],
+    aggs=["median", "robust_std"],
+    min_count=3,
+)
+
+# 2b) Attach geometry to step-2 products (geospatial)
+cells_gdf = healpix_to_geodataframe(
+    nside=64,
+    order="nested",
+    lon_convention="0_360",
+    pixels=agg_df["healpix_id"].to_numpy(),
+    fix_antimeridian=True,
+    cache_mode="use",
+).reset_index(drop=False)
+
+agg_geo_gdf = cells_gdf.merge(agg_df, on="healpix_id", how="left")
+
+# 3) Accumulator (streaming apply)
+state_df = accumulator.update_state(
+    batch=df,
+    sidecar=sidecar_df,
+    value_columns=["r750", "r950"],
+    state=None,
+)
+
+# 4) Finalize (combine)
+final_df = finalize.from_state(
+    state=state_df,
+    aggs=["mean", "std", "median", "robust_std"],
 )
 ```
-
-## Documentation
-
-See the [full documentation](https://mariodamore.github.io/healpyxel)
-for:
-
-- Detailed tutorials
-- API reference
-- Performance optimization tips
-- Example workflows
 
 ## Developed for MESSENGER/MASCS
 
@@ -110,66 +941,157 @@ handles:
 While designed for MASCS, healpyxel is general-purpose and works with
 any planetary science dataset in GeoParquet format.
 
-### Useful Healpix data for those missions
+### Useful Healpix data for Moon Venus Mercury
 
-``` python
-import healpy as hp
-import pandas as pd
-import numpy as np
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+&#10;    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+&#10;    .dataframe thead th {
+        text-align: right;
+    }
+</style>
 
-# Mean planetary radii (km)
-R_MERCURY = 2439.7
-R_MOON = 1737.4
-R_VENUS = 6051.8
+<table class="dataframe" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header" style="text-align: right;">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">Number of Cells</th>
+<th data-quarto-table-cell-role="th">Cell Angular Size (deg)</th>
+<th data-quarto-table-cell-role="th">Mercury Cell Size (km)</th>
+<th data-quarto-table-cell-role="th">Moon Cell Size (km)</th>
+<th data-quarto-table-cell-role="th">Venus Cell Size (km)</th>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">nside</th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1</td>
+<td>12</td>
+<td>58.632</td>
+<td>2496.610</td>
+<td>1777.928</td>
+<td>6192.969</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2</td>
+<td>48</td>
+<td>29.316</td>
+<td>1248.305</td>
+<td>888.964</td>
+<td>3096.484</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>192</td>
+<td>14.658</td>
+<td>624.153</td>
+<td>444.482</td>
+<td>1548.242</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8</td>
+<td>768</td>
+<td>7.329</td>
+<td>312.076</td>
+<td>222.241</td>
+<td>774.121</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">16</td>
+<td>3,072</td>
+<td>3.665</td>
+<td>156.038</td>
+<td>111.120</td>
+<td>387.061</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">32</td>
+<td>12,288</td>
+<td>1.832</td>
+<td>78.019</td>
+<td>55.560</td>
+<td>193.530</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">64</td>
+<td>49,152</td>
+<td>0.916</td>
+<td>39.010</td>
+<td>27.780</td>
+<td>96.765</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">128</td>
+<td>196,608</td>
+<td>0.458</td>
+<td>19.505</td>
+<td>13.890</td>
+<td>48.383</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">256</td>
+<td>786,432</td>
+<td>0.229</td>
+<td>9.752</td>
+<td>6.945</td>
+<td>24.191</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">512</td>
+<td>3,145,728</td>
+<td>0.115</td>
+<td>4.876</td>
+<td>3.473</td>
+<td>12.096</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1,024</td>
+<td>12,582,912</td>
+<td>0.057</td>
+<td>2.438</td>
+<td>1.736</td>
+<td>6.048</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">2,048</td>
+<td>50,331,648</td>
+<td>0.029</td>
+<td>1.219</td>
+<td>0.868</td>
+<td>3.024</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4,096</td>
+<td>201,326,592</td>
+<td>0.014</td>
+<td>0.610</td>
+<td>0.434</td>
+<td>1.512</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8,192</td>
+<td>805,306,368</td>
+<td>0.007</td>
+<td>0.305</td>
+<td>0.217</td>
+<td>0.756</td>
+</tr>
+</tbody>
+</table>
 
-#| export
-nsides = 2 ** np.arange(1, 13, dtype=np.int64)
-npix = hp.nside2npix(nsides)
-cell_ang_rad = np.sqrt(4 * np.pi / npix)
-cell_ang_deg = np.degrees(cell_ang_rad)
-
-df_resolution = pd.DataFrame({
-    "nside": nsides,
-    "Number of Cells": npix,
-    "Cell Angular Size": cell_ang_deg,
-    "Mercury Cell Size": cell_ang_rad * R_MERCURY,
-    "Moon Cell Size": cell_ang_rad * R_MOON,
-    "Venus Cell Size": cell_ang_rad * R_VENUS,
-})
-
-#| export
-def format_resolution_table(df: pd.DataFrame) -> pd.DataFrame:
-    """Return a copy of the resolution table with int columns formatted with thousand separators and floats rounded to 3 decimals."""
-    df_fmt = df.copy()
-    int_cols = df_fmt.select_dtypes(include="int64").columns
-    float_cols = df_fmt.select_dtypes(include="float64").columns
-    for col in int_cols:
-        df_fmt[col] = df_fmt[col].map(lambda x: f"{x:,}")
-    for col in float_cols:
-        df_fmt[col] = df_fmt[col].round(3)
-    return df_fmt.set_index("nside")
-
-# Test: Ensure formatting is correct
-fmt = format_resolution_table(df_resolution)
-
-print(format_resolution_table(df_resolution).to_markdown()
-)
-```
-
-    | nside   | Number of Cells   |   Cell Angular Size |   Mercury Cell Size |   Moon Cell Size |   Venus Cell Size |
-    |:--------|:------------------|--------------------:|--------------------:|-----------------:|------------------:|
-    | 2       | 48                |              29.316 |            1248.31  |          888.964 |          3096.48  |
-    | 4       | 192               |              14.658 |             624.153 |          444.482 |          1548.24  |
-    | 8       | 768               |               7.329 |             312.076 |          222.241 |           774.121 |
-    | 16      | 3,072             |               3.665 |             156.038 |          111.12  |           387.061 |
-    | 32      | 12,288            |               1.832 |              78.019 |           55.56  |           193.53  |
-    | 64      | 49,152            |               0.916 |              39.01  |           27.78  |            96.765 |
-    | 128     | 196,608           |               0.458 |              19.505 |           13.89  |            48.383 |
-    | 256     | 786,432           |               0.229 |               9.752 |            6.945 |            24.191 |
-    | 512     | 3,145,728         |               0.115 |               4.876 |            3.473 |            12.096 |
-    | 1,024   | 12,582,912        |               0.057 |               2.438 |            1.736 |             6.048 |
-    | 2,048   | 50,331,648        |               0.029 |               1.219 |            0.868 |             3.024 |
-    | 4,096   | 201,326,592       |               0.014 |               0.61  |            0.434 |             1.512 |
+</div>
 
 ## License
 

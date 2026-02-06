@@ -85,6 +85,7 @@ healpyxel_aggregate = "healpyxel.cli:aggregate_cli"
 healpyxel_accumulator = "healpyxel.cli:accumulator_cli"
 healpyxel_finalize = "healpyxel.cli:finalize_cli"
 healpyxel_to_geoparquet = "healpyxel.cli:to_geoparquet_cli"
+healpyxel_cache = "healpyxel.cli:cache_cli"
 
 [project.urls]
 Homepage = "https://github.com/mariodamore/healpyxel"
