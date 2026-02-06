@@ -405,7 +405,29 @@ sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.pa
 
 </div>
 
+Each cell is linked to some initial observation via the sidecar file, we
+can see here the distribution of one value in all the cell
+
 ![](index_files/figure-commonmark/cell-9-output-1.png)
+
+We can visualize each pixel with one of the aggregator function output
+available in `healpyxel_aggregate` :
+
+- **`mean`**: Arithmetic mean
+- **`median`**: Median (50th percentile)
+- **`std`**: Standard deviation
+- **`min`**: Minimum value
+- **`max`**: Maximum value
+- **`mad`**: Median Absolute Deviation (robust to outliers)
+- **`robust_std`**: MAD × 1.4826 (equivalent to standard deviation for
+  normal distributions, robust to outliers)
+
+Each function generates one output column per input value column, named
+`<column>_<agg>` (e.g., `r1050_mean`, `r1050_median`, `r1050_mad`).
+Robust statistics (`mad`, `robust_std`) are recommended for
+outlier-prone datasets.
+
+![](index_files/figure-commonmark/cell-10-output-1.png)
 
 ## Python API
 

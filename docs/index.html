@@ -446,7 +446,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>input are at <a href="test_data/samples/sample_50k.parquet">test_data/samples/sample_50k.parquet</a></li>
 <li>ouput are in <a href="test_data/derived/cli_quickstart">test_data/derived/cli_quickstart</a></li>
 </ul>
-<div id="822d1c3f" class="cell">
+<div id="822d1c3f" class="cell" data-execution_count="70">
 <div class="cell-output cell-output-stdout">
 <pre><code>Original files excerpt (transposed for clarity):
 Sidecar Metadata:
@@ -637,7 +637,7 @@ Unique sources: 49988
 <li>sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet</li>
 <li>sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json</li>
 </ul>
-<div id="fa2ec4da" class="cell" data-execution_count="7">
+<div id="fa2ec4da" class="cell" data-execution_count="71">
 <div class="cell-output cell-output-stdout">
 <pre><code>Nside 32: 54931 assignments, 10860 unique cells</code></pre>
 </div>
@@ -691,12 +691,12 @@ Unique sources: 49988
 </div>
 </div>
 </div>
-<div id="696c671f" class="cell" data-execution_count="8">
+<div id="696c671f" class="cell" data-execution_count="72">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># original_df['geometry'] = original_df.geometry.apply(</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     lambda geom: geom.buffer(0) if geom and not geom.is_valid else geom</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div id="1c2d74eb" class="cell" data-execution_count="20">
+<div id="1c2d74eb" class="cell" data-execution_count="73">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
@@ -730,7 +730,7 @@ Unique sources: 49988
 <span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggs</span> mean median std mad robust_std <span class="dt">\</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This produces sparse output : only cells with actual values are written in ouput.</p>
 <p><strong>Outputs</strong> - sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet - sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json - sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet - sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json</p>
-<div id="2ae16f82" class="cell" data-execution_count="14">
+<div id="2ae16f82" class="cell" data-execution_count="74">
 <div class="cell-output cell-output-stdout">
 <pre><code>Nside 32: 10860 unique cells</code></pre>
 </div>
@@ -824,7 +824,7 @@ Unique sources: 49988
 <span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--densify</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>This produces dense output : all HEALPix cells are writeen in ouput, empty one as filled with Nan.</p>
 <p><strong>Outputs</strong> - sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet - sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.meta.json - sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet - sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json</p>
-<div id="08743a5f" class="cell" data-execution_count="15">
+<div id="08743a5f" class="cell" data-execution_count="75">
 <div class="cell-output cell-output-stdout">
 <pre><code>Nside 32: 12288 unique cells &lt;- densified , 1428 additional empty cells filled in by densification</code></pre>
 </div>
@@ -1021,7 +1021,7 @@ Unique sources: 49988
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> <span class="st">"</span><span class="va">$f</span><span class="st">"</span> <span class="at">-d</span> <span class="st">"test_data/derived/cli_quickstart"</span> <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-f</span></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Outputs</strong> - sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.geo.parquet - sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.parquet - sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-32_order-nested.geo.parquet - sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.parquet</p>
-<div id="04b99f7b" class="cell" data-execution_count="16">
+<div id="04b99f7b" class="cell" data-execution_count="76">
 <div class="cell-output cell-output-stdout">
 <pre><code>Nside 32: 10860 unique cells</code></pre>
 </div>
@@ -1109,11 +1109,32 @@ Unique sources: 49988
 </div>
 </div>
 </div>
-<div id="74936f99" class="cell" data-execution_count="22">
+<p>Each cell is linked to some initial observation via the sidecar file, we can see here the distribution of one value in all the cell</p>
+<div id="dfd276a3" class="cell" data-execution_count="80">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We can visualize each pixel with one of the aggregator function output available in <code>healpyxel_aggregate</code> :</p>
+<ul>
+<li><strong><code>mean</code></strong>: Arithmetic mean</li>
+<li><strong><code>median</code></strong>: Median (50th percentile)</li>
+<li><strong><code>std</code></strong>: Standard deviation</li>
+<li><strong><code>min</code></strong>: Minimum value</li>
+<li><strong><code>max</code></strong>: Maximum value</li>
+<li><strong><code>mad</code></strong>: Median Absolute Deviation (robust to outliers)</li>
+<li><strong><code>robust_std</code></strong>: MAD × 1.4826 (equivalent to standard deviation for normal distributions, robust to outliers)</li>
+</ul>
+<p>Each function generates one output column per input value column, named <code>&lt;column&gt;_&lt;agg&gt;</code> (e.g., <code>r1050_mean</code>, <code>r1050_median</code>, <code>r1050_mad</code>). Robust statistics (<code>mad</code>, <code>robust_std</code>) are recommended for outlier-prone datasets.</p>
+<div id="74936f99" class="cell" data-execution_count="78">
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1199,7 +1220,7 @@ Unique sources: 49988
 <p>While designed for MASCS, healpyxel is general-purpose and works with any planetary science dataset in GeoParquet format.</p>
 <section id="useful-healpix-data-for-moon-venus-mercury" class="level3">
 <h3 class="anchored" data-anchor-id="useful-healpix-data-for-moon-venus-mercury">Useful Healpix data for Moon Venus Mercury</h3>
-<div id="7d27f9c7" class="cell">
+<div id="7d27f9c7" class="cell" data-execution_count="79">
 <div class="cell-output cell-output-display">
 <div>
 

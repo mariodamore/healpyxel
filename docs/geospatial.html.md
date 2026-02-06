@@ -521,6 +521,92 @@ fix_antimeridian: whether to fix antimeridian-wrapping chunk_size:
 pixels per chunk when building geometries parquet_kwargs: forwarded to
 `GeoDataFrame.to_parquet` Returns: Path to written file\*
 
+------------------------------------------------------------------------
+
+### export_healpix_to_geotiff
+
+>      export_healpix_to_geotiff (df:pandas.core.frame.DataFrame, column:str,
+>                                 output_path:Union[str,pathlib.Path],
+>                                 nside:int, order:str='nested',
+>                                 crs:str='IAU:19900', width:int=1440,
+>                                 height:int=720)
+
+\*Export a HEALPix column to GeoTIFF (requires rasterio + healpy).
+
+Args: df: DataFrame with healpix_id index or healpix_id column column:
+data column to export output_path: GeoTIFF output path nside: HEALPix
+nside order: ‘nested’ or ‘ring’ crs: CRS string for GeoTIFF width:
+output raster width (pixels) height: output raster height (pixels)
+
+Returns: Path to written GeoTIFF\*
+
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>df</td>
+<td>DataFrame</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>column</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>output_path</td>
+<td>Union</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>nside</td>
+<td>int</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>order</td>
+<td>str</td>
+<td>nested</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>crs</td>
+<td>str</td>
+<td>IAU:19900</td>
+<td>Mercury IAU CRS</td>
+</tr>
+<tr class="odd">
+<td>width</td>
+<td>int</td>
+<td>1440</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>height</td>
+<td>int</td>
+<td>720</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>Path</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
 ## Quick test
 
 ## CLI with Metadata Auto-Detection

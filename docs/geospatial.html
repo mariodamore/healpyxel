@@ -336,6 +336,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#healpix_to_geodataframe" id="toc-healpix_to_geodataframe" class="nav-link" data-scroll-target="#healpix_to_geodataframe">healpix_to_geodataframe</a></li>
   <li><a href="#save_healpix_to_geoparquet" id="toc-save_healpix_to_geoparquet" class="nav-link" data-scroll-target="#save_healpix_to_geoparquet">save_healpix_to_geoparquet</a></li>
+  <li><a href="#export_healpix_to_geotiff" id="toc-export_healpix_to_geotiff" class="nav-link" data-scroll-target="#export_healpix_to_geotiff">export_healpix_to_geotiff</a></li>
   </ul></li>
   <li><a href="#quick-test" id="toc-quick-test" class="nav-link" data-scroll-target="#quick-test">Quick test</a></li>
   <li><a href="#cli-with-metadata-auto-detection" id="toc-cli-with-metadata-auto-detection" class="nav-link" data-scroll-target="#cli-with-metadata-auto-detection">CLI with Metadata Auto-Detection</a>
@@ -788,6 +789,86 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </blockquote>
 <p>*Build HEALPix vector layer and save as GeoParquet. This will create a GeoParquet file containing one polygon per HEALPix cell. For large nsides consider increasing memory or using chunked processing.</p>
 <p>Args: nside: HEALPix nside output_path: path to output geoparquet file order: ‘nested’ or ‘ring’ lon_convention: ‘0_360’ or ‘-180_180’ fix_antimeridian: whether to fix antimeridian-wrapping chunk_size: pixels per chunk when building geometries parquet_kwargs: forwarded to <code>GeoDataFrame.to_parquet</code> Returns: Path to written file*</p>
+<hr>
+</section>
+<section id="export_healpix_to_geotiff" class="level3">
+<h3 class="anchored" data-anchor-id="export_healpix_to_geotiff">export_healpix_to_geotiff</h3>
+<blockquote class="blockquote">
+<pre><code> export_healpix_to_geotiff (df:pandas.core.frame.DataFrame, column:str,
+                            output_path:Union[str,pathlib.Path],
+                            nside:int, order:str='nested',
+                            crs:str='IAU:19900', width:int=1440,
+                            height:int=720)</code></pre>
+</blockquote>
+<p>*Export a HEALPix column to GeoTIFF (requires rasterio + healpy).</p>
+<p>Args: df: DataFrame with healpix_id index or healpix_id column column: data column to export output_path: GeoTIFF output path nside: HEALPix nside order: ‘nested’ or ‘ring’ crs: CRS string for GeoTIFF width: output raster width (pixels) height: output raster height (pixels)</p>
+<p>Returns: Path to written GeoTIFF*</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th></th>
+<th><strong>Type</strong></th>
+<th><strong>Default</strong></th>
+<th><strong>Details</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>df</td>
+<td>DataFrame</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>column</td>
+<td>str</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>output_path</td>
+<td>Union</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="even">
+<td>nside</td>
+<td>int</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>order</td>
+<td>str</td>
+<td>nested</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>crs</td>
+<td>str</td>
+<td>IAU:19900</td>
+<td>Mercury IAU CRS</td>
+</tr>
+<tr class="odd">
+<td>width</td>
+<td>int</td>
+<td>1440</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>height</td>
+<td>int</td>
+<td>720</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td><strong>Returns</strong></td>
+<td><strong>Path</strong></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </section>
 </section>
 <section id="quick-test" class="level2">
@@ -800,14 +881,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Parameter Resolution Precedence:</strong> 1. <strong>CLI args</strong> (highest priority) — explicit user override 2. <strong>Metadata</strong> — from <code>.meta.json</code> sidecar (if present) 3. <strong>Defaults</strong> — fallback values or inference from aggregate</p>
 <p><strong>lon_convention Behavior:</strong> - <code>--lon-convention auto</code> (default) → searches metadata, falls back to <code>0_360</code> - <code>--lon-convention 0_360</code> or <code>-180_180</code> → explicit override - Prevents user confusion about which convention was used in aggregation</p>
 <p><strong>Usage Examples:</strong></p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Zero-config: metadata has all parameters</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Override metadata</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-O</span> ring</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Batch mode with metadata</span></span>
-<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span>  <span class="co"># Auto-confirm overwrites</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Zero-config: metadata has all parameters</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Override metadata</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-O</span> ring</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Batch mode with metadata</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span>  <span class="co"># Auto-confirm overwrites</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 <section id="main" class="level3">
 <h3 class="anchored" data-anchor-id="main">main</h3>
@@ -914,14 +995,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <p><strong>Zero-config (best case):</strong></p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto-detects: nside, order, lon_convention from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto-detects: nside, order, lon_convention from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Override metadata (for testing/validation):</strong></p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-n</span> 256</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -l -180_180 overrides metadata, nside still from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-n</span> 256</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -l -180_180 overrides metadata, nside still from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Batch mode with metadata:</strong></p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -y auto-confirms overwrites, metadata provides all params</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -y auto-confirms overwrites, metadata provides all params</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="testing" class="level3">
 <h3 class="anchored" data-anchor-id="testing">Testing ✓</h3>

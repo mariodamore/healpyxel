@@ -347,7 +347,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="test-data" class="level2">
 <h2 class="anchored" data-anchor-id="test-data">Test Data</h2>
 <p>Check available test data in the package</p>
-<div id="07d1b8f7" class="cell" data-execution_count="2">
+<div id="07d1b8f7" class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -863,7 +863,7 @@ First few rows:</code></pre>
 </div>
 </div>
 </div>
-<div id="264bbef4" class="cell" data-execution_count="6">
+<div id="264bbef4" class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># #| hide</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="co"># # convert to geopandas creating a polygon box with lat_min    lat_max lon_min lon_max per file</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ax = gdf_stats[~gdf_stats.filename.str.contains('sample')].plot(column='filename', legend=False, figsize=(20, 6), aspect=0.25)</span></span>
@@ -912,7 +912,7 @@ Columns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 
 Converting WKB geometry to GeoDataFrame...
 CRS: EPSG:4326</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="7">
+<div class="cell-output cell-output-display">
 <div>
 
 
@@ -1022,7 +1022,7 @@ healpix_id     UInt64
 weight        float64
 dtype: object</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="8">
+<div class="cell-output cell-output-display">
 <div>
 
 
@@ -1120,7 +1120,7 @@ Name: count, dtype: int64</code></pre>
 </div>
 </div>
 <p>Optional: Save sidecar to file for later use</p>
-<div id="2b41dbd8" class="cell" data-execution_count="10">
+<div id="2b41dbd8" class="cell">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sidecar_output <span class="op">=</span> pathlib.Path(<span class="ss">f'/tmp/sample_50k_sidecar_nside</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">_</span><span class="sc">{</span>mode<span class="sc">}</span><span class="ss">.parquet'</span>)</span>
@@ -1166,7 +1166,7 @@ Number of HEALPix cells with data: 10860
 
 Aggregated columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_std', 'n_sources']</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="12">
+<div class="cell-output cell-output-display">
 <div>
 
 
@@ -1394,7 +1394,7 @@ Dense HEALPix grid cells: 12288 (expected: 12288)
 Empty cells (no data): 1428
 Cells with data: 10860</code></pre>
 </div>
-<div class="cell-output cell-output-display" data-execution_count="17">
+<div class="cell-output cell-output-display">
 <div>
 
 
