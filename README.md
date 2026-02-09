@@ -45,7 +45,175 @@ dask-geopandas, antimeridian (required for `healpyxel_sidecar`) -
 All of the above + nbdev, pytest, black, ruff, mypy - `all`: Installs
 geospatial + streaming + viz (excludes dev tools)
 
+``` python
+import time
+from pathlib import Path
+from IPython.display import display, Markdown
+from d2_widget import Widget
+
+def save_and_embed_svg(widget, output_path: Path, max_wait: float = 2.0) -> bool:
+    """
+    Extract SVG from d2_widget.Widget, save to disk, and embed as Markdown.
+    
+    Parameters
+    ----------
+    widget : d2_widget.Widget
+        Rendered diagram widget.
+    output_path : Path
+        Where to save the SVG file. Parent directories created automatically.
+    max_wait : float
+        Maximum seconds to wait for frontend to render SVG.
+    
+    Returns
+    -------
+    bool
+        True if SVG was extracted and saved; False if timeout/empty.
+    
+    Examples
+    --------
+    >>> widget = Widget(diagram_str, {...})
+    >>> success = save_and_embed_svg(widget, Path('output/diagram.svg'))
+    >>> assert success, "Widget rendering timed out"
+    """
+    # Poll for SVG with brief waits
+    start = time.time()
+    svg_content = None
+    
+    while time.time() - start < max_wait:
+        svg_content = widget._svg
+        if svg_content and svg_content.strip():
+            break
+        time.sleep(0.1)
+    
+    if not svg_content or not svg_content.strip():
+        print("⚠ Warning: SVG not yet rendered by frontend.")
+        print("  In Jupyter, anywidget renders asynchronously via JavaScript.")
+        print("  Consider exporting from d2 CLI instead, or use nbconvert to generate static output.")
+        print(f"  Widget has diagram: {len(widget.diagram)} chars")
+        print(f"  Current _svg: '{widget._svg}'")
+        return False
+    
+    # Save to disk
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(svg_content)
+    
+    print(f"✓ Saved: {output_path} ({len(svg_content)} bytes)")
+    
+    # Embed in notebook
+    display(Markdown(f'![{output_path.name}]({output_path})'))
+    
+    return True
+
+def render_d2_diagram(diagram_str: str, output_path: Path, title: str = "", **widget_opts) -> bool:
+    """
+    Render d2 diagram, save SVG, and embed in notebook.
+    
+    Parameters
+    ----------
+    diagram_str : str
+        D2 diagram definition (DSL).
+    output_path : Path
+        Where to save the SVG file.
+    title : str
+        Optional title for the diagram (not used in render, for documentation).
+    **widget_opts : dict
+        Options passed to d2_widget.Widget (themeID, pad, sketch, scale, etc.)
+    
+    Returns
+    -------
+    bool
+        True if rendering + save succeeded; False if timeout.
+    
+    Examples
+    --------
+    >>> diagram_str = "A -> B"
+    >>> render_d2_diagram(diagram_str, Path('output/flow.svg'), themeID=0, scale=1.5)
+    True
+    """
+    from d2_widget import Widget
+    
+    # Default widget options
+    default_opts = {"themeID": 0, "pad": 10, "sketch": True, "scale": 1.5}
+    default_opts.update(widget_opts)
+    
+    widget = Widget(diagram_str, default_opts)
+    return widget
+```
+
 ## Quick Start
+
+The **healpyxel workflow** implements spatial aggregation using three
+core steps:
+
+### 1. **Split**: Map observations to HEALPix cells
+
+You start with observation data (GeoParquet): geometries + values per
+record. A **sidecar** file links each observation (`source_id`) to
+HEALPix cells at your target resolution (`nside`).
+
+**Data contract:** - Input: `observations.parquet` → columns:
+`source_id`, `value`, `geometry` - Output:
+`observations-sidecar.parquet` → columns: `source_id`, `healpix_id`,
+`weight` (fuzzy mode only)
+
+**CLI:**
+`healpyxel_sidecar --input observations.parquet --nside 64 128 --mode fuzzy`
+
+    <d2_widget._widget.Widget object>
+
+    ✓ Saved: Sidecar.svg (74732 bytes)
+
+![](Sidecar.svg)
+
+    True
+
+### 2. **Apply**: Aggregate values per HEALPix cell
+
+Group all observations assigned to the same cell and compute statistics
+(median, mean, MAD, robust_std, etc.).
+
+**Data contract:** - Input: `observations.parquet` + sidecar file -
+Output: `observations-aggregated.parquet` → columns: `healpix_id`,
+`value_median`, `value_robust_std`, …
+
+**CLI:**
+`healpyxel_aggregate --input observations.parquet --sidecar-dir output/ --columns value --aggs median robust_std`
+
+    <d2_widget._widget.Widget object>
+
+    ✓ Saved: Aggregate.svg (75340 bytes)
+
+![](Aggregate.svg)
+
+    True
+
+### 3. **Combine**: Attach HEALPix cell geometry
+
+Add polygon boundaries to aggregated cells (computed from `healpix_id`
+via `healpy`).
+
+**Data contract:** - Input: `observations-aggregated.parquet` - Output:
+`observations-aggregated.geo.parquet` → adds column: `geometry` (HEALPix
+cell polygon)
+
+**CLI:**
+`healpyxel_to_geoparquet --aggregate-path observations-aggregated.parquet --output-dir output/`
+
+    <d2_widget._widget.Widget object>
+
+    ✓ Saved: Geometry.svg (69438 bytes)
+
+![](Geometry.svg)
+
+    True
+
+### Optional: Cache geometries
+
+Pre-compute HEALPix cell boundaries for faster repeated use (especially
+for high `nside`).
+
+**CLI:**
+`healpyxel_cache --nside 64 128 --order nested --lon-convention 0_360`
 
 ### Batch Processing
 
@@ -172,7 +340,7 @@ All input/output are in this repsitory:
 
 </div>
 
-![](index_files/figure-commonmark/cell-2-output-4.png)
+![](index_files/figure-commonmark/cell-9-output-4.png)
 
 ### 1) Create HEALPix sidecar(s)
 
@@ -233,7 +401,7 @@ healpyxel_sidecar \
 # )
 ```
 
-![](index_files/figure-commonmark/cell-5-output-1.png)
+![](index_files/figure-commonmark/cell-13-output-1.png)
 
 ### 2) Aggregate sparse regridded map(s)
 
@@ -408,7 +576,7 @@ sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.pa
 Each cell is linked to some initial observation via the sidecar file, we
 can see here the distribution of one value in all the cell
 
-![](index_files/figure-commonmark/cell-9-output-1.png)
+![](index_files/figure-commonmark/cell-17-output-1.png)
 
 We can visualize each pixel with one of the aggregator function output
 available in `healpyxel_aggregate` :
@@ -427,7 +595,7 @@ Each function generates one output column per input value column, named
 Robust statistics (`mad`, `robust_std`) are recommended for
 outlier-prone datasets.
 
-![](index_files/figure-commonmark/cell-10-output-1.png)
+![](index_files/figure-commonmark/cell-18-output-1.png)
 
 ## Python API
 

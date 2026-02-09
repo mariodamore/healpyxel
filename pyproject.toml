@@ -67,6 +67,7 @@ dev = [
     "matplotlib>=3.5",
     "scikit-image>=0.20",
     "skyproj>=0.2",
+    "d2"
 ]
 all = [
     "geopandas>=0.14",

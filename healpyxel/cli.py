@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['sidecar_cli', 'aggregate_cli', 'accumulator_cli', 'finalize_cli', 'to_geoparquet_cli', 'cache_cli']
 
-# %% ../nbs/05_cli.ipynb 1
+# %% ../nbs/05_cli.ipynb 2
 """Command-line interface for healpyxel."""
 
 import sys
@@ -33,7 +33,7 @@ def to_geoparquet_cli():
     from healpyxel import geospatial
     return geospatial.main()
 
-# %% ../nbs/05_cli.ipynb 2
+# %% ../nbs/05_cli.ipynb 3
 def cache_cli():
     """CLI entry point for healpyxel-cache command."""
     import click

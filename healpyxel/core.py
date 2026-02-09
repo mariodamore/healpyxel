@@ -3,14 +3,14 @@
 # %% auto 0
 __all__ = ['validate_nside', 'mad', 'robust_std', 'setup_logger']
 
-# %% ../nbs/00_core.ipynb 1
+# %% ../nbs/00_core.ipynb 2
 import numpy as np
 import pandas as pd
 from pathlib import Path
 from typing import Optional, Union
 import logging
 
-# %% ../nbs/00_core.ipynb 2
+# %% ../nbs/00_core.ipynb 3
 def validate_nside(nside: int) -> int:
     """Validate that nside is a power of 2.
     
@@ -35,7 +35,7 @@ def validate_nside(nside: int) -> int:
         raise ValueError(f"nside must be a power of 2, got {nside}")
     return nside
 
-# %% ../nbs/00_core.ipynb 3
+# %% ../nbs/00_core.ipynb 4
 def mad(arr: np.ndarray) -> float:
     """Compute Median Absolute Deviation.
     
@@ -56,7 +56,7 @@ def mad(arr: np.ndarray) -> float:
         return float("nan")
     return float(np.median(np.abs(arr - np.median(arr))))
 
-# %% ../nbs/00_core.ipynb 4
+# %% ../nbs/00_core.ipynb 5
 def robust_std(arr: np.ndarray) -> float:
     """Compute robust standard deviation using MAD * 1.4826.
     
@@ -76,7 +76,7 @@ def robust_std(arr: np.ndarray) -> float:
     """
     return mad(arr) * 1.4826
 
-# %% ../nbs/00_core.ipynb 5
+# %% ../nbs/00_core.ipynb 6
 def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     """Setup a logger with standard formatting.
     

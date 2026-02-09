@@ -47,6 +47,88 @@ geospatial + streaming + viz (excludes dev tools)
 
 ## Quick Start
 
+The **healpyxel workflow** implements spatial aggregation using three
+core steps:
+
+### 1. **Split**: Map observations to HEALPix cells
+
+You start with observation data (GeoParquet): geometries + values per
+record. A **sidecar** file links each observation (`source_id`) to
+HEALPix cells at your target resolution (`nside`).
+
+**Data contract:** - Input: `observations.parquet` → columns:
+`source_id`, `value`, `geometry` - Output:
+`observations-sidecar.parquet` → columns: `source_id`, `healpix_id`,
+`weight` (fuzzy mode only)
+
+**CLI:**
+`healpyxel_sidecar --input observations.parquet --nside 64 128 --mode fuzzy`
+
+    <d2_widget._widget.Widget object at 0x7f06e3b69d50>
+
+    ✓ Saved: Sidecar.svg (74732 bytes)
+
+<figure>
+<img src="Sidecar.svg" alt="Sidecar.svg" />
+<figcaption aria-hidden="true">Sidecar.svg</figcaption>
+</figure>
+
+    True
+
+### 2. **Apply**: Aggregate values per HEALPix cell
+
+Group all observations assigned to the same cell and compute statistics
+(median, mean, MAD, robust_std, etc.).
+
+**Data contract:** - Input: `observations.parquet` + sidecar file -
+Output: `observations-aggregated.parquet` → columns: `healpix_id`,
+`value_median`, `value_robust_std`, …
+
+**CLI:**
+`healpyxel_aggregate --input observations.parquet --sidecar-dir output/ --columns value --aggs median robust_std`
+
+    <d2_widget._widget.Widget object at 0x7f06e3b52310>
+
+    ✓ Saved: Aggregate.svg (75340 bytes)
+
+<figure>
+<img src="Aggregate.svg" alt="Aggregate.svg" />
+<figcaption aria-hidden="true">Aggregate.svg</figcaption>
+</figure>
+
+    True
+
+### 3. **Combine**: Attach HEALPix cell geometry
+
+Add polygon boundaries to aggregated cells (computed from `healpix_id`
+via `healpy`).
+
+**Data contract:** - Input: `observations-aggregated.parquet` - Output:
+`observations-aggregated.geo.parquet` → adds column: `geometry` (HEALPix
+cell polygon)
+
+**CLI:**
+`healpyxel_to_geoparquet --aggregate-path observations-aggregated.parquet --output-dir output/`
+
+    <d2_widget._widget.Widget object at 0x7f06e057b690>
+
+    ✓ Saved: Geometry.svg (69438 bytes)
+
+<figure>
+<img src="Geometry.svg" alt="Geometry.svg" />
+<figcaption aria-hidden="true">Geometry.svg</figcaption>
+</figure>
+
+    True
+
+### Optional: Cache geometries
+
+Pre-compute HEALPix cell boundaries for faster repeated use (especially
+for high `nside`).
+
+**CLI:**
+`healpyxel_cache --nside 64 128 --order nested --lon-convention 0_360`
+
 ### Batch Processing
 
 see [below](#cli-workflow)
@@ -297,7 +379,7 @@ All input/output are in this repsitory:
 
 </div>
 
-![](index_files/figure-commonmark/cell-2-output-4.png)
+![](index_files/figure-commonmark/cell-8-output-4.png)
 
 ### 1) Create HEALPix sidecar(s)
 
@@ -393,7 +475,7 @@ healpyxel_sidecar \
 # )
 ```
 
-![](index_files/figure-commonmark/cell-5-output-1.png)
+![](index_files/figure-commonmark/cell-12-output-1.png)
 
 ### 2) Aggregate sparse regridded map(s)
 
@@ -854,7 +936,7 @@ sample_50k-aggregated.cell-healpix_assignment-fuzzy_nside-64_order-nested.geo.pa
 Each cell is linked to some initial observation via the sidecar file, we
 can see here the distribution of one value in all the cell
 
-![](index_files/figure-commonmark/cell-9-output-1.png)
+![](index_files/figure-commonmark/cell-16-output-1.png)
 
 We can visualize each pixel with one of the aggregator function output
 available in `healpyxel_aggregate` :
@@ -873,7 +955,7 @@ Each function generates one output column per input value column, named
 Robust statistics (`mad`, `robust_std`) are recommended for
 outlier-prone datasets.
 
-![](index_files/figure-commonmark/cell-10-output-1.png)
+![](index_files/figure-commonmark/cell-17-output-1.png)
 
 ## Python API
 

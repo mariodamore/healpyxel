@@ -3,12 +3,12 @@
 # %% auto 0
 __all__ = ['prepare_healpix_map']
 
-# %% ../nbs/06_visualization.ipynb 2
+# %% ../nbs/06_visualization.ipynb 3
 import numpy as np
 import pandas as pd
 from typing import Optional, Union, Tuple
 
-# %% ../nbs/06_visualization.ipynb 4
+# %% ../nbs/06_visualization.ipynb 5
 # Import with guards for optional dependencies
 try:
     from matplotlib import cm, colors
@@ -34,7 +34,7 @@ try:
 except ImportError:
     SKYPROJ_AVAILABLE = False
 
-# %% ../nbs/06_visualization.ipynb 5
+# %% ../nbs/06_visualization.ipynb 6
 def _check_dependencies():
     """Check if required visualization dependencies are available."""
     if not MATPLOTLIB_AVAILABLE:
@@ -48,7 +48,7 @@ def _check_dependencies():
             "Install with: pip install scikit-image"
         )
 
-# %% ../nbs/06_visualization.ipynb 7
+# %% ../nbs/06_visualization.ipynb 8
 def prepare_healpix_map(
     aggregated_dense: pd.DataFrame,  # Dense HEALPix aggregated DataFrame (from densify_healpix_aggregates)
     output_column: str = 'r1050_median',  # Column name to visualize
