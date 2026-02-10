@@ -795,13 +795,13 @@ def write_sidecar_metadata(output_path: Path, input_path: Path, nside: int, mode
     Returns:
         Path to the written metadata file
     """
-    from datetime import datetime
+    from datetime import datetime, timezone
     from healpyxel.metadata import HEALPyxelxMetadata
 
     metadata = {
         'processing': {
             'stage': 'sidecar',
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
+            'timestamp': datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             'source_file': str(input_path.absolute()),
             'output_file': str(output_path.absolute())
         },

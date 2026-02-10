@@ -45,7 +45,7 @@ from typing import Optional, List, Dict, Any, Tuple
 import logging
 import argparse
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 import sys
 
 import numpy as np
@@ -437,7 +437,7 @@ Examples:
     full_metadata = {
         'processing': {
             'stage': 'finalize',
-            'timestamp': datetime.utcnow().isoformat() + 'Z',
+            'timestamp': datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
             'source_state': str(args.state),
             'output_file': str(args.output),
             'n_cells': len(df),

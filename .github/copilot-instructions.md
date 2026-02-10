@@ -111,7 +111,7 @@ The accumulator stores per-cell state as parquet with columns like `count`, `mea
 
 ## Testing and Test Data
 
-Tests live in `tests/` (auto-generated from notebooks). Fixtures in [conftest.py](tests/conftest.py) provide:
+Tests live in `tests/` (handwritten) **and** `healpyxel/tests/` (auto-generated from test notebooks). Use nbdev to export test notebooks into `healpyxel/tests/` so they are runnable by both `nbdev_test` and `pytest`. Fixtures in [conftest.py](tests/conftest.py) provide:
 - `test_data_dir` — Points to `test_data/` with batches, samples, validation files
 - `sample_5k`, `batch_001`, etc. — Pre-loaded test dataframes
 
@@ -121,6 +121,14 @@ Test data structure:
 - `test_data/validation/` — Ground truth files for validation
 
 Generated via [create_test_data.sh](create_test_data.sh).
+
+### Test Notebook Export Pattern (nbdev v2)
+
+- I create a dedicated test notebook (e.g., `nbs/00_core_test.ipynb`).
+- Set `#| default_exp tests.test_core` so exports land in `healpyxel/tests/test_core.py`.
+- Use `#| export` for pytest-style test functions.
+- Use `#| hide` for test-only imports to keep docs clean.
+- Run both `nbdev_test` (notebook execution) and `pytest` (exported module) as part of verification.
 
 ## Common Development Tasks
 

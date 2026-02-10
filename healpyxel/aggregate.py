@@ -34,7 +34,7 @@ import os
 import json
 from pathlib import Path
 from typing import Optional, Sequence, Iterable, Callable, Dict, List
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 import pyarrow.parquet as pq
 import pyarrow as pa
@@ -1295,7 +1295,7 @@ def process_single_sidecar(
         output_metadata = {
             'processing': {
                 'stage': 'aggregate',
-                'timestamp': datetime.utcnow().isoformat() + 'Z',
+                'timestamp': datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
                 'source_file': str(input_file),
                 'sidecar_file': str(sidecar_path),
                 'output_file': str(output_path.absolute())
