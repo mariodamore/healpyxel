@@ -1,0 +1,30 @@
+
+direction: right
+
+# INPUT
+Aggregated: {
+  shape: sql_table
+  style: {fill: "#d5e8d4"}
+  healpix_id: "median | n_sources"
+  "pix_A": "015000 | 00000002"
+  "pix_B": "030000 | 00000001"
+}
+
+# GEOMETRY ATTACHMENT
+healpyxel_to_geoparquet: {
+  style: {fill: "#fff4e6"}
+  "HEALPix Cell Geometry\nvia healpy"
+}
+
+# OUTPUT
+Aggregated_Geo: {
+  shape: sql_table
+  style: {fill: "#e1d5e7"}
+  healpix_id: "median | n_sources | geometry"
+  "pix_A":    "015000 | 00000002 | POLY(..)"
+  "pix_B":    "030000 | 00000001 | POLY(..)"
+}
+
+# FLOW
+Aggregated -> healpyxel_to_geoparquet
+healpyxel_to_geoparquet -> Aggregated_Geo

@@ -3,10 +3,14 @@ website:
     contents:
       - index.ipynb
       - 00_core.ipynb
+      - 00_core_test.ipynb
       - 00_setup.ipynb
       - 00b_metadata.ipynb
+      - 00b_metadata_test.ipynb
       - 01_sidecar.ipynb
+      - 01_sidecar_test.ipynb
       - 02_aggregate.ipynb
+      - 02_aggregate_test.ipynb
       - 03_accumulator.ipynb
       - 04_finalize.ipynb
       - 05_cli.ipynb
@@ -18,3 +22,4 @@ website:
       - 83_example_accumulation.ipynb
       - 90_example_streaming.ipynb
       - logo_generation.ipynb
+      - utils_diagrams.ipynb
