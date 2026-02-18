@@ -3,10 +3,10 @@
 # %% auto 0
 __all__ = ['TestComputeHealpixIds', 'TestDetectLonlatColumns', 'TestWeightHandling', 'TestProcessPartition',
            'TestBuildOutputPath', 'TestValidationFunctions', 'TestPSFHandling', 'TestGeometryOperations',
-           'TestMetadataWriting', 'TestSidecarIntegration', 'TestFormatAndPathFunctions',
-           'TestColumnDetectionEdgeCases', 'TestWeightNormalizationComplex', 'TestHealpixIDEdgeCases',
-           'TestProcessPartitionComplex', 'TestValidationComprehensive', 'TestPSFComprehensive',
-           'TestGeometryComprehensive']
+           'TestMetadataWriting', 'test_validate_nside_type_coercion', 'TestSidecarIntegration',
+           'TestFormatAndPathFunctions', 'TestColumnDetectionEdgeCases', 'TestWeightNormalizationComplex',
+           'TestHealpixIDEdgeCases', 'TestProcessPartitionComplex', 'TestValidationComprehensive',
+           'TestPSFComprehensive', 'TestGeometryComprehensive']
 
 # %% ../../nbs/01_sidecar_test.ipynb 2
 import pytest
@@ -395,6 +395,13 @@ class TestMetadataWriting:
         # Check that metadata file was created
         meta_path = output_path.with_suffix('.meta.json')
         assert meta_path.exists()
+
+# %% ../../nbs/01_sidecar_test.ipynb 12
+def test_validate_nside_type_coercion(self):
+    """Test validation handles numeric types properly."""
+    assert validate_nside(32) == True
+    assert validate_nside(np.int32(32)) == True
+    assert validate_nside(np.int64(64)) == True
 
 # %% ../../nbs/01_sidecar_test.ipynb 13
 # ============================================================================

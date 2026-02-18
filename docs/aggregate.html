@@ -38,11 +38,11 @@ ul.task-list li input[type="checkbox"] {
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -153,7 +153,7 @@ ul.task-list li input[type="checkbox"] {
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix-based Spatial Aggregation</span></a>
+ <span class="menu-text">HealPyxel</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -174,19 +174,19 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization</span></a>
+ <span class="menu-text">Complete workflow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_psf.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization : Gaussian PSF - WIP!</span></a>
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accumulation - WIP!</span></a>
+ <span class="menu-text">Streaming Accumulation - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -227,13 +227,13 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accumulator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Accumulator</span></a>
+ <span class="menu-text">Accumulator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./finalize.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Finalize</span></a>
+  <a href="./04_finalize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Usage Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -251,7 +251,7 @@ ul.task-list li input[type="checkbox"] {
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./geospatial.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Geospatial</span></a>
+ <span class="menu-text">Development: opportunistic cache use (default)</span></a>
   </div>
 </li>
       </ul>
@@ -494,7 +494,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
+  const darkModeDefault = true;
   let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {

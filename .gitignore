@@ -4,6 +4,7 @@ __pycache__/
 dist/
 *.egg-info/
 .pytest_cache/
+coverage.json
 .DS_Store
 *.swp
 .vscode/

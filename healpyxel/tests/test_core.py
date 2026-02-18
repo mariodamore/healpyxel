@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['TestValidateNside', 'TestMAD', 'TestRobustStd', 'TestSetupLogger']
 
-# %% ../../nbs/00_core_test.ipynb 2
+# %% ../../nbs/00_core_test.ipynb 1
 import pytest
 import numpy as np
 import logging

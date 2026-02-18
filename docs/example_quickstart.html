@@ -6,7 +6,6 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Quickstart guide and basic usage">
 
 <title>Healpyxel - Quickstart</title>
 <style>
@@ -72,11 +71,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -108,10 +107,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <link rel="stylesheet" href="styles.css">
 <meta property="og:title" content="Healpyxel - Quickstart">
-<meta property="og:description" content="Quickstart guide and basic usage">
+<meta property="og:description" content="HEALPix-based spatial aggregation for planetary science data">
 <meta property="og:site_name" content="Healpyxel">
 <meta name="twitter:title" content="Healpyxel - Quickstart">
-<meta name="twitter:description" content="Quickstart guide and basic usage">
+<meta name="twitter:description" content="HEALPix-based spatial aggregation for planetary science data">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -187,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix-based Spatial Aggregation</span></a>
+ <span class="menu-text">HealPyxel</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -208,19 +207,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization</span></a>
+ <span class="menu-text">Complete workflow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_psf.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization : Gaussian PSF - WIP!</span></a>
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accumulation - WIP!</span></a>
+ <span class="menu-text">Streaming Accumulation - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -261,13 +260,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accumulator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Accumulator</span></a>
+ <span class="menu-text">Accumulator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./finalize.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Finalize</span></a>
+  <a href="./04_finalize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Usage Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -285,7 +284,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./geospatial.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Geospatial</span></a>
+ <span class="menu-text">Development: opportunistic cache use (default)</span></a>
   </div>
 </li>
       </ul>
@@ -300,8 +299,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#setup" id="toc-setup" class="nav-link active" data-scroll-target="#setup">Setup</a></li>
-  <li><a href="#core-utilities" id="toc-core-utilities" class="nav-link" data-scroll-target="#core-utilities">Core Utilities</a></li>
+  <li><a href="#core-utilities" id="toc-core-utilities" class="nav-link active" data-scroll-target="#core-utilities">Core Utilities</a></li>
   <li><a href="#test-data" id="toc-test-data" class="nav-link" data-scroll-target="#test-data">Test Data</a></li>
   <li><a href="#cli-commands" id="toc-cli-commands" class="nav-link" data-scroll-target="#cli-commands">CLI Commands</a></li>
   <li><a href="#quick-test-with-sample-data" id="toc-quick-test-with-sample-data" class="nav-link" data-scroll-target="#quick-test-with-sample-data">Quick Test with Sample Data</a></li>
@@ -319,11 +317,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1 class="title">Quickstart</h1>
 </div>
 
-<div>
-  <div class="description">
-    Quickstart guide and basic usage
-  </div>
-</div>
 
 
 <div class="quarto-title-meta column-body">
@@ -339,9 +332,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
-<section id="setup" class="level2">
-<h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<p>Import the healpyxel package and core utilities:</p>
 <div id="45a0bd7f" class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpyxel</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel <span class="im">import</span> core</span>
@@ -353,7 +343,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>healpyxel version: 0.1.0</code></pre>
 </div>
 </div>
-</section>
 <section id="core-utilities" class="level2">
 <h2 class="anchored" data-anchor-id="core-utilities">Core Utilities</h2>
 <p>Test the core utility functions:</p>
@@ -720,7 +709,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
+  const darkModeDefault = true;
   let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {

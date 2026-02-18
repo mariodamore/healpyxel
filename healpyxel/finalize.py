@@ -3,7 +3,7 @@
 # %% auto 0
 __all__ = ['logger', 'finalize_statistics', 'densify_healpix_map', 'export_to_geotiff', 'main']
 
-# %% ../nbs/04_finalize.ipynb 2
+# %% ../nbs/04_finalize.ipynb 1
 """healpix_finalize.py
 
 Convert accumulator state to final HEALPix maps with statistics.
@@ -83,7 +83,7 @@ except ImportError:
     TQDM_AVAILABLE = False
     tqdm = None
 
-# %% ../nbs/04_finalize.ipynb 3
+# %% ../nbs/04_finalize.ipynb 2
 def finalize_statistics(
     state: Dict[int, CellAccumulator],
     percentiles: Optional[List[float]] = None,
@@ -175,7 +175,7 @@ def finalize_statistics(
     
     return df
 
-# %% ../nbs/04_finalize.ipynb 4
+# %% ../nbs/04_finalize.ipynb 3
 def densify_healpix_map(
     sparse_df: pd.DataFrame,
     nside: int,
@@ -209,7 +209,7 @@ def densify_healpix_map(
     
     return dense_df
 
-# %% ../nbs/04_finalize.ipynb 5
+# %% ../nbs/04_finalize.ipynb 4
 def export_to_geotiff(
     df: pd.DataFrame,
     column: str,
@@ -277,7 +277,7 @@ def export_to_geotiff(
     
     logger.info(f"✓ Exported GeoTIFF ({width}x{height})")
 
-# %% ../nbs/04_finalize.ipynb 6
+# %% ../nbs/04_finalize.ipynb 5
 def _normalize_load_state_result(result) -> Tuple[Dict[int, CellAccumulator], Optional[HEALPyxelxMetadata]]:
     """Normalize load_state outputs across versions."""
     if isinstance(result, tuple) and len(result) == 2:
@@ -488,7 +488,7 @@ Examples:
     
     return 0
 
-# %% ../nbs/04_finalize.ipynb 7
+# %% ../nbs/04_finalize.ipynb 6
 #| eval: false
 if __name__ == '__main__':
     sys.exit(main())

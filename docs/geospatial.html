@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet">
 
-<title>Healpyxel - Geospatial</title>
+<title>Healpyxel - Development: opportunistic cache use (default)</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -72,11 +71,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -107,11 +106,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="Healpyxel - Geospatial">
-<meta property="og:description" content="HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet">
+<meta property="og:title" content="Healpyxel - Development: opportunistic cache use (default)">
+<meta property="og:description" content="HEALPix-based spatial aggregation for planetary science data">
 <meta property="og:site_name" content="Healpyxel">
-<meta name="twitter:title" content="Healpyxel - Geospatial">
-<meta name="twitter:description" content="HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet">
+<meta name="twitter:title" content="Healpyxel - Development: opportunistic cache use (default)">
+<meta name="twitter:description" content="HEALPix-based spatial aggregation for planetary science data">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -167,7 +166,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00_setup.html">API Reference</a></li><li class="breadcrumb-item"><a href="./geospatial.html">Geospatial</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00_setup.html">API Reference</a></li><li class="breadcrumb-item"><a href="./geospatial.html">Development: opportunistic cache use (default)</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -187,7 +186,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix-based Spatial Aggregation</span></a>
+ <span class="menu-text">HealPyxel</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -208,19 +207,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization</span></a>
+ <span class="menu-text">Complete workflow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_psf.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization : Gaussian PSF - WIP!</span></a>
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accumulation - WIP!</span></a>
+ <span class="menu-text">Streaming Accumulation - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -261,13 +260,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accumulator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Accumulator</span></a>
+ <span class="menu-text">Accumulator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./finalize.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Finalize</span></a>
+  <a href="./04_finalize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Usage Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -285,7 +284,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./geospatial.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Geospatial</span></a>
+ <span class="menu-text">Development: opportunistic cache use (default)</span></a>
   </div>
 </li>
       </ul>
@@ -303,6 +302,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#core-helpers" id="toc-core-helpers" class="nav-link active" data-scroll-target="#core-helpers">Core helpers</a></li>
   <li><a href="#caching-xdg-configuration" id="toc-caching-xdg-configuration" class="nav-link" data-scroll-target="#caching-xdg-configuration">Caching &amp; XDG Configuration</a>
   <ul class="collapse">
+  <li><a href="#is_geometry_valid" id="toc-is_geometry_valid" class="nav-link" data-scroll-target="#is_geometry_valid">is_geometry_valid</a></li>
   <li><a href="#init_user_config" id="toc-init_user_config" class="nav-link" data-scroll-target="#init_user_config">init_user_config</a></li>
   </ul></li>
   <li><a href="#cache-management-core-logic" id="toc-cache-management-core-logic" class="nav-link" data-scroll-target="#cache-management-core-logic">Cache Management Core Logic</a>
@@ -319,17 +319,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#test_spherical_conversion" id="toc-test_spherical_conversion" class="nav-link" data-scroll-target="#test_spherical_conversion">test_spherical_conversion</a></li>
   <li><a href="#test_cache_key_generation" id="toc-test_cache_key_generation" class="nav-link" data-scroll-target="#test_cache_key_generation">test_cache_key_generation</a></li>
   <li><a href="#test_xdg_precedence" id="toc-test_xdg_precedence" class="nav-link" data-scroll-target="#test_xdg_precedence">test_xdg_precedence</a></li>
-  </ul></li>
-  <li><a href="#healpix-grid-caching-system" id="toc-healpix-grid-caching-system" class="nav-link" data-scroll-target="#healpix-grid-caching-system">HEALPix Grid Caching System</a>
-  <ul class="collapse">
-  <li><a href="#key-features" id="toc-key-features" class="nav-link" data-scroll-target="#key-features">Key Features</a></li>
-  <li><a href="#cache-modes" id="toc-cache-modes" class="nav-link" data-scroll-target="#cache-modes">Cache Modes</a></li>
-  <li><a href="#production-pipeline-workflow" id="toc-production-pipeline-workflow" class="nav-link" data-scroll-target="#production-pipeline-workflow">Production Pipeline Workflow</a></li>
-  <li><a href="#directory-resolution-precedence" id="toc-directory-resolution-precedence" class="nav-link" data-scroll-target="#directory-resolution-precedence">Directory Resolution Precedence</a></li>
-  <li><a href="#configuration-file" id="toc-configuration-file" class="nav-link" data-scroll-target="#configuration-file">Configuration File</a></li>
-  <li><a href="#environment-variables" id="toc-environment-variables" class="nav-link" data-scroll-target="#environment-variables">Environment Variables</a></li>
-  <li><a href="#cache-management-commands" id="toc-cache-management-commands" class="nav-link" data-scroll-target="#cache-management-commands">Cache Management Commands</a></li>
-  <li><a href="#troubleshooting" id="toc-troubleshooting" class="nav-link" data-scroll-target="#troubleshooting">Troubleshooting</a></li>
   </ul></li>
   <li><a href="#polygon-creation-and-antimeridian-handling" id="toc-polygon-creation-and-antimeridian-handling" class="nav-link" data-scroll-target="#polygon-creation-and-antimeridian-handling">Polygon creation and antimeridian handling</a></li>
   <li><a href="#main-api-build-geodataframe-and-save-geoparquet" id="toc-main-api-build-geodataframe-and-save-geoparquet" class="nav-link" data-scroll-target="#main-api-build-geodataframe-and-save-geoparquet">Main API: build GeoDataFrame and save geoparquet</a>
@@ -358,16 +347,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content column-body" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00_setup.html">API Reference</a></li><li class="breadcrumb-item"><a href="./geospatial.html">Geospatial</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./00_setup.html">API Reference</a></li><li class="breadcrumb-item"><a href="./geospatial.html">Development: opportunistic cache use (default)</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Geospatial</h1>
+<h1 class="title">Development: opportunistic cache use (default)</h1>
 </div>
 
-<div>
-  <div class="description">
-    HEALPix → vector utilities: produce polygon geometries for HEALPix cells and save as GeoParquet
-  </div>
-</div>
 
 
 <div class="quarto-title-meta column-body">
@@ -392,6 +376,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Precedence for directory resolution (highest to lowest):</strong> 1. CLI argument (e.g., <code>--cache-dir /tmp</code>) 2. Environment variable (e.g., <code>HEALPYXEL_CACHE=/fast/disk</code>) 3. XDG spec: <code>$XDG_CACHE_HOME</code> or <code>$XDG_CONFIG_HOME</code> 4. Fallback: <code>~/.cache/healpyxel/healpix_grids</code> or <code>~/.config/healpyxel</code></p>
 <p><strong>Configuration file:</strong> <code>$XDG_CONFIG_HOME/healpyxel/settings.ini</code> (or <code>~/.config/healpyxel/settings.ini</code>) - Controls precomputed nsides, antimeridian handling, cache location override - Auto-created on first use; can be edited manually</p>
 <hr>
+<section id="is_geometry_valid" class="level3">
+<h3 class="anchored" data-anchor-id="is_geometry_valid">is_geometry_valid</h3>
+<blockquote class="blockquote">
+<pre><code> is_geometry_valid (geom:shapely.geometry.base.BaseGeometry)</code></pre>
+</blockquote>
+<p>*Check if a geometry is valid for use in a spherical projection.</p>
+<p>This function ensures that the geometry is either associated with a CRS in degrees or has latitude/longitude coordinates within valid bounds. If no CRS is provided, it checks that the latitude is within [-90, 90] and longitude is within [-180, 360].</p>
+<p>Args: geom (BaseGeometry): A Shapely geometry object to validate.</p>
+<p>Returns: bool: True if the geometry is valid for spherical projection, False otherwise.</p>
+<p>Example: &gt;&gt;&gt; from shapely.geometry import Polygon &gt;&gt;&gt; geom = Polygon([(-180, -90), (-180, 90), (180, 90), (180, -90), (-180, -90)]) &gt;&gt;&gt; is_geometry_valid(geom) # Valid lat/lon bounds True &gt;&gt;&gt; geom = Polygon([(1e32, 1e32), (180, 90), (180, -90), (1e32, 1e32)]) &gt;&gt;&gt; is_geometry_valid(geom) # Invalid due to extreme coordinates False*</p>
+<hr>
+</section>
 <section id="init_user_config" class="level3">
 <h3 class="anchored" data-anchor-id="init_user_config">init_user_config</h3>
 <blockquote class="blockquote">
@@ -490,271 +486,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><em>Verify XDG directory resolution with full precedence.</em></p>
 </section>
 </section>
-<section id="healpix-grid-caching-system" class="level2">
-<h2 class="anchored" data-anchor-id="healpix-grid-caching-system">HEALPix Grid Caching System</h2>
-<p>This module provides a robust caching system for HEALPix cell geometries to accelerate repeated conversions.</p>
-<section id="key-features" class="level3">
-<h3 class="anchored" data-anchor-id="key-features">Key Features</h3>
-<ol type="1">
-<li><strong>XDG Base Directory Compliant</strong> — Follows freedesktop.org standards for cross-platform cache storage</li>
-<li><strong>Explicit Precedence</strong> — Clear resolution order: CLI arg &gt; env var &gt; config file &gt; XDG defaults</li>
-<li><strong>Spherical Coordinate Storage</strong> — Caches <code>(theta, phi)</code> radians in parquet for format-agnostic reuse</li>
-<li><strong>Smart Subsetting</strong> — For sparse aggregates, loads only the required pixels from cache</li>
-<li><strong>Strict Cache Modes</strong> — Prevents accidental full-grid computation with explicit cache policies</li>
-</ol>
-</section>
-<section id="cache-modes" class="level3">
-<h3 class="anchored" data-anchor-id="cache-modes">Cache Modes</h3>
-<p>The <code>cache_mode</code> parameter provides strict control over caching behavior:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 13%">
-<col style="width: 22%">
-<col style="width: 22%">
-<col style="width: 40%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Mode</th>
-<th>Behavior</th>
-<th>Use Case</th>
-<th>Safety Guarantee</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>use</code></td>
-<td>Opportunistic: load cache if available, compute missing pixels on demand</td>
-<td>Development, interactive analysis</td>
-<td>⚠️ May trigger expensive computation if cache incomplete</td>
-</tr>
-<tr class="even">
-<td><code>require</code></td>
-<td>Strict: <strong>fail immediately</strong> if cache missing or incomplete</td>
-<td><strong>CI/CD pipelines, production ETL</strong></td>
-<td>✅ Never computes full grid silently</td>
-</tr>
-<tr class="odd">
-<td><code>off</code></td>
-<td>Ignore cache entirely, always compute from scratch</td>
-<td>Testing, benchmarking, one-off analysis</td>
-<td>⚠️ Always pays full computation cost</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Production Recommendation:</strong> Use <code>cache_mode='require'</code> in automated pipelines to prevent accidental multi-hour computations when cache is stale or missing.</p>
-<p><strong>Usage Examples:</strong></p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Development: opportunistic cache use (default)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Production: fail-fast if cache missing (recommended for CI/CD)</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">--cache-mode</span> require</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Ignore cache entirely</span></span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">--cache-mode</span> off</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="production-pipeline-workflow" class="level3">
-<h3 class="anchored" data-anchor-id="production-pipeline-workflow">Production Pipeline Workflow</h3>
-<p>For reliable CI/CD and production ETL, follow this pattern:</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Generate cache for required nsides (run once or in setup stage)</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--generate</span> 256 <span class="at">--generate</span> 512 <span class="at">--generate</span> 1024</span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Verify cache integrity (recommended in CI)</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--verify</span> 256 <span class="at">--verify</span> 512 <span class="at">--verify</span> 1024</span>
-<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Process data with strict cache policy (fail if cache missing)</span></span>
-<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> batch_001.parquet <span class="at">--cache-mode</span> require <span class="at">-n</span> 256</span>
-<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> batch_002.parquet <span class="at">--cache-mode</span> require <span class="at">-n</span> 512</span>
-<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> batch_003.parquet <span class="at">--cache-mode</span> require <span class="at">-n</span> 1024</span>
-<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Cache becomes stale? Regenerate with --force</span></span>
-<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--generate</span> 256 <span class="at">--force</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Why This Matters:</strong> - <code>cache_mode='use'</code> (default) will <strong>silently compute</strong> 50M+ boundaries if cache is missing at nside=2048 - A sparse aggregate with 10 pixels at nside=2048 + missing cache = <strong>catastrophic performance regression</strong> - <code>cache_mode='require'</code> makes this an <strong>explicit error</strong> instead of a silent 3-hour job</p>
-</section>
-<section id="directory-resolution-precedence" class="level3">
-<h3 class="anchored" data-anchor-id="directory-resolution-precedence">Directory Resolution Precedence</h3>
-<p>Both cache and config use <strong>XDG Base Directory Specification</strong> with explicit precedence:</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 20%">
-<col style="width: 26%">
-<col style="width: 30%">
-<col style="width: 23%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Rank</th>
-<th>Method</th>
-<th>Example</th>
-<th>Scope</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>1</td>
-<td>CLI argument</td>
-<td><code>--cache-dir /tmp</code></td>
-<td>This command only</td>
-</tr>
-<tr class="even">
-<td>2</td>
-<td>Environment variable</td>
-<td><code>HEALPYXEL_CACHE=/mnt/ssd</code></td>
-<td>This shell session</td>
-</tr>
-<tr class="odd">
-<td>3</td>
-<td>Config file</td>
-<td><code>~/.config/healpyxel/settings.ini</code></td>
-<td>Persistent (all sessions)</td>
-</tr>
-<tr class="even">
-<td>4</td>
-<td>XDG env var</td>
-<td><code>$XDG_CACHE_HOME</code> or <code>$XDG_CONFIG_HOME</code></td>
-<td>System-wide (multi-user systems)</td>
-</tr>
-<tr class="odd">
-<td>5</td>
-<td>XDG defaults</td>
-<td><code>~/.cache</code> or <code>~/.config</code></td>
-<td>Fallback (POSIX standard)</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Effective paths:</strong></p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Default (nothing configured)</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="ex">Cache:</span>  <span class="va">$HOME</span>/.cache/healpyxel/healpix_grids</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="ex">Config:</span> <span class="va">$HOME</span>/.config/healpyxel</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># With XDG_CACHE_HOME set</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Cache:</span>  <span class="va">$XDG_CACHE_HOME</span>/healpyxel/healpix_grids</span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="co"># With HEALPYXEL_CACHE env var (overrides XDG)</span></span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="ex">Cache:</span>  <span class="va">$HEALPYXEL_CACHE</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="co"># CLI arg (overrides everything)</span></span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--cache-dir</span> /custom/path <span class="at">--list</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="configuration-file" class="level3">
-<h3 class="anchored" data-anchor-id="configuration-file">Configuration File</h3>
-<p>Location: <code>$XDG_CONFIG_HOME/healpyxel/settings.ini</code> (or <code>~/.config/healpyxel/settings.ini</code>)</p>
-<p><strong>Auto-created</strong> on first use. Edit manually to customize:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode ini code-with-copy"><code class="sourceCode ini"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ~/.config/healpyxel/settings.ini</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="kw">[cache]</span></span>
-<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Cache directory for HEALPix grids (parquet files with spherical coordinates)</span></span>
-<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Special value 'auto' means use XDG resolution</span></span>
-<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="dt">cache_dir </span><span class="ot">=</span><span class="st"> auto</span></span>
-<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Precomputed nsides (comma-separated) to generate/cache automatically</span></span>
-<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="dt">precomputed_nsides </span><span class="ot">=</span><span class="st"> 32,64,128,256</span></span>
-<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a><span class="kw">[general]</span></span>
-<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Whether to fix antimeridian-crossing polygons during boundary computation</span></span>
-<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="dt">fix_antimeridian </span><span class="ot">=</span><span class="st"> </span><span class="kw">true</span></span>
-<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Tolerance in degrees for antimeridian detection (advanced)</span></span>
-<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a><span class="dt">antimeridian_tolerance </span><span class="ot">=</span><span class="st"> </span><span class="fl">1.0</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="environment-variables" class="level3">
-<h3 class="anchored" data-anchor-id="environment-variables">Environment Variables</h3>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 35%">
-<col style="width: 32%">
-<col style="width: 32%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Variable</th>
-<th>Purpose</th>
-<th>Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td><code>HEALPYXEL_CACHE</code></td>
-<td>Cache directory (session override)</td>
-<td><code>export HEALPYXEL_CACHE=/fast/disk</code></td>
-</tr>
-<tr class="even">
-<td><code>HEALPYXEL_CONFIG</code></td>
-<td>Config directory (session override)</td>
-<td><code>export HEALPYXEL_CONFIG=~/.healpyxel_alt</code></td>
-</tr>
-<tr class="odd">
-<td><code>XDG_CACHE_HOME</code></td>
-<td>XDG cache root (system-wide)</td>
-<td>Standard: leave unset (defaults to ~/.cache)</td>
-</tr>
-<tr class="even">
-<td><code>XDG_CONFIG_HOME</code></td>
-<td>XDG config root (system-wide)</td>
-<td>Standard: leave unset (defaults to ~/.config)</td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="cache-management-commands" class="level3">
-<h3 class="anchored" data-anchor-id="cache-management-commands">Cache Management Commands</h3>
-<p><strong>List cached grids:</strong></p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--list</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output:</span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Cached grids (3):</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   nside_032_nest_spherical.parquet    786432 cells  (3.2 MB)</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   nside_256_nest_spherical.parquet   49152 cells  (25.6 MB)</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   nside_512_nest_spherical.parquet  196608 cells  (102.4 MB)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Generate cache for specific nsides:</strong></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--generate</span> 32 <span class="at">--generate</span> 256 <span class="at">--generate</span> 512</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Computes and caches all three at once</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Verify cache integrity (recommended for CI):</strong></p>
-<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--verify</span> 256 <span class="at">--verify</span> 512</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Checks:</span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   ✓ All expected pixels present (no missing cells)</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   ✓ No NaN values in coordinate columns</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   ✓ Correct schema (theta_0...3, phi_0...3, healpix_id)</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   ✓ healpix_id values in valid range [0, npix)</span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Returns non-zero exit code if any check fails</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Show configuration and precedence:</strong></p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--config</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Output:</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Config file: /home/user/.config/healpyxel/settings.ini</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Exists: true</span></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Current Settings:</span></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   cache_dir: auto (XDG)</span></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="co">#   precomputed_nsides: [32, 64, 128, 256]</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="co">#   fix_antimeridian: true</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   antimeridian_tolerance: 1.0</span></span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="co">#</span></span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Precedence Resolution:</span></span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#   cache_dir_resolved: /home/user/.cache/healpyxel/healpix_grids</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<p><strong>Clean cache (remove all files):</strong></p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel-cache</span> <span class="at">--clean</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">WARNING</span><span class="co">: Deletes all cached grids. Use with caution!</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</section>
-<section id="troubleshooting" class="level3">
-<h3 class="anchored" data-anchor-id="troubleshooting">Troubleshooting</h3>
-<p><strong>Cache not found:</strong></p>
-<pre><code>ValueError: Cache required but not found: nside_256_nest_spherical.parquet</code></pre>
-<p>→ Solution: Generate cache first: <code>healpyxel-cache --generate 256</code></p>
-<p><strong>Performance regression with sparse aggregates:</strong></p>
-<pre><code># Sparse aggregate with 10 pixels at nside=2048
-# Takes 3 hours instead of 10 seconds</code></pre>
-<p>→ Root cause: Missing cache forces full 50M pixel computation<br>
-→ Solution: Use <code>cache_mode='require'</code> to fail fast, then generate cache</p>
-<p><strong>Cache verification failed:</strong></p>
-<pre><code>healpyxel-cache --verify 256
-# ERROR: Expected 786432 pixels, found 786000 (432 missing)</code></pre>
-<p>→ Solution: Regenerate: <code>healpyxel-cache --generate 256 --force</code></p>
-<p><strong>Wrong cache directory:</strong></p>
-<pre><code>healpyxel-cache --list
-# Shows 0 files but you know cache exists</code></pre>
-<p>→ Diagnosis: Check precedence: <code>healpyxel-cache --config</code><br>
-→ Solution: Set <code>HEALPYXEL_CACHE</code> env var or use <code>--cache-dir</code> explicitly</p>
-</section>
-</section>
 <section id="polygon-creation-and-antimeridian-handling" class="level2">
 <h2 class="anchored" data-anchor-id="polygon-creation-and-antimeridian-handling">Polygon creation and antimeridian handling</h2>
 </section>
@@ -785,10 +516,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
                              lon_convention:str='0_360',
                              fix_antimeridian:bool=True,
                              chunk_size:int=65536,
-                             parquet_kwargs:Optional[dict]=None)</code></pre>
+                             parquet_kwargs:Optional[dict]=None,
+                             overwrite:bool=False, interactive:bool=True)</code></pre>
 </blockquote>
-<p>*Build HEALPix vector layer and save as GeoParquet. This will create a GeoParquet file containing one polygon per HEALPix cell. For large nsides consider increasing memory or using chunked processing.</p>
-<p>Args: nside: HEALPix nside output_path: path to output geoparquet file order: ‘nested’ or ‘ring’ lon_convention: ‘0_360’ or ‘-180_180’ fix_antimeridian: whether to fix antimeridian-wrapping chunk_size: pixels per chunk when building geometries parquet_kwargs: forwarded to <code>GeoDataFrame.to_parquet</code> Returns: Path to written file*</p>
+<p>*Build HEALPix vector layer and save as GeoParquet.</p>
+<p>Args: nside: HEALPix nside output_path: Path to output GeoParquet file order: ‘nested’ or ‘ring’ lon_convention: ‘0_360’ or ‘-180_180’ fix_antimeridian: Whether to fix antimeridian-wrapping chunk_size: Pixels per chunk when building geometries parquet_kwargs: Forwarded to <code>GeoDataFrame.to_parquet</code> overwrite: Whether to overwrite the file if it exists (default: False) interactive: If True, prompt the user for confirmation before overwriting</p>
+<p>Returns: Path to the written file</p>
+<p>Raises: FileExistsError: If the file exists and overwrite is False*</p>
 <hr>
 </section>
 <section id="export_healpix_to_geotiff" class="level3">
@@ -881,14 +615,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p><strong>Parameter Resolution Precedence:</strong> 1. <strong>CLI args</strong> (highest priority) — explicit user override 2. <strong>Metadata</strong> — from <code>.meta.json</code> sidecar (if present) 3. <strong>Defaults</strong> — fallback values or inference from aggregate</p>
 <p><strong>lon_convention Behavior:</strong> - <code>--lon-convention auto</code> (default) → searches metadata, falls back to <code>0_360</code> - <code>--lon-convention 0_360</code> or <code>-180_180</code> → explicit override - Prevents user confusion about which convention was used in aggregation</p>
 <p><strong>Usage Examples:</strong></p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Zero-config: metadata has all parameters</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Override metadata</span></span>
-<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-O</span> ring</span>
-<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Batch mode with metadata</span></span>
-<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span>  <span class="co"># Auto-confirm overwrites</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Zero-config: metadata has all parameters</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Override metadata</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-O</span> ring</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Batch mode with metadata</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span>  <span class="co"># Auto-confirm overwrites</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <hr>
 <section id="main" class="level3">
 <h3 class="anchored" data-anchor-id="main">main</h3>
@@ -995,14 +729,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="usage" class="level3">
 <h3 class="anchored" data-anchor-id="usage">Usage</h3>
 <p><strong>Zero-config (best case):</strong></p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto-detects: nside, order, lon_convention from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> sample_50k_nside256_aggregate.parquet</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Auto-detects: nside, order, lon_convention from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Override metadata (for testing/validation):</strong></p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-n</span> 256</span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -l -180_180 overrides metadata, nside still from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-n</span> 256</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -l -180_180 overrides metadata, nside still from metadata</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Batch mode with metadata:</strong></p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -y auto-confirms overwrites, metadata provides all params</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> data.parquet <span class="at">-y</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="co"># -y auto-confirms overwrites, metadata provides all params</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="testing" class="level3">
 <h3 class="anchored" data-anchor-id="testing">Testing ✓</h3>
@@ -1153,7 +887,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
+  const darkModeDefault = true;
   let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {

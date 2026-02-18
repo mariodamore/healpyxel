@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mariodamore.github.io/healpyxel/index.html</loc>
-    <lastmod>2026-02-11T15:53:53.148Z</lastmod>
+    <lastmod>2026-02-18T13:24:12.315Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/02_aggregate_test.html</loc>
@@ -10,11 +10,11 @@
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/example_visualization_psf.html</loc>
-    <lastmod>2026-02-09T16:19:56.270Z</lastmod>
+    <lastmod>2026-02-13T10:22:37.340Z</lastmod>
   </url>
   <url>
-    <loc>https://mariodamore.github.io/healpyxel/finalize.html</loc>
-    <lastmod>2026-02-11T14:53:50.442Z</lastmod>
+    <loc>https://mariodamore.github.io/healpyxel/04_finalize.html</loc>
+    <lastmod>2026-02-13T08:54:00.961Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/cli.html</loc>
@@ -22,15 +22,15 @@
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/geospatial.html</loc>
-    <lastmod>2026-02-11T14:53:50.011Z</lastmod>
+    <lastmod>2026-02-13T12:27:38.717Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/example_accumulation.html</loc>
-    <lastmod>2026-02-05T15:16:45.969Z</lastmod>
+    <lastmod>2026-02-13T12:37:03.232Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/accumulator.html</loc>
-    <lastmod>2026-02-11T14:53:50.587Z</lastmod>
+    <lastmod>2026-02-13T12:37:04.220Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/00_core.html</loc>
@@ -38,7 +38,7 @@
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/example_quickstart.html</loc>
-    <lastmod>2026-02-11T14:53:49.197Z</lastmod>
+    <lastmod>2026-02-13T10:22:37.323Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/logo_generation.html</loc>
@@ -46,7 +46,7 @@
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/01_sidecar_test.html</loc>
-    <lastmod>2026-02-11T15:49:58.014Z</lastmod>
+    <lastmod>2026-02-13T12:27:37.898Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/00_core_test.html</loc>
@@ -74,7 +74,7 @@
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/example_visualization_workflow.html</loc>
-    <lastmod>2026-02-09T16:19:56.234Z</lastmod>
+    <lastmod>2026-02-13T10:22:37.412Z</lastmod>
   </url>
   <url>
     <loc>https://mariodamore.github.io/healpyxel/example_streaming.html</loc>

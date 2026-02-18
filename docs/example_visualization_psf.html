@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Complete visualization workflow: sidecar creation, aggregation, and map display">
 
-<title>Healpyxel - Visualization : Gaussian PSF - WIP!</title>
+<title>Healpyxel - Gaussian PSF - WIP!</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -72,11 +71,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -110,11 +109,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="Healpyxel - Visualization : Gaussian PSF - WIP!">
-<meta property="og:description" content="Complete visualization workflow: sidecar creation, aggregation, and map display">
+<meta property="og:title" content="Healpyxel - Gaussian PSF - WIP!">
 <meta property="og:site_name" content="Healpyxel">
-<meta name="twitter:title" content="Healpyxel - Visualization : Gaussian PSF - WIP!">
-<meta name="twitter:description" content="Complete visualization workflow: sidecar creation, aggregation, and map display">
+<meta name="twitter:title" content="Healpyxel - Gaussian PSF - WIP!">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -170,7 +167,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_visualization_psf.html">Visualization : Gaussian PSF - WIP!</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_visualization_psf.html">Gaussian PSF - WIP!</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -190,7 +187,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix-based Spatial Aggregation</span></a>
+ <span class="menu-text">HealPyxel</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -211,19 +208,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization</span></a>
+ <span class="menu-text">Complete workflow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_psf.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Visualization : Gaussian PSF - WIP!</span></a>
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accumulation - WIP!</span></a>
+ <span class="menu-text">Streaming Accumulation - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -264,13 +261,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accumulator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Accumulator</span></a>
+ <span class="menu-text">Accumulator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./finalize.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Finalize</span></a>
+  <a href="./04_finalize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Usage Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -288,7 +285,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./geospatial.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Geospatial</span></a>
+ <span class="menu-text">Development: opportunistic cache use (default)</span></a>
   </div>
 </li>
       </ul>
@@ -304,16 +301,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content column-body" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_visualization_psf.html">Visualization : Gaussian PSF - WIP!</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_visualization_psf.html">Gaussian PSF - WIP!</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Visualization : Gaussian PSF - WIP!</h1>
+<h1 class="title">Gaussian PSF - WIP!</h1>
 </div>
 
-<div>
-  <div class="description">
-    Complete visualization workflow: sidecar creation, aggregation, and map display
-  </div>
-</div>
 
 
 <div class="quarto-title-meta column-body">
@@ -329,7 +321,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
-<p>Import the healpyxel package and core utilities:</p>
 <div id="42e78c86" class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the GaussianPSF class from healpyxel.sidecar</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.sidecar <span class="im">import</span> GaussianPSF</span>
@@ -1090,7 +1081,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
+  const darkModeDefault = true;
   let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {

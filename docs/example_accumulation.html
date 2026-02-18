@@ -6,9 +6,8 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="Batch processing workflow: Sidecar → Aggregate → Visualize">
 
-<title>Healpyxel - Accumulation - WIP!</title>
+<title>Healpyxel - Streaming Accumulation - WIP!</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -72,11 +71,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -111,11 +110,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="Healpyxel - Accumulation - WIP!">
-<meta property="og:description" content="Batch processing workflow: Sidecar → Aggregate → Visualize">
+<meta property="og:title" content="Healpyxel - Streaming Accumulation - WIP!">
+<meta property="og:description" content="HEALPix-based spatial aggregation for planetary science data">
 <meta property="og:site_name" content="Healpyxel">
-<meta name="twitter:title" content="Healpyxel - Accumulation - WIP!">
-<meta name="twitter:description" content="Batch processing workflow: Sidecar → Aggregate → Visualize">
+<meta name="twitter:title" content="Healpyxel - Streaming Accumulation - WIP!">
+<meta name="twitter:description" content="HEALPix-based spatial aggregation for planetary science data">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -171,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_accumulation.html">Accumulation - WIP!</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_accumulation.html">Streaming Accumulation - WIP!</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -191,7 +190,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix-based Spatial Aggregation</span></a>
+ <span class="menu-text">HealPyxel</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -212,19 +211,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization</span></a>
+ <span class="menu-text">Complete workflow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_psf.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization : Gaussian PSF - WIP!</span></a>
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Accumulation - WIP!</span></a>
+ <span class="menu-text">Streaming Accumulation - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -265,13 +264,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accumulator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Accumulator</span></a>
+ <span class="menu-text">Accumulator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./finalize.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Finalize</span></a>
+  <a href="./04_finalize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Usage Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -289,7 +288,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./geospatial.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Geospatial</span></a>
+ <span class="menu-text">Development: opportunistic cache use (default)</span></a>
   </div>
 </li>
       </ul>
@@ -320,16 +319,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content column-body" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_accumulation.html">Accumulation - WIP!</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./example_quickstart.html">Examples</a></li><li class="breadcrumb-item"><a href="./example_accumulation.html">Streaming Accumulation - WIP!</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Accumulation - WIP!</h1>
+<h1 class="title">Streaming Accumulation - WIP!</h1>
 </div>
 
-<div>
-  <div class="description">
-    Batch processing workflow: Sidecar → Aggregate → Visualize
-  </div>
-</div>
 
 
 <div class="quarto-title-meta column-body">
@@ -345,7 +339,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
-<div id="45a0bd7f" class="cell">
+<div id="45a0bd7f" class="cell" data-execution_count="1">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpyxel</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.sidecar <span class="im">import</span> process_partition</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.aggregate <span class="im">import</span> aggregate_by_sidecar, densify_healpix_aggregates</span>
@@ -363,7 +357,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="test-data-discovery" class="level2">
 <h2 class="anchored" data-anchor-id="test-data-discovery">Test Data Discovery</h2>
 <p>Find available batch data files:</p>
-<div id="07d1b8f7" class="cell">
+<div id="07d1b8f7" class="cell" data-execution_count="2">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Look for test data</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>test_data_dir <span class="op">=</span> Path(<span class="st">'../test_data'</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>batches_dir <span class="op">=</span> test_data_dir <span class="op">/</span> <span class="st">'batches'</span></span>
@@ -372,14 +366,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    batch_files <span class="op">=</span> <span class="bu">sorted</span>(batches_dir.glob(<span class="st">'batch_*.parquet'</span>))</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Found </span><span class="sc">{</span><span class="bu">len</span>(batch_files)<span class="sc">}</span><span class="ss"> batch files!"</span>)</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">First few batches:"</span>)</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> batch_files[:<span class="dv">5</span>]:</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> f <span class="kw">in</span> batch_files:</span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        size_mb <span class="op">=</span> f.stat().st_size <span class="op">/</span> <span class="dv">1024</span> <span class="op">/</span> <span class="dv">1024</span></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>f<span class="sc">.</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>size_mb<span class="sc">:.2f}</span><span class="ss"> MB"</span>)</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(batch_files) <span class="op">&gt;</span> <span class="dv">5</span>:</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  ... and </span><span class="sc">{</span><span class="bu">len</span>(batch_files) <span class="op">-</span> <span class="dv">5</span><span class="sc">}</span><span class="ss"> more"</span>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Batch data not found. Run create_test_data.sh to generate test data."</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    batch_files <span class="op">=</span> []</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Batch data not found. Run create_test_data.sh to generate test data."</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    batch_files <span class="op">=</span> []</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Found 10 batch files!
 
@@ -389,122 +381,225 @@ First few batches:
   batch_003.parquet: 1.37 MB
   batch_004.parquet: 1.46 MB
   batch_005.parquet: 1.66 MB
-  ... and 5 more</code></pre>
+  batch_006.parquet: 1.42 MB
+  batch_007.parquet: 1.53 MB
+  batch_008.parquet: 1.64 MB
+  batch_009.parquet: 1.61 MB
+  batch_010.parquet: 1.80 MB</code></pre>
+</div>
+</div>
+<div id="909435c5" class="cell" data-execution_count="3">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.geospatial <span class="im">import</span> is_geometry_valid</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>batch_files_loaded <span class="op">=</span> [</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    gdf[gdf[<span class="st">'geometry'</span>].<span class="bu">apply</span>(is_geometry_valid)]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> gdf <span class="kw">in</span> (gpd.read_parquet(f) <span class="cf">for</span> f <span class="kw">in</span> batch_files)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> rich </span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Number of geometries in each batch:"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>rich.<span class="bu">print</span>({k.stem : <span class="bu">len</span>(gdf) <span class="cf">for</span> k, gdf <span class="kw">in</span> <span class="bu">zip</span>(batch_files, batch_files_loaded)})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of geometries in each batch:</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">{</span>
+    <span style="color: #008000; text-decoration-color: #008000">'batch_001'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3027</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_002'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4124</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_003'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3734</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_004'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3989</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_005'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4501</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_006'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3885</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_007'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4174</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_008'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4479</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_009'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4416</span>,
+    <span style="color: #008000; text-decoration-color: #008000">'batch_010'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4931</span>
+<span style="font-weight: bold">}</span>
+</pre>
+</div>
+</div>
+<div id="9d247d0d" class="cell" data-execution_count="4">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div id="2b3cc7e1" class="cell" data-execution_count="6">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">10</span>))</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.tab10.colors  <span class="co"># Use a colormap for distinct colors</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, gdf <span class="kw">in</span> <span class="bu">enumerate</span>(batch_files_loaded):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    gdf.plot(ax<span class="op">=</span>ax, color<span class="op">=</span>colors[i <span class="op">%</span> <span class="bu">len</span>(colors)], linewidth<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># axs[i].set_xlim(150, 180)</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>ax.set_aspect(<span class="fl">0.25</span>)  <span class="co"># Ensure the aspect ratio of the figure is respected</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="83_example_accumulation_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="38f602dc" class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(nrows<span class="op">=</span><span class="dv">2</span>,ncols<span class="op">=</span><span class="dv">5</span>, figsize<span class="op">=</span>(<span class="dv">20</span>, <span class="dv">10</span>))</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> plt.cm.tab10.colors  <span class="co"># Use a colormap for distinct colors</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>axs <span class="op">=</span> axs.flatten()  <span class="co"># Flatten the 2D array of axes for easy iteration</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, gdf <span class="kw">in</span> <span class="bu">enumerate</span>(batch_files_loaded):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    gdf.plot(ax<span class="op">=</span>axs[i], color<span class="op">=</span>colors[i <span class="op">%</span> <span class="bu">len</span>(colors)], linewidth<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># axs[i].set_xlim(150, 180)</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    axs[i].set_aspect(<span class="fl">0.25</span>)  <span class="co"># Ensure the aspect ratio of the figure is respected</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    axs[i].set_title(<span class="ss">f"</span><span class="sc">{</span>batch_files[i]<span class="sc">.</span>stem<span class="sc">}</span><span class="ss"> (n=</span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss">)"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="83_example_accumulation_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
 <section id="step-1-create-sidecar-for-each-batch" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-create-sidecar-for-each-batch">Step 1: Create Sidecar for Each Batch</h2>
 <p>Process each batch file to create HEALPix assignments:</p>
-<div id="4a956247" class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuration</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>nside <span class="op">=</span> <span class="dv">64</span>  <span class="co"># HEALPix resolution</span></span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>mode <span class="op">=</span> <span class="st">'fuzzy'</span>  <span class="co"># Assignment mode</span></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>lon_convention <span class="op">=</span> <span class="st">'0_360'</span>  <span class="co"># Longitude range of input data</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Process first few batches as demonstration (adjust as needed)</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>n_batches_to_process <span class="op">=</span> <span class="bu">min</span>(<span class="dv">3</span>, <span class="bu">len</span>(batch_files)) <span class="cf">if</span> batch_files <span class="cf">else</span> <span class="dv">0</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>sidecars <span class="op">=</span> []</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, batch_file <span class="kw">in</span> <span class="bu">enumerate</span>(batch_files[:n_batches_to_process]):</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">[</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>n_batches_to_process<span class="sc">}</span><span class="ss">] Processing </span><span class="sc">{</span>batch_file<span class="sc">.</span>name<span class="sc">}</span><span class="ss">..."</span>)</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Load batch data</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.read_parquet(batch_file)</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert WKB geometry to GeoDataFrame</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">'geometry'</span> <span class="kw">in</span> df.columns:</span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>        df[<span class="st">'geometry'</span>] <span class="op">=</span> df[<span class="st">'geometry'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: wkb.loads(<span class="bu">bytes</span>(x)) <span class="cf">if</span> x <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> <span class="va">None</span>)</span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>        gdf <span class="op">=</span> gpd.GeoDataFrame(df, geometry<span class="op">=</span><span class="st">'geometry'</span>, crs<span class="op">=</span><span class="st">'EPSG:4326'</span>)</span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  ⚠️  No geometry column found, skipping..."</span>)</span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
-<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create sidecar</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>    sidecar <span class="op">=</span> process_partition(</span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>        gdf<span class="op">=</span>gdf,</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>        nside<span class="op">=</span>nside,</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>        mode<span class="op">=</span>mode,</span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>        base_index<span class="op">=</span><span class="dv">0</span>,</span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>        lon_convention<span class="op">=</span>lon_convention  <span class="co"># Use lon_convention instead of lat_min/lat_max</span></span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store with batch info</span></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    sidecar[<span class="st">'batch'</span>] <span class="op">=</span> i</span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    sidecars.append(sidecar)</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  ✓ Created </span><span class="sc">{</span><span class="bu">len</span>(sidecar)<span class="sc">}</span><span class="ss"> assignments from </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> geometries"</span>)</span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Unique cells: </span><span class="sc">{</span>sidecar[<span class="st">'healpix_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sidecars:</span>
-<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Combine all sidecars</span></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    combined_sidecar <span class="op">=</span> pd.concat(sidecars, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span><span class="st">'='</span><span class="op">*</span><span class="dv">60</span><span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Combined sidecar: </span><span class="sc">{</span><span class="bu">len</span>(combined_sidecar)<span class="sc">}</span><span class="ss"> total assignments"</span>)</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Unique cells touched: </span><span class="sc">{</span>combined_sidecar[<span class="st">'healpix_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Unique sources: </span><span class="sc">{</span>combined_sidecar[<span class="st">'source_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">No sidecars created. Check that batch files exist and have geometry columns."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="4a956247" class="cell" data-execution_count="10">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Configuration</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>nside <span class="op">=</span> <span class="dv">32</span>  <span class="co"># HEALPix resolution</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>mode <span class="op">=</span> <span class="st">'fuzzy'</span>  <span class="co"># Assignment mode</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>lon_convention <span class="op">=</span> <span class="st">'0_360'</span>  <span class="co"># Longitude range of input data</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Process first few batches as demonstration (adjust as needed)</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>n_batches_to_process <span class="op">=</span> <span class="bu">len</span>(batch_files_loaded)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>sidecars <span class="op">=</span> []</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, gdf <span class="kw">in</span> <span class="bu">enumerate</span>(batch_files_loaded[:n_batches_to_process]):</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">[</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>n_batches_to_process<span class="sc">}</span><span class="ss">] Processing batch </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Ensure the GeoDataFrame has valid geometries</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> gdf.empty <span class="kw">or</span> <span class="st">'geometry'</span> <span class="kw">not</span> <span class="kw">in</span> gdf.columns:</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  ⚠️  No valid geometry column found in batch </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">, skipping..."</span>)</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create sidecar</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    sidecar <span class="op">=</span> process_partition(</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        gdf<span class="op">=</span>gdf,</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>        nside<span class="op">=</span>nside,</span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        mode<span class="op">=</span>mode,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        base_index<span class="op">=</span><span class="dv">0</span>,</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>        lon_convention<span class="op">=</span>lon_convention  <span class="co"># Use lon_convention instead of lat_min/lat_max</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Store with batch info</span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    sidecar[<span class="st">'batch'</span>] <span class="op">=</span> i</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    sidecars.append(sidecar)</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  ✓ Created </span><span class="sc">{</span><span class="bu">len</span>(sidecar)<span class="sc">}</span><span class="ss"> assignments from </span><span class="sc">{</span><span class="bu">len</span>(gdf)<span class="sc">}</span><span class="ss"> geometries"</span>)</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    Unique cells: </span><span class="sc">{</span>sidecar[<span class="st">'healpix_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Combine all sidecars if any were created</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sidecars:</span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>    combined_sidecar <span class="op">=</span> pd.concat(sidecars, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span><span class="st">'='</span><span class="op">*</span><span class="dv">60</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Combined sidecar: </span><span class="sc">{</span><span class="bu">len</span>(combined_sidecar)<span class="sc">}</span><span class="ss"> total assignments"</span>)</span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Unique cells touched: </span><span class="sc">{</span>combined_sidecar[<span class="st">'healpix_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Unique sources: </span><span class="sc">{</span>combined_sidecar[<span class="st">'source_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">No sidecars created. Check that batch files exist and have valid geometry columns."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-[1/3] Processing batch_001.parquet...
-  ✓ Created 3912 assignments from 3029 geometries
-    Unique cells: 341
+[1/10] Processing batch 1...
+  ✓ Created 3539 assignments from 3027 geometries
+    Unique cells: 157
 
-[2/3] Processing batch_002.parquet...
-  ✓ Created 5382 assignments from 4127 geometries
-    Unique cells: 338
+[2/10] Processing batch 2...
+  ✓ Created 4782 assignments from 4124 geometries
+    Unique cells: 140
 
-[3/3] Processing batch_003.parquet...
-  ✓ Created 4892 assignments from 3734 geometries
-    Unique cells: 342
+[3/10] Processing batch 3...
+  ✓ Created 4304 assignments from 3734 geometries
+    Unique cells: 151
+
+[4/10] Processing batch 4...
+  ✓ Created 4565 assignments from 3989 geometries
+    Unique cells: 156
+
+[5/10] Processing batch 5...
+  ✓ Created 5308 assignments from 4501 geometries
+    Unique cells: 160
+
+[6/10] Processing batch 6...
+  ✓ Created 4552 assignments from 3885 geometries
+    Unique cells: 160
+
+[7/10] Processing batch 7...
+  ✓ Created 4874 assignments from 4174 geometries
+    Unique cells: 160
+
+[8/10] Processing batch 8...
+  ✓ Created 5205 assignments from 4479 geometries
+    Unique cells: 147
+
+[9/10] Processing batch 9...
+  ✓ Created 5134 assignments from 4416 geometries
+    Unique cells: 143
+
+[10/10] Processing batch 10...
+  ✓ Created 5632 assignments from 4931 geometries
+    Unique cells: 155
 
 ============================================================
-Combined sidecar: 14186 total assignments
-Unique cells touched: 641
-Unique sources: 4127
-  ✓ Created 4892 assignments from 3734 geometries
-    Unique cells: 342
-
-============================================================
-Combined sidecar: 14186 total assignments
-Unique cells touched: 641
-Unique sources: 4127</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>2025-12-11 15:11:05,333 INFO Partition: processed 3029 geometries, dropped 2 (0.1%) due to invalid bounds
-2025-12-11 15:11:06,269 INFO Partition: processed 4127 geometries, dropped 3 (0.1%) due to invalid bounds</code></pre>
+Combined sidecar: 47895 total assignments
+Unique cells touched: 458
+Unique sources: 4931</code></pre>
 </div>
 </div>
 </section>
 <section id="step-2-aggregate-data-by-healpix-cells" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-aggregate-data-by-healpix-cells">Step 2: Aggregate Data by HEALPix Cells</h2>
 <p>Now aggregate the original data values by HEALPix cell using the sidecar:</p>
-<div id="19e94370" class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reload and combine data from processed batches (drop geometry for aggregation)</span></span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>combined_data_list <span class="op">=</span> []</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, batch_file <span class="kw">in</span> <span class="bu">enumerate</span>(batch_files[:n_batches_to_process]):</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    df <span class="op">=</span> pd.read_parquet(batch_file)</span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Drop geometry column if present (not needed for aggregation)</span></span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">'geometry'</span> <span class="kw">in</span> df.columns:</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> df.drop(columns<span class="op">=</span>[<span class="st">'geometry'</span>])</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add source_id matching the sidecar creation</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'source_id'</span>] <span class="op">=</span> df.index.astype(np.int64)</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'batch'</span>] <span class="op">=</span> i</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    combined_data_list.append(df)</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> combined_data_list:</span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    combined_data <span class="op">=</span> pd.concat(combined_data_list, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Combined data: </span><span class="sc">{</span><span class="bu">len</span>(combined_data)<span class="sc">}</span><span class="ss"> rows"</span>)</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Columns: </span><span class="sc">{</span><span class="bu">list</span>(combined_data.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">First few rows:"</span>)</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    display(combined_data.head())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="19e94370" class="cell" data-execution_count="12">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Reload and combine data from processed batches (drop geometry for aggregation)</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>combined_data_list <span class="op">=</span> []</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, gdf <span class="kw">in</span> <span class="bu">enumerate</span>(batch_files_loaded[:n_batches_to_process]):</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">[</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">/</span><span class="sc">{</span>n_batches_to_process<span class="sc">}</span><span class="ss">] Processing batch </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Drop geometry column if present (not needed for aggregation)</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="st">'geometry'</span> <span class="kw">in</span> gdf.columns:</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>        gdf <span class="op">=</span> gdf.drop(columns<span class="op">=</span>[<span class="st">'geometry'</span>])</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Add source_id matching the sidecar creation</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>    gdf[<span class="st">'source_id'</span>] <span class="op">=</span> gdf.index.astype(np.int64)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    gdf[<span class="st">'batch'</span>] <span class="op">=</span> i</span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    combined_data_list.append(gdf)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> combined_data_list:</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>    combined_data <span class="op">=</span> pd.concat(combined_data_list, ignore_index<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Combined data: </span><span class="sc">{</span><span class="bu">len</span>(combined_data)<span class="sc">}</span><span class="ss"> rows"</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Columns: </span><span class="sc">{</span><span class="bu">list</span>(combined_data.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">First few rows:"</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    display(combined_data.head())</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No data combined. Check that batch_files_loaded contains valid data."</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Combined data: 10890 rows
+<pre><code>
+[1/10] Processing batch 1...
+
+[2/10] Processing batch 2...
+
+[3/10] Processing batch 3...
+
+[4/10] Processing batch 4...
+
+[5/10] Processing batch 5...
+
+[6/10] Processing batch 6...
+
+[7/10] Processing batch 7...
+
+[8/10] Processing batch 8...
+
+[9/10] Processing batch 9...
+
+[10/10] Processing batch 10...
+Combined data: 41260 rows
 Columns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'source_id', 'batch']
 
 First few rows:</code></pre>
@@ -668,64 +763,55 @@ First few rows:</code></pre>
 </div>
 </div>
 </div>
-<div id="fd3aee8f" class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose a value column to aggregate (adjust based on your data)</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Common columns in MESSENGER MASCS data: r1050, r750, etc.</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>value_columns <span class="op">=</span> [<span class="st">'r1050'</span>] <span class="cf">if</span> <span class="st">'r1050'</span> <span class="kw">in</span> combined_data.columns <span class="cf">else</span> []</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> value_columns:</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Try to find numeric columns</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    numeric_cols <span class="op">=</span> combined_data.select_dtypes(include<span class="op">=</span>[np.number]).columns.tolist()</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Exclude id and coordinate columns</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    exclude <span class="op">=</span> [<span class="st">'source_id'</span>, <span class="st">'batch'</span>, <span class="st">'lat_center'</span>, <span class="st">'lon_center'</span>, <span class="st">'lat'</span>, <span class="st">'lon'</span>, <span class="st">'latitude'</span>, <span class="st">'longitude'</span>]</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    value_columns <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> numeric_cols <span class="cf">if</span> c <span class="kw">not</span> <span class="kw">in</span> exclude][:<span class="dv">1</span>]  <span class="co"># Take first suitable column</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Aggregating column(s): </span><span class="sc">{</span>value_columns<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> value_columns <span class="kw">and</span> sidecars:</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Perform aggregation</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    aggregated <span class="op">=</span> aggregate_by_sidecar(</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>        original<span class="op">=</span>combined_data,</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>        sidecar<span class="op">=</span>combined_sidecar,</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>        value_columns<span class="op">=</span>value_columns,</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>        aggs<span class="op">=</span>[<span class="st">'mean'</span>, <span class="st">'median'</span>, <span class="st">'std'</span>, <span class="st">'mad'</span>, <span class="st">'robust_std'</span>],</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>        source_id_col<span class="op">=</span><span class="st">'source_id'</span>,</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>        healpix_col<span class="op">=</span><span class="st">'healpix_id'</span>,</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>        min_count<span class="op">=</span><span class="dv">1</span>,</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>       sentinel_threshold<span class="op">=</span><span class="fl">1e30</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Aggregated </span><span class="sc">{</span><span class="bu">len</span>(aggregated)<span class="sc">}</span><span class="ss"> HEALPix cells"</span>)</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Columns: </span><span class="sc">{</span><span class="bu">list</span>(aggregated.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    display(aggregated.head(<span class="dv">10</span>))</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Cannot aggregate: no suitable value columns or no sidecars created"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div id="fd3aee8f" class="cell" data-execution_count="13">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose a value column to aggregate (adjust based on your data)</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Common columns in MESSENGER MASCS data: r1050, r750, etc.</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>value_columns <span class="op">=</span> [<span class="st">'r1050'</span>] <span class="cf">if</span> <span class="st">'r1050'</span> <span class="kw">in</span> combined_data.columns <span class="cf">else</span> []</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> value_columns:</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Try to find numeric columns</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    numeric_cols <span class="op">=</span> combined_data.select_dtypes(include<span class="op">=</span>[np.number]).columns.tolist()</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Exclude id and coordinate columns</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    exclude <span class="op">=</span> [<span class="st">'source_id'</span>, <span class="st">'batch'</span>, <span class="st">'lat_center'</span>, <span class="st">'lon_center'</span>, <span class="st">'lat'</span>, <span class="st">'lon'</span>, <span class="st">'latitude'</span>, <span class="st">'longitude'</span>]</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>    value_columns <span class="op">=</span> [c <span class="cf">for</span> c <span class="kw">in</span> numeric_cols <span class="cf">if</span> c <span class="kw">not</span> <span class="kw">in</span> exclude][:<span class="dv">1</span>]  <span class="co"># Take first suitable column</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Aggregating column(s): </span><span class="sc">{</span>value_columns<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> value_columns <span class="kw">and</span> sidecars:</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Perform aggregation</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>    aggregated <span class="op">=</span> aggregate_by_sidecar(</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        original<span class="op">=</span>combined_data,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        sidecar<span class="op">=</span>combined_sidecar,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        value_columns<span class="op">=</span>value_columns,</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        aggs<span class="op">=</span>[<span class="st">'mean'</span>, <span class="st">'median'</span>, <span class="st">'std'</span>, <span class="st">'mad'</span>, <span class="st">'robust_std'</span>],</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>        source_id_col<span class="op">=</span><span class="st">'source_id'</span>,</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>        healpix_col<span class="op">=</span><span class="st">'healpix_id'</span>,</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>        min_count<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>       sentinel_threshold<span class="op">=</span><span class="fl">1e30</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Aggregated </span><span class="sc">{</span><span class="bu">len</span>(aggregated)<span class="sc">}</span><span class="ss"> HEALPix cells"</span>)</span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Columns: </span><span class="sc">{</span><span class="bu">list</span>(aggregated.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>    display(aggregated.head(<span class="dv">10</span>))</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Cannot aggregate: no suitable value columns or no sidecars created"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>2025-12-11 15:11:07,204 INFO Starting aggregation for 1 column(s): ['r1050']
-2025-12-11 15:11:07,205 INFO Aggregation functions: ['mean', 'median', 'std', 'mad', 'robust_std']
-2025-12-11 15:11:07,205 INFO Aggregation functions: ['mean', 'median', 'std', 'mad', 'robust_std']
-2025-12-11 15:11:07,218 WARNING Found 6763 duplicate source_id values - keeping first occurrence
-2025-12-11 15:11:07,218 WARNING Found 6763 duplicate source_id values - keeping first occurrence
-2025-12-11 15:11:07,228 INFO Sidecar source_id overlap: 4127/4127 (100.0%)
-2025-12-11 15:11:07,229 INFO Merging sidecar with original data
-2025-12-11 15:11:07,229 INFO Merging sidecar with original data
-2025-12-11 15:11:07,233 INFO Grouping by healpix_id and computing aggregations
-2025-12-11 15:11:07,241 INFO Processing 641 HEALPix cells
-2025-12-11 15:11:07,233 INFO Grouping by healpix_id and computing aggregations
-2025-12-11 15:11:07,241 INFO Processing 641 HEALPix cells
-2025-12-11 15:11:07,456 INFO Creating output DataFrame with 641 cells
-2025-12-11 15:11:07,459 INFO Aggregation complete. Output shape: (641, 6)
-2025-12-11 15:11:07,459 INFO Aggregation complete. Output shape: (641, 6)</code></pre>
+<pre><code>2026-02-13 13:31:15,506 WARNING Found 36329 duplicate source_id values - keeping first occurrence
+2026-02-13 13:31:15,516 INFO Sidecar source_id overlap: 4931/4931 (100.0%)
+2026-02-13 13:31:15,517 INFO Merging sidecar with original data
+2026-02-13 13:31:15,523 INFO Grouping by healpix_id and computing aggregations
+2026-02-13 13:31:15,531 INFO Processing 458 HEALPix cells
+2026-02-13 13:31:15,728 INFO Aggregation complete: 458 cells with data</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Aggregating column(s): ['r1050']
 
-Aggregated 641 HEALPix cells
+Aggregated 458 HEALPix cells
 Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_std', 'n_sources']</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"cd8e424d15bb4215b3f71508301e82bb","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"3ea222b8166b4c30b2771b55f7be7b1f","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-display">
@@ -755,94 +841,94 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 </thead>
 <tbody>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">5441</td>
-<td>0.065725</td>
-<td>0.066955</td>
-<td>0.001959</td>
-<td>0.000304</td>
-<td>0.000451</td>
-<td>3</td>
+<td data-quarto-table-cell-role="th">1360</td>
+<td>0.064800</td>
+<td>0.064958</td>
+<td>0.002333</td>
+<td>0.002149</td>
+<td>0.003187</td>
+<td>4</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5443</td>
-<td>0.062025</td>
-<td>0.062025</td>
-<td>0.000000</td>
-<td>0.000000</td>
-<td>0.000000</td>
-<td>1</td>
+<td data-quarto-table-cell-role="th">1361</td>
+<td>0.056111</td>
+<td>0.053312</td>
+<td>0.009071</td>
+<td>0.006254</td>
+<td>0.009272</td>
+<td>67</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">5444</td>
-<td>0.052158</td>
-<td>0.050539</td>
-<td>0.005063</td>
-<td>0.002227</td>
-<td>0.003301</td>
-<td>10</td>
+<td data-quarto-table-cell-role="th">1364</td>
+<td>0.052999</td>
+<td>0.052222</td>
+<td>0.009556</td>
+<td>0.005086</td>
+<td>0.007540</td>
+<td>121</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5445</td>
-<td>0.055384</td>
-<td>0.053641</td>
-<td>0.008371</td>
-<td>0.005352</td>
-<td>0.007935</td>
-<td>49</td>
+<td data-quarto-table-cell-role="th">1365</td>
+<td>0.055351</td>
+<td>0.052325</td>
+<td>0.011867</td>
+<td>0.002711</td>
+<td>0.004019</td>
+<td>84</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">5447</td>
-<td>0.062666</td>
-<td>0.066012</td>
-<td>0.007553</td>
-<td>0.003986</td>
-<td>0.005910</td>
-<td>11</td>
+<td data-quarto-table-cell-role="th">1366</td>
+<td>0.061883</td>
+<td>0.062385</td>
+<td>0.008684</td>
+<td>0.006037</td>
+<td>0.008951</td>
+<td>86</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5456</td>
-<td>0.055859</td>
-<td>0.052784</td>
-<td>0.008179</td>
-<td>0.004984</td>
-<td>0.007389</td>
-<td>37</td>
+<td data-quarto-table-cell-role="th">1367</td>
+<td>0.051103</td>
+<td>0.050074</td>
+<td>0.006332</td>
+<td>0.002375</td>
+<td>0.003521</td>
+<td>116</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">5457</td>
-<td>0.054064</td>
-<td>0.051851</td>
-<td>0.006374</td>
-<td>0.004704</td>
-<td>0.006975</td>
-<td>12</td>
+<td data-quarto-table-cell-role="th">1372</td>
+<td>0.058407</td>
+<td>0.058615</td>
+<td>0.007742</td>
+<td>0.005122</td>
+<td>0.007594</td>
+<td>116</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5458</td>
-<td>0.055457</td>
-<td>0.052863</td>
-<td>0.012101</td>
-<td>0.011351</td>
-<td>0.016828</td>
-<td>36</td>
+<td data-quarto-table-cell-role="th">1373</td>
+<td>0.052792</td>
+<td>0.052738</td>
+<td>0.009365</td>
+<td>0.004715</td>
+<td>0.006991</td>
+<td>143</td>
 </tr>
 <tr class="odd">
-<td data-quarto-table-cell-role="th">5459</td>
-<td>0.048873</td>
-<td>0.049093</td>
-<td>0.009073</td>
-<td>0.006335</td>
-<td>0.009392</td>
-<td>40</td>
+<td data-quarto-table-cell-role="th">1374</td>
+<td>0.056128</td>
+<td>0.054841</td>
+<td>0.006303</td>
+<td>0.004398</td>
+<td>0.006521</td>
+<td>111</td>
 </tr>
 <tr class="even">
-<td data-quarto-table-cell-role="th">5462</td>
-<td>0.049698</td>
-<td>0.049482</td>
-<td>0.004805</td>
-<td>0.002275</td>
-<td>0.003373</td>
-<td>16</td>
+<td data-quarto-table-cell-role="th">1375</td>
+<td>0.055762</td>
+<td>0.054951</td>
+<td>0.008210</td>
+<td>0.006297</td>
+<td>0.009336</td>
+<td>134</td>
 </tr>
 </tbody>
 </table>
@@ -855,34 +941,34 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <h2 class="anchored" data-anchor-id="step-3-densify-for-complete-healpix-grid">Step 3: Densify for Complete HEALPix Grid</h2>
 <p>Fill in empty cells to create a complete HEALPix map:</p>
 <div id="a74db222" class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> value_columns <span class="kw">and</span> sidecars:</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Densify the sparse aggregated data</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    aggregated_dense <span class="op">=</span> densify_healpix_aggregates(</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>        agg_sparse_df<span class="op">=</span>aggregated,</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        nside<span class="op">=</span>nside,</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>        healpix_col<span class="op">=</span><span class="st">'healpix_id'</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    total_cells <span class="op">=</span> <span class="dv">12</span> <span class="op">*</span> nside <span class="op">**</span> <span class="dv">2</span></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    filled_cells <span class="op">=</span> aggregated[<span class="ss">f'</span><span class="sc">{</span>value_columns[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_mean'</span>].notna().<span class="bu">sum</span>()</span>
-<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    empty_cells <span class="op">=</span> total_cells <span class="op">-</span> filled_cells</span>
-<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"HEALPix Grid (nside=</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">):"</span>)</span>
-<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Total cells: </span><span class="sc">{</span>total_cells<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Cells with data: </span><span class="sc">{</span>filled_cells<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Empty cells: </span><span class="sc">{</span>empty_cells<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Coverage: </span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> filled_cells <span class="op">/</span> total_cells<span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
-<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    display(aggregated_dense.head(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> value_columns <span class="kw">and</span> sidecars:</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Densify the sparse aggregated data</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    aggregated_dense <span class="op">=</span> densify_healpix_aggregates(</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        agg_sparse_df<span class="op">=</span>aggregated,</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        nside<span class="op">=</span>nside,</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        healpix_col<span class="op">=</span><span class="st">'healpix_id'</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    total_cells <span class="op">=</span> <span class="dv">12</span> <span class="op">*</span> nside <span class="op">**</span> <span class="dv">2</span></span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    filled_cells <span class="op">=</span> aggregated[<span class="ss">f'</span><span class="sc">{</span>value_columns[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_mean'</span>].notna().<span class="bu">sum</span>()</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    empty_cells <span class="op">=</span> total_cells <span class="op">-</span> filled_cells</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"HEALPix Grid (nside=</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">):"</span>)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Total cells: </span><span class="sc">{</span>total_cells<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Cells with data: </span><span class="sc">{</span>filled_cells<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Empty cells: </span><span class="sc">{</span>empty_cells<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Coverage: </span><span class="sc">{</span><span class="dv">100</span> <span class="op">*</span> filled_cells <span class="op">/</span> total_cells<span class="sc">:.2f}</span><span class="ss">%"</span>)</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    display(aggregated_dense.head(<span class="dv">10</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>2025-12-11 15:11:07,511 INFO Densified to 49152 cells (added 48511 empty cells)</code></pre>
+<pre><code>2026-02-13 13:31:35,234 INFO Densified from 458 to 12288 cells (nside=32)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>HEALPix Grid (nside=64):
-  Total cells: 49152
-  Cells with data: 641
-  Empty cells: 48511
-  Coverage: 1.30%</code></pre>
+<pre><code>HEALPix Grid (nside=32):
+  Total cells: 12288
+  Cells with data: 458
+  Empty cells: 11830
+  Coverage: 3.73%</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -917,7 +1003,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">1</td>
@@ -926,7 +1012,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">2</td>
@@ -935,7 +1021,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">3</td>
@@ -944,7 +1030,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">4</td>
@@ -953,7 +1039,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">5</td>
@@ -962,7 +1048,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">6</td>
@@ -971,7 +1057,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">7</td>
@@ -980,7 +1066,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="odd">
 <td data-quarto-table-cell-role="th">8</td>
@@ -989,7 +1075,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 <tr class="even">
 <td data-quarto-table-cell-role="th">9</td>
@@ -998,7 +1084,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <td>NaN</td>
 <td>NaN</td>
 <td>NaN</td>
-<td>&lt;NA&gt;</td>
+<td>NaN</td>
 </tr>
 </tbody>
 </table>
@@ -1011,36 +1097,36 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <h2 class="anchored" data-anchor-id="step-4-visualize-healpix-map">Step 4: Visualize HEALPix Map</h2>
 <p>Create a visualization of the aggregated data:</p>
 <div id="5ba5b8fa" class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> value_columns <span class="kw">and</span> sidecars:</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> healpy <span class="im">as</span> hp</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Choose which statistic to visualize</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    stat_column <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>value_columns[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_median'</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract map values (NaN for empty cells)</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    healpix_map <span class="op">=</span> aggregated_dense[stat_column].values.astype(<span class="bu">float</span>)</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create visualization</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    hp.mollview(</span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>        healpix_map,</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>        nest<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>        title<span class="op">=</span><span class="ss">f'HEALPix Map: </span><span class="sc">{</span>stat_column<span class="sc">}</span><span class="ss"> (nside=</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">)'</span>,</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'Spectral_r'</span>,</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>        flip<span class="op">=</span><span class="st">'geo'</span>,</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>        xsize<span class="op">=</span><span class="dv">2000</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    hp.graticule()</span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    </span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Statistics of the mapped data</span></span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    valid_data <span class="op">=</span> healpix_map[<span class="op">~</span>np.isnan(healpix_map)]</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Map Statistics:"</span>)</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min: </span><span class="sc">{</span>valid_data<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max: </span><span class="sc">{</span>valid_data<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean: </span><span class="sc">{</span>valid_data<span class="sc">.</span>mean()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median: </span><span class="sc">{</span>np<span class="sc">.</span>median(valid_data)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> value_columns <span class="kw">and</span> sidecars:</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> healpy <span class="im">as</span> hp</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Choose which statistic to visualize</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    stat_column <span class="op">=</span> <span class="ss">f'</span><span class="sc">{</span>value_columns[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">_median'</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Extract map values (NaN for empty cells)</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    healpix_map <span class="op">=</span> aggregated_dense[stat_column].values.astype(<span class="bu">float</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Create visualization</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    plt.figure(figsize<span class="op">=</span>(<span class="dv">12</span>, <span class="dv">8</span>))</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    hp.mollview(</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>        healpix_map,</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>        nest<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>        title<span class="op">=</span><span class="ss">f'HEALPix Map: </span><span class="sc">{</span>stat_column<span class="sc">}</span><span class="ss"> (nside=</span><span class="sc">{</span>nside<span class="sc">}</span><span class="ss">)'</span>,</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>        cmap<span class="op">=</span><span class="st">'Spectral_r'</span>,</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>        flip<span class="op">=</span><span class="st">'geo'</span>,</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>        xsize<span class="op">=</span><span class="dv">2000</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>    hp.graticule()</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>    plt.show()</span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Statistics of the mapped data</span></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    valid_data <span class="op">=</span> healpix_map[<span class="op">~</span>np.isnan(healpix_map)]</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Map Statistics:"</span>)</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Min: </span><span class="sc">{</span>valid_data<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Max: </span><span class="sc">{</span>valid_data<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Mean: </span><span class="sc">{</span>valid_data<span class="sc">.</span>mean()<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Median: </span><span class="sc">{</span>np<span class="sc">.</span>median(valid_data)<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>2025-12-11 15:11:07,965 INFO 0.0 180.0 -180.0 180.0
 2025-12-11 15:11:07,966 INFO The interval between parallels is 30 deg -0.00'.
@@ -1054,7 +1140,7 @@ Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="83_example_accumulation_files/figure-html/cell-8-output-3.png" class="img-fluid figure-img"></p>
+<p><img src="83_example_accumulation_files/figure-html/cell-12-output-3.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1080,25 +1166,25 @@ Map Statistics:
 <section id="for-large-datasets" class="level3">
 <h3 class="anchored" data-anchor-id="for-large-datasets">For Large Datasets</h3>
 <p>For processing many batch files efficiently, use the CLI tools:</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Process all batches with sidecar creation</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> batch <span class="kw">in</span> test_data/batches/batch_<span class="pp">*</span>.parquet<span class="kw">;</span> <span class="cf">do</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">healpix_sidecar</span> <span class="at">--input</span> <span class="st">"</span><span class="va">$batch</span><span class="st">"</span> <span class="dt">\</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--nside</span> 32 64 <span class="dt">\</span></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--mode</span> fuzzy <span class="dt">\</span></span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--lon-convention</span> 0_360 <span class="dt">\</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--ncores</span> 4</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate all data</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="ex">healpix_aggregate</span> <span class="at">--input</span> test_data/batches/ <span class="dt">\</span></span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">--pattern</span> <span class="st">"*.parquet"</span> <span class="dt">\</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">--nside</span> 32 <span class="dt">\</span></span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">--output</span> aggregated_nside32.parquet</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Finalize maps</span></span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a><span class="ex">healpix_finalize</span> <span class="at">--input</span> aggregated_nside32.parquet <span class="dt">\</span></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>                 <span class="at">--nside</span> 32 <span class="dt">\</span></span>
-<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>                 <span class="at">--output</span> final_maps/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Process all batches with sidecar creation</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> batch <span class="kw">in</span> test_data/batches/batch_<span class="pp">*</span>.parquet<span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    <span class="ex">healpix_sidecar</span> <span class="at">--input</span> <span class="st">"</span><span class="va">$batch</span><span class="st">"</span> <span class="dt">\</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--nside</span> 32 64 <span class="dt">\</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--mode</span> fuzzy <span class="dt">\</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--lon-convention</span> 0_360 <span class="dt">\</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">--ncores</span> 4</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregate all data</span></span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="ex">healpix_aggregate</span> <span class="at">--input</span> test_data/batches/ <span class="dt">\</span></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>                  <span class="at">--pattern</span> <span class="st">"*.parquet"</span> <span class="dt">\</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>                  <span class="at">--nside</span> 32 <span class="dt">\</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">--output</span> aggregated_nside32.parquet</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Finalize maps</span></span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="ex">healpix_finalize</span> <span class="at">--input</span> aggregated_nside32.parquet <span class="dt">\</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>                 <span class="at">--nside</span> 32 <span class="dt">\</span></span>
+<span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a>                 <span class="at">--output</span> final_maps/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="next-steps" class="level3">
 <h3 class="anchored" data-anchor-id="next-steps">Next Steps</h3>
@@ -1253,7 +1339,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
+  const darkModeDefault = true;
   let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {

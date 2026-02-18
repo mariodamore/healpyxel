@@ -5,7 +5,7 @@ __all__ = ['TestAggLookup', 'TestAggregateBySidecar', 'TestDensifyHealpixAggrega
            'TestExtractNsideFromFilename', 'TestValidateSidecarMetadata', 'TestCollectSidecarOutputs',
            'TestInteractiveSession']
 
-# %% ../../nbs/02_aggregate_test.ipynb 4
+# %% ../../nbs/02_aggregate_test.ipynb 2
 import pytest
 from pathlib import Path
 import tempfile

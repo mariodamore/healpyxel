@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="description" content="HEALPix-based spatial aggregation for planetary science data">
+<meta name="description" content="High-performance HEALPix data engineering for planetary and astronomical observations.">
 
-<title>Healpyxel - HEALPix-based Spatial Aggregation</title>
+<title>Healpyxel - healpyxel</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -72,11 +72,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
 <link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
-<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="site_libs/bootstrap/bootstrap-dark.min.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
 <script id="quarto-search-options" type="application/json">{
   "location": "navbar",
   "copy-button": false,
@@ -108,13 +108,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="styles.css">
-<meta property="og:title" content="Healpyxel - HEALPix-based Spatial Aggregation">
-<meta property="og:description" content="HEALPix-based spatial aggregation for planetary science data">
+<meta property="og:title" content="Healpyxel - healpyxel">
+<meta property="og:description" content="High-performance HEALPix data engineering for planetary and astronomical observations.">
 <meta property="og:site_name" content="Healpyxel">
-<meta name="twitter:title" content="Healpyxel - HEALPix-based Spatial Aggregation">
-<meta name="twitter:description" content="HEALPix-based spatial aggregation for planetary science data">
+<meta name="twitter:title" content="Healpyxel - healpyxel">
+<meta name="twitter:description" content="High-performance HEALPix data engineering for planetary and astronomical observations.">
 <meta name="twitter:card" content="summary">
 </head>
 
@@ -170,7 +199,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">HEALPix-based Spatial Aggregation</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./index.html">HealPyxel</a></li></ol></nav>
         <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -190,7 +219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./index.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">HEALPix-based Spatial Aggregation</span></a>
+ <span class="menu-text">HealPyxel</span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
@@ -211,19 +240,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_workflow.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization</span></a>
+ <span class="menu-text">Complete workflow</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_visualization_psf.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Visualization : Gaussian PSF - WIP!</span></a>
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./example_accumulation.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Accumulation - WIP!</span></a>
+ <span class="menu-text">Streaming Accumulation - WIP!</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -264,13 +293,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./accumulator.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Accumulator</span></a>
+ <span class="menu-text">Accumulator</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./finalize.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HEALPix Finalize</span></a>
+  <a href="./04_finalize.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Usage Example</span></a>
   </div>
 </li>
           <li class="sidebar-item">
@@ -288,7 +317,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./geospatial.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Geospatial</span></a>
+ <span class="menu-text">Development: opportunistic cache use (default)</span></a>
   </div>
 </li>
       </ul>
@@ -303,11 +332,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#design-philosophy-use-cases" id="toc-design-philosophy-use-cases" class="nav-link active" data-scroll-target="#design-philosophy-use-cases">Design Philosophy &amp; Use Cases</a>
+  <li><a href="#what-is-healpix" id="toc-what-is-healpix" class="nav-link active" data-scroll-target="#what-is-healpix">What is HEALPix?</a></li>
+  <li><a href="#the-problem-data-distortion-scale" id="toc-the-problem-data-distortion-scale" class="nav-link" data-scroll-target="#the-problem-data-distortion-scale">The Problem: Data Distortion &amp; Scale</a></li>
+  <li><a href="#design-philosophy-use-cases" id="toc-design-philosophy-use-cases" class="nav-link" data-scroll-target="#design-philosophy-use-cases">Design Philosophy &amp; Use Cases</a>
   <ul class="collapse">
+  <li><a href="#who-is-this-for" id="toc-who-is-this-for" class="nav-link" data-scroll-target="#who-is-this-for">Who is this for?</a></li>
+  <li><a href="#who-is-this-not-for" id="toc-who-is-this-not-for" class="nav-link" data-scroll-target="#who-is-this-not-for"><span style="color: red;">🛑 Who is this NOT for?</span></a></li>
   <li><a href="#how-it-works-the-sidecar-strategy" id="toc-how-it-works-the-sidecar-strategy" class="nav-link" data-scroll-target="#how-it-works-the-sidecar-strategy">How it Works: The “Sidecar” Strategy</a></li>
   </ul></li>
-  <li><a href="#features" id="toc-features" class="nav-link" data-scroll-target="#features">Features</a></li>
   <li><a href="#installation" id="toc-installation" class="nav-link" data-scroll-target="#installation">Installation</a>
   <ul class="collapse">
   <li><a href="#optional-dependencies" id="toc-optional-dependencies" class="nav-link" data-scroll-target="#optional-dependencies">Optional Dependencies</a></li>
@@ -344,12 +376,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">HEALPix-based Spatial Aggregation</h1>
+<h1 class="title">healpyxel</h1>
 </div>
 
 <div>
   <div class="description">
-    HEALPix-based spatial aggregation for planetary science data
+    High-performance HEALPix data engineering for planetary and astronomical observations.
   </div>
 </div>
 
@@ -367,47 +399,65 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <!-- WARNING: THIS FILE WAS AUTOGENERATED! DO NOT EDIT! -->
+<section id="what-is-healpix" class="level2">
+<h2 class="anchored" data-anchor-id="what-is-healpix">What is HEALPix?</h2>
+<p><strong>HEALPix</strong> (Hierarchical Equal Area isoLatitude Pixelization) is a standard for partitioning a sphere (like a planet or the sky) into pixels of equal surface area.</p>
+<p>Unlike traditional “rectangular” map projections (like Equirectangular or Mercator), HEALPix ensures that:</p>
+<ul>
+<li><strong>Every pixel is the same size:</strong> Statistical analysis remains valid across the entire globe, including the poles.</li>
+<li><strong>It is Hierarchical:</strong> You can easily increase or decrease resolution (<span class="math inline">\(NSIDE\)</span>) while maintaining spatial relationships.</li>
+<li><strong>Fast Computation:</strong> Its structure allows for extremely efficient neighbor searches and spherical harmonic transforms.</li>
+</ul>
+<p>Some useful links:</p>
+<ul>
+<li><a href="https://en.wikipedia.org/wiki/HEALPix">HEALPix - Wikipedia</a></li>
+<li>LandscapeGeoinformatics/<a href="https://github.com/LandscapeGeoinformatics/awesome-discrete-global-grid-systems?tab=readme-ov-file">Awesome Discrete Global Grid Systems (DGGS)</a></li>
+<li>pangeo-data/<a href="https://github.com/pangeo-data/awesome-HEALPix">awesome-HEALPix</a>: A curated list of awesome HEALPix libraries, tools, and resources.</li>
+</ul>
+</section>
+<section id="the-problem-data-distortion-scale" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-data-distortion-scale">The Problem: Data Distortion &amp; Scale</h2>
+<p>In planetary science, data often arrives as <strong>scattered points, tracks, or footprints</strong> from spectrometers and altimeters. Traditionally, researchers face two major hurdles:</p>
+<ol type="1">
+<li><strong>Projection Bias:</strong> Standard grids distort the poles, making global surface calculations (like mean chemical abundance or crater density) mathematically biased.</li>
+<li><strong>The Memory Wall:</strong> Modern missions generate billions of points. Loading an entire global high-resolution map into RAM to update it is often impossible.</li>
+</ol>
+<p><code>healpyxel</code> solves this by treating the sphere as a <strong>modern data engineering target</strong> rather than just a geometric grid.</p>
+</section>
 <section id="design-philosophy-use-cases" class="level2">
 <h2 class="anchored" data-anchor-id="design-philosophy-use-cases">Design Philosophy &amp; Use Cases</h2>
-<p>healpyxel is built on the <strong>Unix Philosophy</strong>: do one thing and do it well, using a decoupled, chainable structure. It treats HEALPix indexing as a data-engineering problem rather than just a geometric one.</p>
-<p><strong>Who is this for?</strong></p>
+<p><code>healpyxel</code> is built on the <strong>Unix Philosophy</strong>: do one thing and do it well, using a decoupled, chainable structure. It treats HEALPix indexing as a data-engineering problem rather than just a geometric one.</p>
+<p>This package relies heavily on <a href="https://healpy.readthedocs.io/en/latest/">healpy</a>.</p>
+<p>astropy also have a contributed module to handle those grids called <a href="https://astropy-healpix.readthedocs.io/en/latest/">astropy_healpix</a>.</p>
+<section id="who-is-this-for" class="level3">
+<h3 class="anchored" data-anchor-id="who-is-this-for">Who is this for?</h3>
 <p>This package is ideal for researchers and data engineers working with <strong>sparse, irregular, or streaming planetary and astronomical datasets.</strong></p>
 <ul>
 <li><strong>Remote Sensing &amp; Planetary Science:</strong> Specifically designed for instruments like 1-point spectrometers (e.g., MESSENGER/MASCS), laser altimeters, and push-broom spectrometers.</li>
-<li><strong>The “Sidecar” Workflow:</strong> If you want to index your data without modifying the original source files. healpyxel creates lightweight “sidecar” files that map your GeoParquet rows to HEALPix cells.</li>
-<li><strong>Large-Scale Data Engineering:</strong> If your dataset is too large for memory. By using a <strong>Split-Apply-Combine</strong> approach on GeoParquet, you can perform global aggregations, filtering, and map generation across TB-scale datasets.</li>
-<li><strong>Streaming &amp; Incremental Ingestion:</strong> If you need to update global maps as new data arrives (e.g., ongoing missions or sky surveys) without reprocessing the entire historical archive.</li>
-<li><strong>Decoupled Responsibilities:</strong> If you need to separate the <em>spatial indexing</em> (where is the data?) from the <em>physical aggregation</em> (what is the mean/min/max value?).</li>
+<li><strong>The “Sidecar” Workflow:</strong> Index your data without modifying the original source files. <code>healpyxel</code> creates lightweight “sidecar” files that map your GeoParquet rows to HEALPix cells.</li>
+<li><strong>Large-Scale Data Engineering:</strong> Process TB-scale datasets using a <strong>Split-Apply-Combine</strong> approach on GeoParquet.</li>
+<li><strong>Streaming &amp; Incremental Ingestion:</strong> Update global maps as new data arrives without reprocessing the entire historical archive.</li>
 </ul>
-<p><strong>Who is this NOT for?</strong></p>
-<p>While healpyxel is powerful, it is not a “one-size-fits-all” tool for every HEALPix task. You might consider alternatives if your use case falls into these categories:</p>
+</section>
+<section id="who-is-this-not-for" class="level3">
+<h3 class="anchored" data-anchor-id="who-is-this-not-for"><span style="color: red;">🛑 Who is this NOT for?</span></h3>
+<p>You might consider alternatives if your use case falls into these categories:</p>
 <ul>
-<li><strong>High-Resolution 2D Imagery:</strong> If your primary data source is dense 2D images (e.g., CCD frames), converting every single pixel into a row in a Parquet file is inefficient. For dense image-to-HEALPix re-projection, tools like <a href="https://reproject.readthedocs.io/">reproject</a> or <a href="https://astropy-healpix.readthedocs.io/">astropy-healpix</a> are more suitable.</li>
-<li><strong>Standard Xarray/Dask Unstructured Grids:</strong> If you require deep integration with the Xarray ecosystem and need to work with general unstructured meshes beyond just HEALPix, <a href="https://uxarray.readthedocs.io/">UXarray</a> is a better fit.</li>
-<li><strong>Multi-order Coverage (MOC) &amp; LIGO workflows:</strong> If you need to handle Multi-order HEALPix maps or specific astronomical IO formats used in gravitational wave science, check out <a href="https://mhealpy.readthedocs.io/">mhealpy</a>.</li>
-<li><strong>Simple Visualization:</strong> If you only need to plot a small array of values on a sphere once, the overhead of the GeoParquet/Sidecar workflow might be unnecessary.</li>
+<li><strong>High-Resolution 2D Imagery:</strong> For dense image-to-HEALPix re-projection (e.g., CCD frames), tools like <a href="https://reproject.readthedocs.io/">reproject</a> or <a href="https://astropy-healpix.readthedocs.io/">astropy-healpix</a> are more suitable.</li>
+<li><strong>Standard Xarray/Dask Unstructured Grids:</strong> For deep integration with general unstructured meshes beyond HEALPix, use <a href="https://uxarray.readthedocs.io/">UXarray</a>.</li>
+<li><strong>Multi-order Coverage (MOC) &amp; LIGO workflows:</strong> For specific gravitational wave IO formats, check out <a href="https://mhealpy.readthedocs.io/">mhealpy</a>.</li>
 </ul>
+</section>
 <section id="how-it-works-the-sidecar-strategy" class="level3">
 <h3 class="anchored" data-anchor-id="how-it-works-the-sidecar-strategy">How it Works: The “Sidecar” Strategy</h3>
-<p>healpyxel implements a <strong>Split-Apply-Combine</strong> pattern tailored for spherical geometry:</p>
+<p><code>healpyxel</code> implements a <strong>Split-Apply-Combine</strong> pattern tailored for spherical geometry:</p>
 <ol type="1">
-<li><strong>Split (The Sidecar):</strong> Instead of rewriting your heavy raw data, healpyxel generates a small Parquet file containing only the index of the original data and its corresponding healpix_id. This is your “Spatial Index.”</li>
-<li><strong>Apply (Aggregation):</strong> You can then join this sidecar with any column in your original dataset to calculate statistics (Mean, Std Dev, Count) per cell.</li>
-<li><strong>Combine (The Map):</strong> The results are combined into a final HEALPix map or a streaming accumulator.</li>
+<li><strong>Split (The Sidecar):</strong> Instead of rewriting your heavy raw data, <code>healpyxel</code> generates a small Parquet file containing only the <code>index</code> of the original data and its corresponding <code>healpix_id</code>.</li>
+<li><strong>Apply (Aggregation):</strong> Join this sidecar with any column in your original dataset to calculate statistics (Mean, Std Dev, Count) per cell.</li>
+<li><strong>Combine (The Map):</strong> Results are combined into a final HEALPix map or a streaming accumulator.</li>
 </ol>
-<p>This decoupling allows you to experiment with different HEALPix resolutions (NSIDE) or coordinate systems by only recreating the tiny sidecar file, leaving your multi-gigabyte raw data untouched.</p>
-<p><strong>💡 Pro-Tip:</strong> For multiple pixels sensors (e.g.&nbsp;push-broom spectrometer), flatten your 2D acquisitions into a 1D tabular format (one row per spatial pixel) before saving to GeoParquet. healpyxel is optimized to ingest these “shredded” lines at high speed to produce seamless global mosaics.</p>
+<p><strong>💡 Pro-Tip:</strong> For multiple pixels sensors (e.g.&nbsp;push-broom spectrometer), flatten your 2D acquisitions into a 1D tabular format (one row per spatial pixel) before saving to GeoParquet. <code>healpyxel</code> is optimized to ingest these “shredded” lines at high speed.</p>
 </section>
-</section>
-<section id="features" class="level2">
-<h2 class="anchored" data-anchor-id="features">Features</h2>
-<ul>
-<li><strong>Batch Processing</strong>: Classical split-apply-combine for static datasets</li>
-<li><strong>Streaming Aggregation</strong>: Incremental statistics for growing datasets</li>
-<li><strong>Memory Efficient</strong>: Process datasets larger than RAM</li>
-<li><strong>Native Resolution Mosaics</strong>: Fine-grained HEALPix grids</li>
-<li><strong>Flexible Statistics</strong>: Mean, median, std, MAD, robust_std, percentiles</li>
-</ul>
 </section>
 <section id="installation" class="level2">
 <h2 class="anchored" data-anchor-id="installation">Installation</h2>
@@ -429,11 +479,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># All optional dependencies</span></span>
 <span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install healpyxel<span class="pp">[</span><span class="ss">all</span><span class="pp">]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Extras breakdown:</strong> - <code>geospatial</code>: geopandas, shapely, dask-geopandas, antimeridian (required for <code>healpyxel_sidecar</code>) - <code>streaming</code>: tdigest (percentile tracking in <code>healpyxel_accumulator</code>) - <code>viz</code>: matplotlib, scikit-image, skyproj (mapping workflows) - <code>dev</code>: All of the above + nbdev, pytest, black, ruff, mypy - <code>all</code>: Installs geospatial + streaming + viz (excludes dev tools)</p>
-<div id="f5959f2b" class="cell" data-execution_count="2">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> display</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 </section>
 </section>
 <section id="quick-start" class="level2">
@@ -492,37 +537,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="optional-cache-geometries">Optional: Cache geometries</h2>
 <p>Pre-compute HEALPix cell boundaries for faster repeated use (especially for high <code>nside</code>). This example create the 8,16 and 36 grid and convert the cached files to geoparquet that geopandas can directly read and visualize.</p>
 <p><strong>CLI:</strong></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create the grids</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_cache</span> <span class="at">--nside</span> 8 16 32 <span class="at">--order</span> nested <span class="at">--lon-convention</span> 0_360</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># list them</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_cache</span> <span class="at">--list</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Cache</span> directory: <span class="va">$XDG_HOME</span>/.cache/healpyxel/healpix_grids</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Cached</span> grids <span class="er">(</span><span class="ex">7</span><span class="kw">)</span><span class="bu">:</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nside_008_nest_spherical.parquet</span>                 768 cells      0.0 MB</span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nside_016_nest_spherical.parquet</span>                3072 cells      0.1 MB</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nside_032_nest_spherical.parquet</span>               12288 cells      0.2 MB</span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co"># create geoparquet versions, store in tmp</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> grid <span class="kw">in</span> <span class="va">$HOME</span>/.cache/healpyxel/healpix_grids/<span class="pp">*</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"processin </span><span class="va">$grid</span><span class="st"> file"</span> </span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> <span class="va">$grid</span> <span class="at">-d</span> /tmp/ <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-f</span></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create the grids</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_cache</span> <span class="at">--nside</span> 8 16 32 <span class="at">--order</span> nested <span class="at">--lon-convention</span> 0_360</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># list them</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_cache</span> <span class="at">--list</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="ex">Cache</span> directory: <span class="va">$XDG_HOME</span>/.cache/healpyxel/healpix_grids</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="ex">Cached</span> grids <span class="er">(</span><span class="ex">7</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nside_008_nest_spherical.parquet</span>                 768 cells      0.0 MB</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nside_016_nest_spherical.parquet</span>                3072 cells      0.1 MB</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">nside_032_nest_spherical.parquet</span>               12288 cells      0.2 MB</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># create geoparquet versions, store in tmp</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> grid <span class="kw">in</span> <span class="va">$HOME</span>/.cache/healpyxel/healpix_grids/<span class="pp">*</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">echo</span> <span class="st">"processin </span><span class="va">$grid</span><span class="st"> file"</span> </span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">healpyxel_to_geoparquet</span> <span class="at">-a</span> <span class="va">$grid</span> <span class="at">-d</span> /tmp/ <span class="at">-l</span> <span class="at">-180_180</span> <span class="at">-f</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>minimal python example to read plot one of those:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>projection <span class="op">=</span> ccrs.Orthographic(central_longitude<span class="op">=</span><span class="dv">0</span>, central_latitude<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>gdf_projected_8.plot(</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span>gdf.index,  <span class="co"># Color by healpix_id</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">'Spectral_r'</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    edgecolor<span class="op">=</span><span class="st">'black'</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="fl">0.8</span>,</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax</span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>ax.set_aspect(<span class="st">'equal'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> cartopy.crs <span class="im">as</span> ccrs</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>projection <span class="op">=</span> ccrs.Orthographic(central_longitude<span class="op">=</span><span class="dv">0</span>, central_latitude<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">10</span>))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>gdf_projected_8.plot(</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span>gdf.index,  <span class="co"># Color by healpix_id</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    cmap<span class="op">=</span><span class="st">'Spectral_r'</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    legend<span class="op">=</span><span class="va">False</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    edgecolor<span class="op">=</span><span class="st">'black'</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    linewidth<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    ax<span class="op">=</span>ax</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>ax.set_aspect(<span class="st">'equal'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="healpix_grids_comparison.png" class="img-fluid figure-img"></p>
@@ -532,46 +577,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="batch-processing" class="level3">
 <h3 class="anchored" data-anchor-id="batch-processing">Batch Processing</h3>
 <p>see <a href="#cli-workflow">below</a></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Generate HEALPix sidecar (SPLIT)</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_sidecar</span> <span class="dt">\</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> observations.parquet <span class="dt">\</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--nside</span> 64 128 <span class="dt">\</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--mode</span> fuzzy <span class="dt">\</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> output/</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Aggregate by HEALPix cells (APPLY)</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_aggregate</span> <span class="dt">\</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> observations.parquet <span class="dt">\</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-dir</span> output/ <span class="dt">\</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-index</span> 0 <span class="dt">\</span></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggregate</span> <span class="dt">\</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r750 r950 <span class="dt">\</span></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggs</span> median robust_std <span class="dt">\</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">--min-count</span> 3</span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Convert to GeoParquet (for visualization)</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="dt">\</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggregate-path</span> output/observations-aggregated.<span class="pp">*</span>.parquet <span class="dt">\</span></span>
-<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> output/ <span class="dt">\</span></span>
-<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">--lon-convention</span> <span class="at">-180_180</span></span>
-<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Cache HEALPix geometry (optional, speeds up visualization)</span></span>
-<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_cache</span> <span class="at">--nside</span> 64 128 <span class="at">--order</span> nested <span class="at">--lon-convention</span> 0_360</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Generate HEALPix sidecar (SPLIT)</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_sidecar</span> <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> observations.parquet <span class="dt">\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--nside</span> 64 128 <span class="dt">\</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--mode</span> fuzzy <span class="dt">\</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> output/</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Aggregate by HEALPix cells (APPLY)</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_aggregate</span> <span class="dt">\</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> observations.parquet <span class="dt">\</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-dir</span> output/ <span class="dt">\</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sidecar-index</span> 0 <span class="dt">\</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggregate</span> <span class="dt">\</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r750 r950 <span class="dt">\</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggs</span> median robust_std <span class="dt">\</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">--min-count</span> 3</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. Convert to GeoParquet (for visualization)</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_to_geoparquet</span> <span class="dt">\</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  <span class="at">--aggregate-path</span> output/observations-aggregated.<span class="pp">*</span>.parquet <span class="dt">\</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output-dir</span> output/ <span class="dt">\</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>  <span class="at">--lon-convention</span> <span class="at">-180_180</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Cache HEALPix geometry (optional, speeds up visualization)</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_cache</span> <span class="at">--nside</span> 64 128 <span class="at">--order</span> nested <span class="at">--lon-convention</span> 0_360</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 <section id="streaming-processing---work-in-progress" class="level3">
 <h3 class="anchored" data-anchor-id="streaming-processing---work-in-progress">Streaming Processing - WORK IN PROGRESS</h3>
-<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Day 1: Initialize accumulator</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_accumulate</span> <span class="at">--input</span> day001.parquet <span class="dt">\</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r750 r950 <span class="at">--state-output</span> state_v001.parquet</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Day 2+: Incremental updates</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_accumulate</span> <span class="at">--input</span> day002.parquet <span class="dt">\</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r750 r950 <span class="dt">\</span></span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--state-input</span> state_v001.parquet <span class="at">--state-output</span> state_v002.parquet</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Finalize to statistics</span></span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_finalize</span> <span class="at">--state</span> state_v030.parquet <span class="at">--output</span> mosaic.parquet <span class="dt">\</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">--percentiles</span> 25 50 75 <span class="at">--densify</span> <span class="at">--nside</span> 512</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Day 1: Initialize accumulator</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_accumulate</span> <span class="at">--input</span> day001.parquet <span class="dt">\</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r750 r950 <span class="at">--state-output</span> state_v001.parquet</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Day 2+: Incremental updates</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_accumulate</span> <span class="at">--input</span> day002.parquet <span class="dt">\</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--columns</span> r750 r950 <span class="dt">\</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--state-input</span> state_v001.parquet <span class="at">--state-output</span> state_v002.parquet</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Finalize to statistics</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_finalize</span> <span class="at">--state</span> state_v030.parquet <span class="at">--output</span> mosaic.parquet <span class="dt">\</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">--percentiles</span> 25 50 75 <span class="at">--densify</span> <span class="at">--nside</span> 512</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
 <section id="cli-workflow" class="level2">
@@ -584,15 +629,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>input are at <a href="test_data/samples/sample_50k.parquet">test_data/samples/sample_50k.parquet</a></li>
 <li>ouput are in <a href="test_data/derived/cli_quickstart">test_data/derived/cli_quickstart</a></li>
 </ul>
-<div id="822d1c3f" class="cell" data-execution_count="4">
+<div id="822d1c3f" class="cell" data-execution_count="5">
 <div class="cell-output cell-output-stdout">
-<pre><code>Original files excerpt (transposed for clarity):
-Sidecar Metadata:
-Unique sources: 49988
-  Unique HEALPix cells: 10860
-  Total assignments: 54931
-
-  Sidecar Data:</code></pre>
+<pre><code>Original files excerpt (transposed for clarity):</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <div>
@@ -674,6 +713,40 @@ Unique sources: 49988
 </div>
 <div class="cell-output cell-output-display">
 <div>
+<figure class="figure">
+<p><img src="index_files/figure-html/cell-2-output-3.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="962e81da" class="cell" data-execution_count="7">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load sidecar parquet file using metadata</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> sidecar_meta_path.exists():</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> sidecar_path.exists():</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        sidecar_df <span class="op">=</span> pd.read_parquet(sidecar_path)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        </span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Sidecar Metadata:"</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Unique sources: </span><span class="sc">{</span>sidecar_df[<span class="st">'source_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Unique HEALPix cells: </span><span class="sc">{</span>sidecar_df[<span class="st">'healpix_id'</span>]<span class="sc">.</span>nunique()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Total assignments: </span><span class="sc">{</span><span class="bu">len</span>(sidecar_df)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>                </span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">  Sidecar Data:"</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        display(sidecar_df.head(<span class="dv">10</span>))</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Sidecar file not found: </span><span class="sc">{</span>sidecar_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Sidecar metadata not found: </span><span class="sc">{</span>sidecar_meta_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Run the CLI script first: bash examples/cli_regrid_sample_50k.sh"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Sidecar Metadata:
+Unique sources: 49988
+  Unique HEALPix cells: 10860
+  Total assignments: 54931
+
+  Sidecar Data:</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
 
 
 <table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
@@ -751,23 +824,16 @@ Unique sources: 49988
 
 </div>
 </div>
-<div class="cell-output cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="index_files/figure-html/cell-3-output-4.png" class="img-fluid figure-img"></p>
-</figure>
-</div>
-</div>
 </div>
 <section id="create-healpix-sidecars" class="level3">
 <h3 class="anchored" data-anchor-id="create-healpix-sidecars">1) Create HEALPix sidecar(s)</h3>
 <p>Those files link each row in the input parquet file to the HEALPix cells at the requested <strong>nside</strong> resolution; see <a href="#useful-healpix-data-for-moon-venus-mercury">Useful Healpix data for Moon Venus Mercury</a> for some cells data. Refer to <code>healpyxel_sidecar --help</code> for full options. The <code>--mode</code> flag is especially important: - <code>fuzzy</code>: assign each input record to every cell it touches - <code>strict</code>: assign only records fully contained within a cell</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_sidecar</span> <span class="dt">\</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> <span class="st">"test_data/samples/sample_50k.parquet"</span> <span class="dt">\</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--nside</span> 32 64 <span class="dt">\</span></span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--mode</span> fuzzy <span class="dt">\</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--lon-convention</span> 0_360 <span class="dt">\</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output_dir</span> <span class="st">"test_data/derived/cli_quickstart"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_sidecar</span> <span class="dt">\</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--input</span> <span class="st">"test_data/samples/sample_50k.parquet"</span> <span class="dt">\</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--nside</span> 32 64 <span class="dt">\</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--mode</span> fuzzy <span class="dt">\</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--lon-convention</span> 0_360 <span class="dt">\</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output_dir</span> <span class="st">"test_data/derived/cli_quickstart"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><strong>Outputs</strong></p>
 <ul>
 <li>sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet</li>
@@ -775,70 +841,23 @@ Unique sources: 49988
 <li>sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet</li>
 <li>sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.meta.json</li>
 </ul>
-<div id="fa2ec4da" class="cell" data-execution_count="5">
+<div id="fa2ec4da" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-stdout">
-<pre><code>Nside 32: 54931 assignments, 10860 unique cells</code></pre>
+<pre><code>Nside 32: 54931 assignments, 10860 unique cells
+|    |   source_id |   healpix_id |   weight |
+|---:|------------:|-------------:|---------:|
+|  0 |           0 |         7943 |        1 |
+|  1 |           1 |         8287 |        1 |
+|  2 |           2 |         5819 |        1 |
+|  3 |           3 |        11685 |        1 |
+|  4 |           4 |         3618 |        1 |</code></pre>
 </div>
-<div class="cell-output cell-output-display">
-<div>
-
-
-<table class="dataframe caption-top table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">source_id</th>
-<th data-quarto-table-cell-role="th">healpix_id</th>
-<th data-quarto-table-cell-role="th">weight</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>0</td>
-<td>7943</td>
-<td>1.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>1</td>
-<td>8287</td>
-<td>1.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>2</td>
-<td>5819</td>
-<td>1.0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>3</td>
-<td>11685</td>
-<td>1.0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>4</td>
-<td>3618</td>
-<td>1.0</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-</div>
-</div>
-<div id="696c671f" class="cell" data-execution_count="7">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># original_df['geometry'] = original_df.geometry.apply(</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co">#     lambda geom: geom.buffer(0) if geom and not geom.is_valid else geom</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div id="1c2d74eb" class="cell" data-execution_count="8">
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-6-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1252,7 +1271,7 @@ Unique sources: 49988
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1272,7 +1291,7 @@ Unique sources: 49988
 <div class="cell-output cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="index_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 </div>
@@ -1647,7 +1666,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       return localAlternateSentinel;
     }
   }
-  const darkModeDefault = false;
+  const darkModeDefault = true;
   let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
   // Dark / light mode switch
   window.quartoToggleColorScheme = () => {

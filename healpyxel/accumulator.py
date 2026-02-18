@@ -5,38 +5,63 @@ __all__ = ['logger', 'StreamingStats', 'CellAccumulator', 'accumulate_batch', 's
            'validate_accumulator_sidecar_compatibility', 'find_sidecar', 'main']
 
 # %% ../nbs/03_accumulator.ipynb 2
-"""healpix_accumulator.py
+"""
+healpix_accumulator.py
 
-Accumulate streaming planetary science data into HEALPix cells.
-Maintains incremental statistics including approximate percentiles.
+This module provides functionality for accumulating streaming planetary science data into HEALPix cells. 
+It is designed to handle incremental updates to aggregated statistics, enabling efficient processing of
+large datasets in a streaming or batch context. The module supports robust statistical calculations, approximate percentiles, and efficient state management.
 
-Features:
-- Mean/std via Welford's algorithm (streaming)
-- Approximate median/percentiles via T-Digest
-- Efficient state management with parquet
-- Dask support for parallel processing (optional)
-- Memory-efficient: stores only aggregated statistics, not raw data
+Key Components:
+- `StreamingStats`: A class for maintaining running statistics (mean, std, min, max) without storing raw data.
+- `CellAccumulator`: Manages statistics for a single HEALPix cell, including optional T-Digest for percentiles.
+- `accumulate_batch`: Processes a batch of data and updates the accumulator state.
+- `save_state`: Saves the accumulator state to a Parquet file with metadata.
+- `load_state`: Loads the accumulator state from a Parquet file.
+- `validate_accumulator_sidecar_compatibility`: Ensures compatibility between state and sidecar metadata.
+- `find_sidecar`: Locates the appropriate sidecar file for input data.
 
-Requirements:
-- pandas, numpy, pyarrow (core)
-- tdigest (for percentile tracking) - optional but recommended
-- dask[dataframe] (for parallelization) - optional
 
-Usage example:
-  # First batch (initialize state)
-  python healpix_accumulator.py \
+### Features:
+- **Streaming Statistics**: Uses Welford's algorithm for mean and standard deviation, avoiding the need to store raw data.
+- **Percentile Tracking**: Supports approximate median and percentiles via T-Digest (optional).
+- **State Management**: Saves and loads accumulator state as Parquet files with embedded HEALPix metadata.
+- **Sidecar Integration**: Maps observations to HEALPix cells using a sidecar file.
+- **Filter Support**: Allows filtering of input data using pandas query expressions.
+- **Parallel Processing**: Optional support for Dask for distributed or parallel computation.
+
+### Example Usage:
+
+#### Initialize State from First Batch:
+```bash
+healpix_accumulator \
     --input observations_day001.parquet \
     --sidecar sidecars/day001_nside-512.parquet \
     --columns r750 r950 vis_slope \
     --state-output state/state_v001.parquet
+```
 
-  # Subsequent batches (incremental update)
-  python healpix_accumulator.py \
+### Incremental Update with Subsequent Batch:
+
+```
+healpix_accumulator \
     --input observations_day002.parquet \
     --sidecar sidecars/day002_nside-512.parquet \
     --columns r750 r950 vis_slope \
     --state-input state/state_v001.parquet \
     --state-output state/state_v002.parquet
+```
+
+### With Data Filtering:
+```bash
+healpix_accumulator \
+    --input observations_day003.parquet \
+    --sidecar sidecars/day003_nside-512.parquet \
+    --columns r750 r950 vis_slope \
+    --state-input state/state_v002.parquet \
+    --state-output state/state_v003.parquet \
+    --filter "quality > 0.5 and solar_zenith < 80"
+```
 """
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
