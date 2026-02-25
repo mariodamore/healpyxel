@@ -1187,7 +1187,6 @@ def main(argv=None):
 
     # Validate required parameters based on mode
     if not args.geo_stats:
-        # When not using --geo-stats, require --nside and --lon-convention
         if args.nside is None:
             logger.error("--nside is required when not using --geo-stats")
             sys.exit(2)
@@ -1214,6 +1213,27 @@ def main(argv=None):
     logging.getLogger().setLevel(root_level)
     logger.setLevel(root_level)
 
+    logger.info(f"Input file: {input_path.name}")
+    logger.info(f"Mode: {args.mode}, lon-convention: {args.lon_convention}, nside: {nsides}")
+    
+    # --- NEW: Auto-detect lon/lat columns if not explicitly provided ---
+    if args.lon_col is None or args.lat_col is None:
+        logger.info(f"Auto-detecting lon/lat columns (user provided: lon_col={args.lon_col}, lat_col={args.lat_col})")
+        try:
+            df_sample = pd.read_parquet(str(input_path), engine="pyarrow", nrows=100)
+            detected_lon, detected_lat = detect_lonlat_columns(df_sample)
+            args.lon_col = args.lon_col or detected_lon
+            args.lat_col = args.lat_col or detected_lat
+            
+            if detected_lon or detected_lat:
+                logger.info(f"✓ Auto-detected: lon_col='{args.lon_col}', lat_col='{args.lat_col}'")
+            else:
+                logger.warning(f"⚠️  Could not auto-detect lon/lat columns. Checked: {df_sample.columns.tolist()}")
+        except Exception as e:
+            logger.warning(f"Auto-detection sampling failed ({e}). Will retry during processing or use geometry fallback.")
+    else:
+        logger.info(f"✓ Using user-provided lon/lat: lon_col='{args.lon_col}', lat_col='{args.lat_col}'")
+
     # Compute and display geo-statistics if requested (and exit)
     if args.geo_stats:
         if args.lon_convention:
@@ -1228,7 +1248,6 @@ def main(argv=None):
                 sample_size=args.stats_sample_size,
                 lon_convention=args.lon_convention
             )
-            
             if stats:
                 formatted_stats = format_geo_statistics(stats)
                 print("\n" + formatted_stats + "\n")
@@ -1373,6 +1392,7 @@ def main(argv=None):
 
 
 # CLI entry point (use via command line or import main() function)
+
 
 # %% ../nbs/01_sidecar.ipynb 17
 def get_healpix_cell_geometry(healpix_id, nside, nest=True):
