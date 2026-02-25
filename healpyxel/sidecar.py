@@ -472,20 +472,30 @@ def format_geo_statistics(stats: dict) -> str:
 
 # %% ../nbs/01_sidecar.ipynb 6
 def process_partition(gdf, nside: int, mode: str, base_index: int | None = None, 
-                     lon_convention: str = 'None',
+                     lon_convention: str = 'minus_plus180',
+                     lon_col: str | None = None,
+                     lat_col: str | None = None,
                      data_psf=None, cell_psf=None, combine_method='multiply'
                         ) -> pd.DataFrame:
-    """Process a single dask partition (GeoDataFrame) and return DataFrame of assignments.
+    """Process a single dask partition and return DataFrame of assignments.
 
-    The returned D/ataFrame has columns ['source_id', 'healpix_id'] and one row per assignment
-    (for strict mode: at most one row per source_id; for fuzzy mode: one row per touched healpix cell).
+    Supports two workflows:
+    1. Scalar lon/lat columns (efficient for strict mode): pass lon_col, lat_col
+    2. Geometry-based (for fuzzy mode): pass geometries via gdf.geometry
     
     Args:
-        gdf: GeoDataFrame partition
+        gdf: GeoDataFrame or DataFrame partition
         nside: HEALPix nside parameter
         mode: 'strict' or 'fuzzy' assignment mode
-        base_index: Base index for source_id generation
-        lon_convention: Longitude convention - '0_360' for [0,360) or 'minus_plus180' for [-180,180)
+        base_index: Base index for global source_id generation
+        lon_convention: 'minus_plus180' or '0_360'
+        lon_col: Longitude column name (if None, use geometry)
+        lat_col: Latitude column name (if None, use geometry)
+        data_psf, cell_psf: Optional PSF functions
+        combine_method: How to combine PSF weights
+    
+    Returns:
+        DataFrame with columns ['source_id', 'healpix_id'] and optional 'weight'
     """
     import pandas as _pd
 
@@ -497,202 +507,221 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
         lon_min, lon_max = -180.0, 180.0
         lat_min, lat_max = -90.0, 90.0
     else:
-        raise ValueError(f"Invalid lon_convention: {lon_convention}. Use '0_360' or 'minus_plus180'")
-
-    logger.debug(f"Using lon_convention='{lon_convention}' with bounds: lon=[{lon_min}, {lon_max}), lat=[{lat_min}, {lat_max}]")
+        raise ValueError(f"Invalid lon_convention: {lon_convention}")
 
     out_rows = []
     dropped_count = 0
     total_count = 0
     dropped_prefilter = 0
 
-    # if the partition is empty, return empty DataFrame
     if gdf is None or len(gdf) == 0:
         return _pd.DataFrame(columns=["source_id", "healpix_id"])
 
-    # Determine source ids. If `base_index` is provided we generate sequential
-    # global row numbers to match `gdf.reset_index()` semantics from the notebook.
+    # Determine source IDs
     if base_index is not None:
         src_ids = base_index + np.arange(len(gdf), dtype=np.int64)
     else:
-        # Prefer an explicit 'source_id' column if present; otherwise fall back to the index.
-        if "source_id" in gdf.columns:
-            src_ids = gdf["source_id"].to_numpy()
-        else:
-            src_ids = gdf.index.to_numpy()
+        src_ids = gdf["source_id"].to_numpy() if "source_id" in gdf.columns else gdf.index.to_numpy()
 
-    # iterate rows; keep work per-geometry contained to avoid large in-memory structures
-    for src_id, geom in zip(src_ids, gdf.geometry.to_numpy()):
-        try:
-            # handle missing/empty geometries: match notebook filtering semantics by skipping
-            # geometries that are None/empty rather than emitting NA rows
-            if geom is None or geom.is_empty:
-                continue
-
-            # notebook pipeline: first validate the ORIGINAL geometry (pre-fix),
-            # then apply antimeridian.fix_polygon and extract coordinates.
-            def _is_valid_latitude(geometry):
-                if geometry is None or geometry.is_empty:
-                    return False
-                geoms = [geometry] if getattr(geometry, "geom_type", "") == "Polygon" else list(getattr(geometry, "geoms", [geometry]))
-                for g in geoms:
-                    if getattr(g, "exterior", None) is not None:
-                        for coord in g.exterior.coords:
-                            lon = coord[0]
-                            lat = coord[1]
-                            if not (np.isfinite(lon) and np.isfinite(lat)):
-                                return False
-                            # check against configurable bounds
-                            if lat < lat_min or lat > lat_max:
-                                return False
-                            if lon < lon_min or lon > lon_max:
-                                return False
-                    for interior in getattr(g, "interiors", []):
-                        for coord in interior.coords:
-                            lon = coord[0]
-                            lat = coord[1]
-                            if not (np.isfinite(lon) and np.isfinite(lat)):
-                                return False
-                            if lat < lat_min or lat > lat_max:
-                                return False
-                            if lon < lon_min or lon > lon_max:
-                                return False
-                return True
-
-            total_count += 1
-            # if original geometry fails the pre-fix filter, skip it entirely
-            if not _is_valid_latitude(geom):
-                dropped_count += 1
-                dropped_prefilter += 1
-                logger.debug(f"Dropped geometry {src_id} during pre-filter (lon_convention={lon_convention})")
-                continue
-
-            # apply the antimeridian fix (not used for the pre-filter decision)
+    # --- WORKFLOW 1: Scalar lon/lat columns (efficient) ---
+    if lon_col is not None and lat_col is not None and lon_col in gdf.columns and lat_col in gdf.columns:
+        logger.debug(f"Using scalar lon/lat workflow: {lon_col}, {lat_col}")
+        
+        lons = gdf[lon_col].to_numpy(dtype=np.float64)
+        lats = gdf[lat_col].to_numpy(dtype=np.float64)
+        
+        for i, (src_id, lon, lat) in enumerate(zip(src_ids, lons, lats)):
             try:
-                geom2 = antimeridian.fix_polygon(geom)
-            except Exception as e:
-                logger.debug(f"Antimeridian fix failed for {src_id}: {e}")
-                geom2 = geom
-
-            # vectored extraction using shapely.get_coordinates when available (on the fixed geometry)
-            try:
-                coords = get_coordinates(geom2)
-            except Exception:
-                # fallback gather exterior + interiors for polygons/multipolygons
-                coords_list = []
-                if isinstance(geom2, Polygon):
-                    coords_list.extend(np.asarray(geom2.exterior.coords, dtype=float))
-                    for r in geom2.interiors:
-                        coords_list.extend(np.asarray(r.coords, dtype=float))
-                elif isinstance(geom2, MultiPolygon):
-                    for part in geom2.geoms:
-                        coords_list.extend(np.asarray(part.exterior.coords, dtype=float))
-                        for r in part.interiors:
-                            coords_list.extend(np.asarray(r.coords, dtype=float))
-                else:
-                    # generic fallback: treat as single-vertex geometry
-                    try:
-                        coords_list = np.asarray(list(geom2.coords), dtype=float)
-                    except Exception:
-                        coords_list = []
-
-                if len(coords_list) == 0:
-                    # no coordinates to assign -> skip (matches notebook behaviour where empty lists
-                    # later produce no exploded rows)
+                total_count += 1
+                
+                # Validate coordinate bounds
+                if not (np.isfinite(lon) and np.isfinite(lat)):
+                    dropped_count += 1
+                    dropped_prefilter += 1
                     continue
-                coords = np.asarray(coords_list, dtype=float)
-
-            if coords.size == 0:
-                continue
-
-            # Extract lon/lat from coordinates (no normalization)
-            lons = coords[:, 0].astype(float)
-            lats = coords[:, 1].astype(float)
-
-            # Filter invalid lat/lon values - filtering already done in pre-validation
-            # This is just to catch any NaN/Inf values after antimeridian processing
-            mask = np.isfinite(lons) & np.isfinite(lats)
-            if not np.any(mask):
+                
+                if lat < lat_min or lat > lat_max or lon < lon_min or lon > lon_max:
+                    dropped_count += 1
+                    dropped_prefilter += 1
+                    logger.debug(f"Dropped {src_id}: out of bounds ({lon}, {lat})")
+                    continue
+                
+                # Compute HEALPix cell for this point
+                hid = compute_healpix_ids_from_lonlat(nside, np.array([lon]), np.array([lat]))[0]
+                weight = 1.0
+                
+                # Apply PSF if present (point mode)
+                if data_psf or cell_psf:
+                    w_data = data_psf(0.0, 0.0) if data_psf else 1.0  # Point is at (0,0) relative to itself
+                    w_cell = cell_psf(0.0, 0.0) if cell_psf else 1.0
+                    if combine_method == 'multiply':
+                        weight = w_data * w_cell
+                    elif combine_method == 'sum':
+                        weight = w_data + w_cell
+                    elif combine_method == 'min':
+                        weight = min(w_data, w_cell)
+                    elif combine_method == 'max':
+                        weight = max(w_data, w_cell)
+                
+                out_rows.append({"source_id": int(src_id), "healpix_id": int(hid), "weight": weight})
+            
+            except Exception as e:
+                logger.debug(f"Skipping source {src_id}: {e}")
                 dropped_count += 1
-                logger.debug(f"Dropped geometry {src_id} - all coordinates non-finite after antimeridian fix")
+                total_count += 1
                 continue
+    
+    # --- WORKFLOW 2: Geometry-based (fuzzy mode or explicit geometry column) ---
+    elif hasattr(gdf, 'geometry') and gdf.geometry is not None:
+        logger.debug("Using geometry-based workflow")
+        
+        for src_id, geom in zip(src_ids, gdf.geometry.to_numpy()):
+            try:
+                if geom is None or (hasattr(geom, 'is_empty') and geom.is_empty):
+                    continue
 
-            lons = lons[mask]
-            lats = lats[mask]
+                def _is_valid_latitude(geometry):
+                    if geometry is None or (hasattr(geometry, 'is_empty') and geometry.is_empty):
+                        return False
+                    geoms = [geometry] if getattr(geometry, "geom_type", "") == "Polygon" else list(getattr(geometry, "geoms", [geometry]))
+                    for g in geoms:
+                        if getattr(g, "exterior", None) is not None:
+                            for coord in g.exterior.coords:
+                                lon = coord[0]
+                                lat = coord[1]
+                                if not (np.isfinite(lon) and np.isfinite(lat)):
+                                    return False
+                                if lat < lat_min or lat > lat_max or lon < lon_min or lon > lon_max:
+                                    return False
+                        for interior in getattr(g, "interiors", []):
+                            for coord in interior.coords:
+                                lon = coord[0]
+                                lat = coord[1]
+                                if not (np.isfinite(lon) and np.isfinite(lat)):
+                                    return False
+                                if lat < lat_min or lat > lat_max or lon < lon_min or lon > lon_max:
+                                    return False
+                    return True
 
-            # compute healpix indices for all vertices
-            hids = compute_healpix_ids_from_lonlat(nside, lons, lats)
-            if hids.size == 0:
-                continue
+                total_count += 1
+                if not _is_valid_latitude(geom):
+                    dropped_count += 1
+                    dropped_prefilter += 1
+                    logger.debug(f"Dropped geometry {src_id} during pre-filter")
+                    continue
 
-            unique = np.unique(hids)
-            if mode == "strict":
-                # only accept if all vertices fall in same single HEALPix cell
-                if unique.size == 1:
-                    weight = 1.0
-                    if data_psf or cell_psf:
-                        # For strict, use centroid of geometry and cell
-                        src_centroid = geom.centroid
-                        cell_geom = get_healpix_cell_geometry(unique[0], nside)
-                        dx = src_centroid.x - cell_geom.centroid.x
-                        dy = src_centroid.y - cell_geom.centroid.y
-                        w_data = data_psf(dx, dy) if data_psf else 1.0
-                        w_cell = cell_psf(dx, dy) if cell_psf else 1.0
-                        if combine_method == 'multiply':
-                            weight = w_data * w_cell
-                        elif combine_method == 'sum':
-                            weight = w_data + w_cell
-                        elif combine_method == 'min':
-                            weight = min(w_data, w_cell)
-                        elif combine_method == 'max':
-                            weight = max(w_data, w_cell)
-                    out_rows.append({"source_id": int(src_id), "healpix_id": int(unique[0]), "weight": weight})
+                try:
+                    geom2 = antimeridian.fix_polygon(geom)
+                except Exception as e:
+                    logger.debug(f"Antimeridian fix failed for {src_id}: {e}")
+                    geom2 = geom
+
+                try:
+                    coords = get_coordinates(geom2)
+                except Exception:
+                    coords_list = []
+                    if isinstance(geom2, Polygon):
+                        coords_list.extend(np.asarray(geom2.exterior.coords, dtype=float))
+                        for r in geom2.interiors:
+                            coords_list.extend(np.asarray(r.coords, dtype=float))
+                    elif isinstance(geom2, MultiPolygon):
+                        for part in geom2.geoms:
+                            coords_list.extend(np.asarray(part.exterior.coords, dtype=float))
+                            for r in part.interiors:
+                                coords_list.extend(np.asarray(r.coords, dtype=float))
+                    else:
+                        try:
+                            coords_list = np.asarray(list(geom2.coords), dtype=float)
+                        except Exception:
+                            coords_list = []
+                    
+                    if len(coords_list) == 0:
+                        continue
+                    coords = np.asarray(coords_list, dtype=float)
+
+                if coords.size == 0:
+                    continue
+
+                lons = coords[:, 0].astype(float)
+                lats = coords[:, 1].astype(float)
+
+                mask = np.isfinite(lons) & np.isfinite(lats)
+                if not np.any(mask):
+                    dropped_count += 1
+                    logger.debug(f"Dropped geometry {src_id} - all coordinates non-finite")
+                    continue
+
+                lons = lons[mask]
+                lats = lats[mask]
+
+                hids = compute_healpix_ids_from_lonlat(nside, lons, lats)
+                if hids.size == 0:
+                    continue
+
+                unique = np.unique(hids)
+                if mode == "strict":
+                    if unique.size == 1:
+                        weight = 1.0
+                        if data_psf or cell_psf:
+                            src_centroid = geom.centroid
+                            cell_geom = get_healpix_cell_geometry(unique[0], nside)
+                            dx = src_centroid.x - cell_geom.centroid.x
+                            dy = src_centroid.y - cell_geom.centroid.y
+                            w_data = data_psf(dx, dy) if data_psf else 1.0
+                            w_cell = cell_psf(dx, dy) if cell_psf else 1.0
+                            if combine_method == 'multiply':
+                                weight = w_data * w_cell
+                            elif combine_method == 'sum':
+                                weight = w_data + w_cell
+                            elif combine_method == 'min':
+                                weight = min(w_data, w_cell)
+                            elif combine_method == 'max':
+                                weight = max(w_data, w_cell)
+                        out_rows.append({"source_id": int(src_id), "healpix_id": int(unique[0]), "weight": weight})
+                    else:
+                        out_rows.append({"source_id": int(src_id), "healpix_id": int(unique[0]), "weight": 1.0})
                 else:
-                    # If not all vertices in the same cell, still output with weight=1.0
-                    out_rows.append({"source_id": int(src_id), "healpix_id": int(unique[0]), "weight": 1.0})
-            else:
-                # fuzzy: replicate source for each unique cell
-                for hid in unique:
-                    weight = 1.0
-                    if data_psf or cell_psf:
-                        src_centroid = geom.centroid
-                        cell_geom = get_healpix_cell_geometry(hid, nside)
-                        dx = src_centroid.x - cell_geom.centroid.x
-                        dy = src_centroid.y - cell_geom.centroid.y
-                        w_data = data_psf(dx, dy) if data_psf else 1.0
-                        w_cell = cell_psf(dx, dy) if cell_psf else 1.0
-                        if combine_method == 'multiply':
-                            weight = w_data * w_cell
-                        elif combine_method == 'sum':
-                            weight = w_data + w_cell
-                        elif combine_method == 'min':
-                            weight = min(w_data, w_cell)
-                        elif combine_method == 'max':
-                            weight = max(w_data, w_cell)
-                    out_rows.append({"source_id": int(src_id), "healpix_id": int(hid), "weight": weight})
+                    for hid in unique:
+                        weight = 1.0
+                        if data_psf or cell_psf:
+                            src_centroid = geom.centroid
+                            cell_geom = get_healpix_cell_geometry(hid, nside)
+                            dx = src_centroid.x - cell_geom.centroid.x
+                            dy = src_centroid.y - cell_geom.centroid.y
+                            w_data = data_psf(dx, dy) if data_psf else 1.0
+                            w_cell = cell_psf(dx, dy) if cell_psf else 1.0
+                            if combine_method == 'multiply':
+                                weight = w_data * w_cell
+                            elif combine_method == 'sum':
+                                weight = w_data + w_cell
+                            elif combine_method == 'min':
+                                weight = min(w_data, w_cell)
+                            elif combine_method == 'max':
+                                weight = max(w_data, w_cell)
+                        out_rows.append({"source_id": int(src_id), "healpix_id": int(hid), "weight": weight})
 
-        except Exception as e:
-            # protect partition processing from crashing; log and continue
-            logger.debug(f"skipping source {src_id} due to error: {e}")
-            out_rows.append({"source_id": int(src_id) if src_id is not None else pd.NA, "healpix_id": pd.NA})
-            total_count += 1
-            dropped_count += 1
-            continue
+            except Exception as e:
+                logger.debug(f"Skipping source {src_id} due to error: {e}")
+                total_count += 1
+                dropped_count += 1
+                continue
+    
+    # --- NO WORKFLOW AVAILABLE ---
+    else:
+        logger.error(f"Partition has no usable lon/lat columns ({lon_col}, {lat_col}) and no geometry column. Cannot process.")
+        raise ValueError(f"Cannot process partition: no lon/lat columns and no geometry")
 
-    # Log statistics for this partition
+    # Log statistics
     if total_count > 0:
-        drop_pct = 100.0 * dropped_count / total_count
+        drop_pct = 100.0 * dropped_count / total_count if total_count > 0 else 0
         if dropped_count > 0:
             logger.info(f"Partition (lon_convention={lon_convention}): processed {total_count} geometries, "
-                       f"dropped {dropped_count} ({drop_pct:.1f}%) total "
-                       f"[pre-filter: {dropped_prefilter}, post-processing: {dropped_count - dropped_prefilter}]")
-        else:
-            logger.debug(f"Partition (lon_convention={lon_convention}): processed {total_count} geometries, no drops")
+                       f"dropped {dropped_count} ({drop_pct:.1f}%)")
     
     if len(out_rows) == 0:
-        return _pd.DataFrame(columns=["source_id", "healpix_id", "weight"])  # empty
+        return _pd.DataFrame(columns=["source_id", "healpix_id", "weight"])
+    
     df_out = _pd.DataFrame(out_rows)
-    # ensure types
     df_out["source_id"] = df_out["source_id"].astype(np.int64)
     df_out["healpix_id"] = df_out["healpix_id"].astype("UInt64")
     if 'weight' in df_out.columns:
@@ -1083,6 +1112,70 @@ def write_coalesced_output(tasks, out_file: Path, nside: int, mode: str, ncores:
     return total_rows_written
 
 # %% ../nbs/01_sidecar.ipynb 15
+def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame":
+    """Three-tier lazy parquet reader with graceful degradation.
+
+    Tier 1: dask_geopandas.read_parquet — preserves spatial metadata if valid.
+    Tier 2: plain dask.dataframe.read_parquet — ignores broken spatial metadata.
+    Tier 3: raise with clear diagnostic.
+
+    Performance note
+    ----------------
+    Sidecar only uses scalar lon/lat columns fed to ``healpy.ang2pix``.
+    Spatial partitions provide **zero** benefit for full-table HEALPix cell
+    assignment, so Tier 2 is functionally equivalent to Tier 1.
+    """
+    import dask.dataframe as dd
+
+    # Tier 1 — try dask-geopandas
+    try:
+        import dask_geopandas as dg
+
+        ddf = dg.read_parquet(str(input_path))
+        logger.info(
+            "Read with dask_geopandas (%d partitions, spatial partitions OK)",
+            ddf.npartitions,
+        )
+        return ddf
+    except ValueError as exc:
+        if "spatial partitions" in str(exc).lower():
+            logger.warning(
+                "Spatial partition metadata mismatch in '%s' — "
+                "falling back to plain dask.dataframe.  "
+                "No performance impact: sidecar uses scalar lon/lat, not spatial queries.",
+                input_path.name,
+            )
+        else:
+            logger.warning(
+                "dask_geopandas.read_parquet failed (%s) — falling back to plain dask",
+                exc,
+            )
+    except ImportError:
+        logger.info("dask_geopandas not installed, using plain dask.dataframe")
+    except Exception as exc:
+        logger.warning(
+            "dask_geopandas.read_parquet failed unexpectedly (%s) — "
+            "falling back to plain dask",
+            exc,
+        )
+
+    # Tier 2 — plain dask (geometry col becomes WKB bytes; irrelevant for sidecar)
+    try:
+        ddf = dd.read_parquet(str(input_path))
+        logger.info(
+            "Read with plain dask.dataframe (%d partitions, %d columns)",
+            ddf.npartitions,
+            len(ddf.columns),
+        )
+        return ddf
+    except Exception as exc:
+        # Tier 3 — nothing works
+        raise IOError(
+            f"Cannot read '{input_path}' with either dask_geopandas or "
+            f"dask.dataframe. Last error: {exc}"
+        ) from exc
+
+# %% ../nbs/01_sidecar.ipynb 16
 def main(argv=None):
     """Main entry point for HEALPix sidecar generation."""
     args = parse_arguments(argv)
@@ -1166,13 +1259,14 @@ def main(argv=None):
     logger.info(f"Reading input lazily from {input_path}; ncores={args.ncores}; mode={args.mode}; nsides={nsides}")
     logger.info(f"Longitude convention: {args.lon_convention}")
 
-    # read lazily with dask_geopandas
-    # let dask decide partitions but hint with npartitions based on ncores
-    try:
-        ddf = dg.read_parquet(str(input_path))
-    except Exception:
-        # try forcing to use dask read with explicit npartitions
-        ddf = dg.read_parquet(str(input_path), npartitions=args.ncores)
+    # --- OLD (remove) ---
+    # try:
+    #     ddf = dg.read_parquet(str(input_path))
+    # except ValueError:
+    #     ddf = dg.read_parquet(str(input_path), npartitions=args.ncores)
+
+    # --- NEW ---
+    ddf = _read_input_lazy(input_path, args.ncores)
 
     # We will compute explicit, global `source_id` values (0..N-1) that match
     # `gdf.reset_index()` by computing per-partition offsets and passing them to
@@ -1218,8 +1312,14 @@ def main(argv=None):
         # build delayed tasks that pass the base_index per partition so source_id
         # corresponds to global row numbering (like geopandas.reset_index())
         tasks = [dask.delayed(process_partition)(
-                    part, nside, args.mode, int(offsets[i]), args.lon_convention,
-                    data_psf=data_psf, cell_psf=cell_psf, combine_method=args.psf_combine
+                    part, nside, args.mode, 
+                    int(offsets[i]), 
+                    args.lon_convention,
+                    lon_col=args.lon_col,          # NEW
+                    lat_col=args.lat_col,          # NEW
+                    data_psf=data_psf, 
+                    cell_psf=cell_psf, 
+                    combine_method=args.psf_combine
                     )
                     for i, part in enumerate(delayed_partitions)
                 ]
@@ -1274,7 +1374,7 @@ def main(argv=None):
 
 # CLI entry point (use via command line or import main() function)
 
-# %% ../nbs/01_sidecar.ipynb 16
+# %% ../nbs/01_sidecar.ipynb 17
 def get_healpix_cell_geometry(healpix_id, nside, nest=True):
     """
     Return a shapely Polygon for the given HEALPix cell.

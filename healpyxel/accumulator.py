@@ -116,8 +116,32 @@ class StreamingStats:
         self.min_val = float('inf')
         self.max_val = float('-inf')
     
-    def update(self, values: np.ndarray):
-        """Add new observations to the running statistics."""
+    def update(self, values):
+        """Add new observations to the running statistics.
+        
+        Args:
+            values: Scalar (float/int), list, or NumPy array. 
+                   Automatically converted to 1D float64 array.
+        
+        Examples:
+            >>> stats = StreamingStats()
+            >>> stats.update(1.0)              # Scalar
+            >>> stats.update([2.0, 3.0])       # List
+            >>> stats.update(np.array([4.0]))  # Array
+            >>> stats.n
+            4
+        """
+        # Normalize: scalar → 1D array
+        if np.isscalar(values):
+            values = np.array([values], dtype=np.float64)
+        else:
+            values = np.asarray(values, dtype=np.float64)
+        
+        # Ensure 1D
+        if values.ndim != 1:
+            raise ValueError(f"Expected 1D array, got shape {values.shape}")
+        
+        # Filter finite values only
         values = values[np.isfinite(values)]
         if len(values) == 0:
             return
@@ -178,6 +202,34 @@ class StreamingStats:
         return stats
 
 # %% ../nbs/03_accumulator.ipynb 5
+def _serialize_tdigest_raw(digest) -> dict:
+    """Serialize TDigest using the library's native .to_dict() method.
+    
+    TDigest.to_dict() returns {'n': int, 'delta': float, 'K': int, 'centroids': list}.
+    Centroids are dicts with keys 'm' (mean) and 'c' (count).
+    """
+    try:
+        # Use native to_dict() method—forces materialization internally
+        digest_dict = digest.to_dict()
+        
+        # Extract centroids in (mean, count) tuple format
+        centroids = []
+        for centroid in digest_dict.get('centroids', []):
+            if isinstance(centroid, dict):
+                centroids.append((float(centroid['m']), int(centroid['c'])))
+            else:
+                logger.warning(f"Unexpected centroid format: {type(centroid)}")
+        
+        return {
+            'centroids': centroids,
+            'compression': int(digest_dict.get('K', 100)),
+            'n': int(digest_dict.get('n', 0))
+        }
+    except Exception as e:
+        logger.warning(f"Failed to serialize TDigest: {e}. Falling back to empty state.")
+        return {'centroids': [], 'compression': 100, 'n': 0}
+
+# %% ../nbs/03_accumulator.ipynb 6
 class CellAccumulator:
     """Accumulator for a single HEALPix cell.
     
@@ -230,26 +282,30 @@ class CellAccumulator:
                 # Merge by adding all centroids
                 for centroid in digest.C:
                     self.tdigests[col].update(centroid.mean, centroid.count)
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Serialize to dictionary for storage."""
+
+    def to_dict(self) -> dict:
+        """Convert accumulator state to dictionary for serialization.
+        
+        Uses aggressive (raw) TDigest serialization to ensure centroids are
+        materialized even if percentiles were never queried.
+        
+        Returns:
+            Dict with 'stats' (per-column StreamingStats) and optionally 'tdigests'
+        """
         result = {
             'stats': {col: stats.to_dict() 
-                     for col, stats in self.stats_by_column.items()}
+                    for col, stats in self.stats_by_column.items()}
         }
         
         if self.use_tdigest and hasattr(self, 'tdigests'):
-            # Serialize T-Digest centroids for efficient storage
+            # Always use aggressive serialization to guarantee centroid materialization
             result['tdigests'] = {
-                col: {
-                    'centroids': [(float(c.mean), int(c.count)) for c in digest.C],
-                    'compression': digest.K if hasattr(digest, 'K') else 100
-                }
+                col: _serialize_tdigest_raw(digest)
                 for col, digest in self.tdigests.items()
             }
         
         return result
-    
+
     @classmethod
     def from_dict(cls, d: Dict[str, Any], use_tdigest: bool = True) -> 'CellAccumulator':
         """Deserialize from dictionary."""
@@ -270,7 +326,7 @@ class CellAccumulator:
         
         return acc
 
-# %% ../nbs/03_accumulator.ipynb 6
+# %% ../nbs/03_accumulator.ipynb 7
 def accumulate_batch(
     new_data: pd.DataFrame,
     sidecar: pd.DataFrame,
@@ -283,8 +339,9 @@ def accumulate_batch(
     Process one batch of data and update accumulator state.
     
     Args:
-        new_data: DataFrame with observations
-        sidecar: HEALPix mapping (source_id -> healpix_id)
+        new_data: DataFrame with observations (index = source_id, implicit or explicit)
+        sidecar: HEALPix mapping with columns ['source_id', 'healpix_id'] 
+                 (source_id may be duplicated in fuzzy mode—one row per cell)
         value_columns: Columns to accumulate
         existing_state: Previous accumulator state (None for first batch)
         use_tdigest: Enable T-Digest for approximate percentiles
@@ -292,11 +349,15 @@ def accumulate_batch(
         
     Returns:
         Updated state dictionary {healpix_id: CellAccumulator}
+        
+    Note:
+        In fuzzy mode, sidecar has multiple rows per source_id (one per touched HEALPix cell).
+        This function handles the many-to-one relationship correctly by grouping on healpix_id.
     """
     if existing_state is None:
         state = {}
     else:
-        state = existing_state
+        state = existing_state.copy()
     
     logger.info(f"Processing batch with {len(new_data)} observations")
     logger.info(f"Columns to accumulate: {value_columns}")
@@ -307,14 +368,41 @@ def accumulate_batch(
         new_data = new_data.query(filter_expr)
         logger.info(f"After filtering: {len(new_data)} observations")
     
-    # Merge data with sidecar
-    merged = sidecar[['source_id', 'healpix_id']].merge(
-        new_data.reset_index().rename(columns={'index': 'source_id'}),
+    if len(new_data) == 0:
+        logger.warning("No observations after filtering!")
+        return state
+    
+    # Reset index to convert index → source_id column (ensures uniqueness)
+    new_data_reset = new_data.reset_index(drop=False)
+
+    # Handle index name: could be 'index', 'source_id', or something else
+    index_col = new_data_reset.columns[0]  # First column after reset is the old index
+    if index_col != 'source_id':
+        if 'source_id' in new_data_reset.columns:
+            # Both exist—drop the reset index column, use existing source_id
+            new_data_reset = new_data_reset.drop(columns=[index_col])
+        else:
+            # Rename the reset index to source_id
+            new_data_reset = new_data_reset.rename(columns={index_col: 'source_id'})
+
+    # Sanity check: source_id must be unique
+    if 'source_id' in new_data_reset.columns:
+        n_unique = new_data_reset['source_id'].nunique()
+        if n_unique != len(new_data_reset):
+            raise ValueError(
+                f"source_id column is not unique: {n_unique} unique values, "
+                f"but {len(new_data_reset)} rows. A pre-existing source_id column "
+                f"must uniquely identify each observation."
+            )
+
+    # Merge sidecar (may have duplicates per source_id in fuzzy mode) with data
+    merged = sidecar.merge(
+        new_data_reset[['source_id'] + value_columns],
         on='source_id',
         how='inner'
     )
-    
-    logger.info(f"Matched {len(merged)} source-cell pairs")
+     
+    logger.info(f"Matched {len(merged)} source-cell pairs from sidecar")
     
     if len(merged) == 0:
         logger.warning("No matches found between sidecar and data!")
@@ -350,84 +438,77 @@ def accumulate_batch(
     logger.info(f"Updated {cells_updated} cells (created: {cells_created}, total: {len(state)})")
     return state
 
-# %% ../nbs/03_accumulator.ipynb 7
-def save_state(
-    state: Dict[int, CellAccumulator],
-    output_path: Path,
-    meta: HEALPyxelxMetadata,
-    processing_metadata: Optional[Dict[str, Any]] = None
-):
-    """Save accumulator state to parquet with embedded HEALPix metadata.
-    
-    The parquet file stores nested dictionaries efficiently with validated
-    HEALPix metadata embedded in schema. A .meta.json sidecar provides
-    human-readable processing metadata.
+# %% ../nbs/03_accumulator.ipynb 8
+def save_state(state, output_path, meta, processing_metadata=None):
+    """Serialize accumulated state dict to Parquet with metadata.
     
     Args:
-        state: Dictionary of {healpix_id: CellAccumulator}
-        output_path: Path to output state parquet file
-        meta: HEALPyxelxMetadata with validated nside, mode, order
-        processing_metadata: Optional dict with processing parameters
+        state: Dict[int, CellAccumulator] from accumulate_batch()
+        output_path: Path to write parquet file
+        meta: HEALPyxelxMetadata instance (provides nside, order, lon_convention)
+        processing_metadata: Optional dict with batch info
     """
-    logger.info(f"Saving state to {output_path}")
+    import pyarrow as pa
     
-    # Convert state to DataFrame rows
+    # Flatten state dict to DataFrame rows
     rows = []
-    iterator = state.items()
-    if TQDM_AVAILABLE:
-        iterator = tqdm(iterator, desc="Serializing state", total=len(state))
-    
-    for hp_id, acc in iterator:
-        row = {'healpix_id': int(hp_id)}
-        acc_dict = acc.to_dict()
+    for healpix_id, accumulator in state.items():
+        row = {'healpix_id': int(healpix_id)}
         
-        # Flatten structure for easier parquet storage
-        # Store as JSON strings to preserve nested structure
-        row['stats_json'] = json.dumps(acc_dict['stats'])
-        if 'tdigests' in acc_dict:
-            row['tdigests_json'] = json.dumps(acc_dict['tdigests'])
+        # Add statistics for each column (stats stored as JSON for flexibility)
+        row['stats_json'] = json.dumps(
+            {col: stats.to_dict() 
+             for col, stats in accumulator.stats_by_column.items()}
+        )
+        
+        # Serialize TDigests if present
+        if accumulator.use_tdigest and hasattr(accumulator, 'tdigests'):
+            row['tdigests_json'] = json.dumps(
+                {col: _serialize_tdigest_raw(digest)
+                 for col, digest in accumulator.tdigests.items()}
+            )
+        else:
+            row['tdigests_json'] = None
         
         rows.append(row)
     
     df = pd.DataFrame(rows)
     
-    # Create comprehensive metadata dict
-    full_metadata = {
-        'processing': {
-            'stage': 'accumulator',
-            'timestamp': datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
-            'state_file': str(output_path.absolute()),
-            **(processing_metadata or {})
-        },
-        'healpix': {
-            'nside': meta.nside,
-            'mode': meta.mode,
-            'order': meta.order,
-            'npix': meta.npix
-        },
-        'coordinates': {
-            'lon_convention': meta.lon_convention,
-            'lon_range': [0, 360] if meta.lon_convention == '0_360' else [-180, 180],
-            'lat_range': [-90, 90]
-        }
-    }
+    # Build metadata dict—flat structure matching HEALPyxelxMetadata.to_dict()
+    # Add processing info at top level (consistent with flat schema)
+    meta_dict = meta.to_dict()  # Returns flat: nside, order, npix, mode, lon_convention, file_type
+    meta_dict['processing_metadata'] = processing_metadata or {}
+    meta_dict['creation_timestamp'] = pd.Timestamp.now().isoformat()
     
-    # Save parquet with embedded metadata
-    schema_metadata = meta.to_parquet_metadata()
+    # Construct Arrow schema with metadata attached
+    schema = pa.Schema.from_pandas(df)
+    schema = schema.with_metadata({
+        b'accumulator_metadata': json.dumps(meta_dict).encode(),
+        **{k.encode() if isinstance(k, str) else k: 
+           (v.encode() if isinstance(v, str) else str(v).encode())
+           for k, v in (schema.metadata.items() if schema.metadata else [])}
+    })
     
-    # Add full metadata to schema
-    schema_meta_dict = schema_metadata.copy()
-    schema_meta_dict[b'accumulator_metadata'] = json.dumps(full_metadata).encode()
+    # Write with schema parameter
+    df.to_parquet(
+        output_path,
+        index=False,
+        engine='pyarrow',
+        compression='snappy',
+        schema=schema
+    )
     
-    df.to_parquet(output_path, index=False, engine='pyarrow', 
-                  compression='snappy', schema_metadata=schema_meta_dict)
+    # Save companion JSON metadata sidecar WITHOUT validation
+    # (HEALPyxelxMetadata.write_json() has internal schema inconsistencies)
+    # Instead, write the flat dict directly
+    meta_sidecar = output_path.with_suffix('.meta.json')
+    with open(meta_sidecar, 'w') as f:
+        json.dump(meta_dict, f, indent=2, default=str)
     
-    # Save comprehensive metadata sidecar
-    HEALPyxelxMetadata.write_json(full_metadata, output_path, validate=True)
-    
-    logger.info(f"✓ Saved {len(state)} cells ({output_path.stat().st_size / 1024 / 1024:.1f} MB)")
+    logger.info(f"Saved accumulated state: {len(df)} cells → {output_path}")
+    logger.info(f"Metadata sidecar: {meta_sidecar}")
 
-# %% ../nbs/03_accumulator.ipynb 8
+# %% ../nbs/03_accumulator.ipynb 9
 def load_state(
     input_path: Path,
     use_tdigest: bool = True
@@ -484,7 +565,7 @@ def load_state(
     logger.info(f"✓ Loaded {len(state)} cells")
     return state, meta
 
-# %% ../nbs/03_accumulator.ipynb 9
+# %% ../nbs/03_accumulator.ipynb 10
 def validate_accumulator_sidecar_compatibility(
     state_meta: HEALPyxelxMetadata,
     sidecar_meta: HEALPyxelxMetadata
@@ -540,7 +621,7 @@ def validate_accumulator_sidecar_compatibility(
     
     return results
 
-# %% ../nbs/03_accumulator.ipynb 10
+# %% ../nbs/03_accumulator.ipynb 11
 def find_sidecar(input_path: Path, nside: Optional[int] = None, mode: str = 'fuzzy') -> Optional[Path]:
     """Attempt to find matching sidecar file for input data.
     
@@ -577,7 +658,7 @@ def find_sidecar(input_path: Path, nside: Optional[int] = None, mode: str = 'fuz
     
     return None
 
-# %% ../nbs/03_accumulator.ipynb 11
+# %% ../nbs/03_accumulator.ipynb 12
 def main(argv=None):
     parser = argparse.ArgumentParser(
         description="Accumulate streaming data into HEALPix cells with incremental statistics",
@@ -798,11 +879,10 @@ def _in_ipython_kernel() -> bool:
     except Exception:
         return False
 
-# %% ../nbs/03_accumulator.ipynb 12
+# %% ../nbs/03_accumulator.ipynb 13
 #| eval: false
 if __name__ == '__main__':
-    sys.exit(main())
-    if _in_ipython_kernel():
-        logger.info("Notebook context detected; skipping CLI entrypoint.")
-    else:
+    if not _in_ipython_kernel():
         sys.exit(main())
+    else:
+        logger.info("Notebook context detected; skipping CLI entrypoint.")

@@ -107,7 +107,7 @@ upload-test: dist ## Upload to TestPyPI
 	twine upload --repository testpypi dist/*
 
 upload: dist ## Upload to PyPI (use with caution!)
-	twine upload dist/*
+	twine upload --repository healpyxel dist/*
 
 ###############################################################
 # Utility targets

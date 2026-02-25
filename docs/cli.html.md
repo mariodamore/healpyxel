@@ -39,9 +39,22 @@
 
 ### sidecar_cli
 
->      sidecar_cli ()
+>      sidecar_cli (argv=None)
 
-*CLI entry point for healpix_sidecar command.*
+\*CLI entry point for healpyxel_sidecar.
+
+Thin wrapper around sidecar.main() that handles argparse setup. All
+argument validation and parsing happens here; core logic stays in
+sidecar.main().\*
+
+------------------------------------------------------------------------
+
+### validate_lon_lat_columns
+
+>      validate_lon_lat_columns (df, lon_col, lat_col, mode, input_file)
+
+*Validate or auto-detect lon/lat columns. Fail fast with context.
+Returns (lon_col, lat_col) or raises ValueError.*
 
 ------------------------------------------------------------------------
 

@@ -1,0 +1,59 @@
+
+direction: down
+
+# ===== PHASE 1: SPLIT =====
+Observations_Raw: {
+  shape: sql_table
+  style: {fill: "#f8cecc"}
+  "source_id , column"
+}
+
+healpyxel_sidecar: {
+  shape: rectangle
+  style: {fill: "#fff4e6"; stroke: "#ff6b6b"; stroke-width: 2}
+}
+
+Sidecar: {
+  shape: sql_table
+  style: {fill: "#f8cecc"}
+  "healpix_id : source_id"
+
+}
+
+# ===== PHASE 2: APPLY =====
+healpyxel_aggregate: {
+  shape: rectangle
+  style: {fill: "#fff4e6"; stroke: "#ff6b6b"; stroke-width: 2}
+}
+
+# ===== PHASE 3: COMBINE =====
+Aggregated: {
+  shape: sql_table
+  style: {fill: "#f8cecc"}
+  "healpix_id : mean(column)"
+}
+
+
+Geoparquet: {
+  shape: sql_table
+  style: {fill: "#f8cecc"}
+  "healpix_id : mean(column) : geometry"
+
+}
+
+# ===== PHASE 2: APPLY =====
+healpyxel_to_geoparquet: {
+  shape: rectangle
+  style: {fill: "#fff4e6"; stroke: "#ff6b6b"; stroke-width: 2}
+}
+
+
+# ===== CONNECTIONS =====
+Observations_Raw -> healpyxel_sidecar: "split\ngeometries"
+healpyxel_sidecar -> Sidecar: ".parquet\n.meta.json"
+Observations_Raw -> healpyxel_aggregate: "join via\nsource_id"
+Sidecar -> healpyxel_aggregate: "group by\nhealpix_id"
+healpyxel_aggregate -> Aggregated: ".parquet"
+Aggregated -> healpyxel_to_geoparquet: "attach\ngeometry"
+healpyxel_to_geoparquet -> Geoparquet: ".geo.parquet"
+

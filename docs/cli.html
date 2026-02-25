@@ -270,6 +270,7 @@ ul.task-list li input[type="checkbox"] {
   <li><a href="#accumulator_cli" id="toc-accumulator_cli" class="nav-link" data-scroll-target="#accumulator_cli">accumulator_cli</a></li>
   <li><a href="#aggregate_cli" id="toc-aggregate_cli" class="nav-link" data-scroll-target="#aggregate_cli">aggregate_cli</a></li>
   <li><a href="#sidecar_cli" id="toc-sidecar_cli" class="nav-link" data-scroll-target="#sidecar_cli">sidecar_cli</a></li>
+  <li><a href="#validate_lon_lat_columns" id="toc-validate_lon_lat_columns" class="nav-link" data-scroll-target="#validate_lon_lat_columns">validate_lon_lat_columns</a></li>
   <li><a href="#cache_cli" id="toc-cache_cli" class="nav-link" data-scroll-target="#cache_cli">cache_cli</a></li>
   <li><a href="#cli-entry-points" id="toc-cli-entry-points" class="nav-link" data-scroll-target="#cli-entry-points">CLI Entry Points</a></li>
   </ul>
@@ -334,9 +335,18 @@ ul.task-list li input[type="checkbox"] {
 <section id="sidecar_cli" class="level3">
 <h3 class="anchored" data-anchor-id="sidecar_cli">sidecar_cli</h3>
 <blockquote class="blockquote">
-<pre><code> sidecar_cli ()</code></pre>
+<pre><code> sidecar_cli (argv=None)</code></pre>
 </blockquote>
-<p><em>CLI entry point for healpix_sidecar command.</em></p>
+<p>*CLI entry point for healpyxel_sidecar.</p>
+<p>Thin wrapper around sidecar.main() that handles argparse setup. All argument validation and parsing happens here; core logic stays in sidecar.main().*</p>
+<hr>
+</section>
+<section id="validate_lon_lat_columns" class="level3">
+<h3 class="anchored" data-anchor-id="validate_lon_lat_columns">validate_lon_lat_columns</h3>
+<blockquote class="blockquote">
+<pre><code> validate_lon_lat_columns (df, lon_col, lat_col, mode, input_file)</code></pre>
+</blockquote>
+<p><em>Validate or auto-detect lon/lat columns. Fail fast with context. Returns (lon_col, lat_col) or raises ValueError.</em></p>
 <hr>
 </section>
 <section id="cache_cli" class="level3">

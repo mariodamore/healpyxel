@@ -109,6 +109,10 @@ optimized to ingest these “shredded” lines at high speed.
 
 ## Installation
 
+This works if you have a working requires C/C++ toolchain (cfitsio,
+HEALPix C++ library), I have no way to builts wheels for Windows, see
+below for workarounds.
+
 ``` bash
 pip install healpyxel
 ```
@@ -132,6 +136,24 @@ pip install healpyxel[dev]
 pip install healpyxel[all]
 ```
 
+**Windows Users workarounds**:
+
+- Option 1: Use conda (RECOMMENDED)
+
+``` bash
+conda install -c conda-forge healpy
+pip install healpyxel
+```
+
+Conda-forge provides prebuilt Windows binaries.
+
+- Option 2: WSL2 (Windows Subsystem for Linux)
+
+``` bash
+# In WSL2 Ubuntu
+pip install healpyxel
+```
+
 **Extras breakdown:** - `geospatial`: geopandas, shapely,
 dask-geopandas, antimeridian (required for `healpyxel_sidecar`) -
 `streaming`: tdigest (percentile tracking in `healpyxel_accumulator`) -
@@ -143,6 +165,15 @@ geospatial + streaming + viz (excludes dev tools)
 
 The **healpyxel workflow** implements spatial aggregation using three
 core steps:
+
+1.  *Split*: Map observations to HEALPix cells `healpyxel_sidecar`
+2.  and 3. *Apply+Combine*: Aggregate values per HEALPix cell
+    `healpyxel_aggregate`
+
+<figure>
+<img src="Pipeline_End-to-End.svg" alt="Pipeline_End-to-End" />
+<figcaption aria-hidden="true">Pipeline_End-to-End</figcaption>
+</figure>
 
 ### 1. **Split**: Map observations to HEALPix cells
 
@@ -165,7 +196,7 @@ HEALPix cells at your target resolution (`nside`).
 <figcaption aria-hidden="true">Sidecar</figcaption>
 </figure>
 
-### 2. **Apply**: Aggregate values per HEALPix cell
+### 2. **Apply + Combine**: Aggregate values per HEALPix cell
 
 Group all observations assigned to the same cell and compute statistics
 (median, mean, MAD, robust_std, etc.).
@@ -184,10 +215,13 @@ Group all observations assigned to the same cell and compute statistics
 <figcaption aria-hidden="true">Aggregate</figcaption>
 </figure>
 
-### 3. **Combine**: Attach HEALPix cell geometry
+### Optional : Attach HEALPix cell geometry
 
 Add polygon boundaries to aggregated cells (computed from `healpix_id`
 via `healpy`).
+
+Resulting GeoParquet files can be direclty imported in QGIS and other
+GIS programs.
 
 **Data contract:**
 

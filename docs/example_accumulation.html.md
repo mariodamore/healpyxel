@@ -16,8 +16,6 @@ from shapely import wkb
 print(f"healpyxel version: {healpyxel.__version__}")
 ```
 
-    healpyxel version: 0.1.0
-
 ## Test Data Discovery
 
 Find available batch data files:
@@ -39,20 +37,6 @@ else:
     batch_files = []
 ```
 
-    Found 10 batch files!
-
-    First few batches:
-      batch_001.parquet: 1.12 MB
-      batch_002.parquet: 1.51 MB
-      batch_003.parquet: 1.37 MB
-      batch_004.parquet: 1.46 MB
-      batch_005.parquet: 1.66 MB
-      batch_006.parquet: 1.42 MB
-      batch_007.parquet: 1.53 MB
-      batch_008.parquet: 1.64 MB
-      batch_009.parquet: 1.61 MB
-      batch_010.parquet: 1.80 MB
-
 ``` python
 from healpyxel.geospatial import is_geometry_valid
 
@@ -65,22 +49,6 @@ import rich
 print("Number of geometries in each batch:")
 rich.print({k.stem : len(gdf) for k, gdf in zip(batch_files, batch_files_loaded)})
 ```
-
-    Number of geometries in each batch:
-
-<pre style="white-space:pre;overflow-x:auto;line-height:normal;font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><span style="font-weight: bold">{</span>
-    <span style="color: #008000; text-decoration-color: #008000">'batch_001'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3027</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_002'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4124</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_003'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3734</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_004'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3989</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_005'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4501</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_006'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">3885</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_007'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4174</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_008'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4479</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_009'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4416</span>,
-    <span style="color: #008000; text-decoration-color: #008000">'batch_010'</span>: <span style="color: #008080; text-decoration-color: #008080; font-weight: bold">4931</span>
-<span style="font-weight: bold">}</span>
-</pre>
 
 ``` python
 import matplotlib.pyplot as plt
@@ -95,8 +63,6 @@ for i, gdf in enumerate(batch_files_loaded):
 ax.set_aspect(0.25)  # Ensure the aspect ratio of the figure is respected
 ```
 
-![](83_example_accumulation_files/figure-commonmark/cell-6-output-1.png)
-
 ``` python
 fig, axs = plt.subplots(nrows=2,ncols=5, figsize=(20, 10))
 colors = plt.cm.tab10.colors  # Use a colormap for distinct colors
@@ -109,8 +75,6 @@ for i, gdf in enumerate(batch_files_loaded):
 
 plt.tight_layout()
 ```
-
-![](83_example_accumulation_files/figure-commonmark/cell-7-output-1.png)
 
 ## Step 1: Create Sidecar for Each Batch
 
@@ -149,63 +113,15 @@ for i, gdf in enumerate(batch_files_loaded[:n_batches_to_process]):
     
     print(f"  ✓ Created {len(sidecar)} assignments from {len(gdf)} geometries")
     print(f"    Unique cells: {sidecar['healpix_id'].nunique()}")
-
-# Combine all sidecars if any were created
-if sidecars:
-    combined_sidecar = pd.concat(sidecars, ignore_index=True)
-    print(f"\n{'='*60}")
-    print(f"Combined sidecar: {len(combined_sidecar)} total assignments")
-    print(f"Unique cells touched: {combined_sidecar['healpix_id'].nunique()}")
-    print(f"Unique sources: {combined_sidecar['source_id'].nunique()}")
-else:
-    print("\nNo sidecars created. Check that batch files exist and have valid geometry columns.")
 ```
 
-
-    [1/10] Processing batch 1...
-      ✓ Created 3539 assignments from 3027 geometries
-        Unique cells: 157
-
-    [2/10] Processing batch 2...
-      ✓ Created 4782 assignments from 4124 geometries
-        Unique cells: 140
-
-    [3/10] Processing batch 3...
-      ✓ Created 4304 assignments from 3734 geometries
-        Unique cells: 151
-
-    [4/10] Processing batch 4...
-      ✓ Created 4565 assignments from 3989 geometries
-        Unique cells: 156
-
-    [5/10] Processing batch 5...
-      ✓ Created 5308 assignments from 4501 geometries
-        Unique cells: 160
-
-    [6/10] Processing batch 6...
-      ✓ Created 4552 assignments from 3885 geometries
-        Unique cells: 160
-
-    [7/10] Processing batch 7...
-      ✓ Created 4874 assignments from 4174 geometries
-        Unique cells: 160
-
-    [8/10] Processing batch 8...
-      ✓ Created 5205 assignments from 4479 geometries
-        Unique cells: 147
-
-    [9/10] Processing batch 9...
-      ✓ Created 5134 assignments from 4416 geometries
-        Unique cells: 143
-
-    [10/10] Processing batch 10...
-      ✓ Created 5632 assignments from 4931 geometries
-        Unique cells: 155
-
-    ============================================================
-    Combined sidecar: 47895 total assignments
-    Unique cells touched: 458
-    Unique sources: 4931
+``` python
+# Combine all sidecars into a single DataFrame
+combined_sidecar = pd.concat(sidecars, ignore_index=True)
+print(f"\nCombined sidecar assignments: {len(combined_sidecar)} rows")
+print(f"Unique cells in combined sidecar: {combined_sidecar['healpix_id'].nunique()}")
+print(f"Columns in combined sidecar: {list(combined_sidecar.columns)}")
+```
 
 ## Step 2: Aggregate Data by HEALPix Cells
 
@@ -228,207 +144,10 @@ for i, gdf in enumerate(batch_files_loaded[:n_batches_to_process]):
     gdf['batch'] = i
     combined_data_list.append(gdf)
 
-if combined_data_list:
-    combined_data = pd.concat(combined_data_list, ignore_index=True)
-    print(f"Combined data: {len(combined_data)} rows")
-    print(f"Columns: {list(combined_data.columns)}")
-    print(f"\nFirst few rows:")
-    display(combined_data.head())
-else:
-    print("No data combined. Check that batch_files_loaded contains valid data.")
+combined_data = pd.concat(combined_data_list, ignore_index=True)
+print(f"\nCombined data from {len(combined_data_list)} batches: {len(combined_data)} records")
+print(f"Columns in combined data: {list(combined_data.columns)}")
 ```
-
-
-    [1/10] Processing batch 1...
-
-    [2/10] Processing batch 2...
-
-    [3/10] Processing batch 3...
-
-    [4/10] Processing batch 4...
-
-    [5/10] Processing batch 5...
-
-    [6/10] Processing batch 6...
-
-    [7/10] Processing batch 7...
-
-    [8/10] Processing batch 8...
-
-    [9/10] Processing batch 9...
-
-    [10/10] Processing batch 10...
-    Combined data: 41260 rows
-    Columns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'source_id', 'batch']
-
-    First few rows:
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
-<table class="dataframe" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header" style="text-align: right;">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">ref_id</th>
-<th data-quarto-table-cell-role="th">a</th>
-<th data-quarto-table-cell-role="th">b</th>
-<th data-quarto-table-cell-role="th">c</th>
-<th data-quarto-table-cell-role="th">d</th>
-<th data-quarto-table-cell-role="th">e</th>
-<th data-quarto-table-cell-role="th">f</th>
-<th data-quarto-table-cell-role="th">g</th>
-<th data-quarto-table-cell-role="th">h</th>
-<th data-quarto-table-cell-role="th">i</th>
-<th data-quarto-table-cell-role="th">...</th>
-<th data-quarto-table-cell-role="th">lon_center</th>
-<th data-quarto-table-cell-role="th">surface</th>
-<th data-quarto-table-cell-role="th">width</th>
-<th data-quarto-table-cell-role="th">length</th>
-<th data-quarto-table-cell-role="th">ang_incidence</th>
-<th data-quarto-table-cell-role="th">ang_emission</th>
-<th data-quarto-table-cell-role="th">ang_phase</th>
-<th data-quarto-table-cell-role="th">azimuth</th>
-<th data-quarto-table-cell-role="th">source_id</th>
-<th data-quarto-table-cell-role="th">batch</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>0801419125400568</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>...</td>
-<td>175.06512</td>
-<td>54194396.0</td>
-<td>5599.9224</td>
-<td>12322.036</td>
-<td>9.834717</td>
-<td>73.333954</td>
-<td>83.013830</td>
-<td>154.51570</td>
-<td>0</td>
-<td>0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>0801419125400569</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>...</td>
-<td>175.14010</td>
-<td>54753300.0</td>
-<td>5660.6910</td>
-<td>12315.469</td>
-<td>9.769003</td>
-<td>73.381120</td>
-<td>82.985110</td>
-<td>154.42958</td>
-<td>1</td>
-<td>0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>0801419125400570</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>...</td>
-<td>175.21364</td>
-<td>54823684.0</td>
-<td>5736.7520</td>
-<td>12167.806</td>
-<td>9.704690</td>
-<td>73.427300</td>
-<td>82.956314</td>
-<td>154.33447</td>
-<td>2</td>
-<td>0</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>0801419125400571</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>...</td>
-<td>175.28458</td>
-<td>54962964.0</td>
-<td>5861.2773</td>
-<td>11939.551</td>
-<td>9.641157</td>
-<td>73.473150</td>
-<td>82.927510</td>
-<td>154.23120</td>
-<td>3</td>
-<td>0</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>0801419125400572</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>...</td>
-<td>175.35536</td>
-<td>55392168.0</td>
-<td>5779.1610</td>
-<td>12203.761</td>
-<td>9.577167</td>
-<td>73.520050</td>
-<td>82.898830</td>
-<td>154.12103</td>
-<td>4</td>
-<td>0</td>
-</tr>
-</tbody>
-</table>
-
-<p>5 rows × 62 columns</p>
-</div>
 
 ``` python
 # Choose a value column to aggregate (adjust based on your data)
@@ -464,367 +183,417 @@ else:
     print("Cannot aggregate: no suitable value columns or no sidecars created")
 ```
 
-    2026-02-13 13:31:15,506 WARNING Found 36329 duplicate source_id values - keeping first occurrence
-    2026-02-13 13:31:15,516 INFO Sidecar source_id overlap: 4931/4931 (100.0%)
-    2026-02-13 13:31:15,517 INFO Merging sidecar with original data
-    2026-02-13 13:31:15,523 INFO Grouping by healpix_id and computing aggregations
-    2026-02-13 13:31:15,531 INFO Processing 458 HEALPix cells
-    2026-02-13 13:31:15,728 INFO Aggregation complete: 458 cells with data
-
-    Aggregating column(s): ['r1050']
-
-    Aggregated 458 HEALPix cells
-    Columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_std', 'n_sources']
-
-    Aggregating HEALPix cells:   0%|          | 0/458 [00:00<?, ?cell/s]
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
-<table class="dataframe" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header" style="text-align: right;">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">r1050_mean</th>
-<th data-quarto-table-cell-role="th">r1050_median</th>
-<th data-quarto-table-cell-role="th">r1050_std</th>
-<th data-quarto-table-cell-role="th">r1050_mad</th>
-<th data-quarto-table-cell-role="th">r1050_robust_std</th>
-<th data-quarto-table-cell-role="th">n_sources</th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">healpix_id</th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1360</td>
-<td>0.064800</td>
-<td>0.064958</td>
-<td>0.002333</td>
-<td>0.002149</td>
-<td>0.003187</td>
-<td>4</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1361</td>
-<td>0.056111</td>
-<td>0.053312</td>
-<td>0.009071</td>
-<td>0.006254</td>
-<td>0.009272</td>
-<td>67</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1364</td>
-<td>0.052999</td>
-<td>0.052222</td>
-<td>0.009556</td>
-<td>0.005086</td>
-<td>0.007540</td>
-<td>121</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1365</td>
-<td>0.055351</td>
-<td>0.052325</td>
-<td>0.011867</td>
-<td>0.002711</td>
-<td>0.004019</td>
-<td>84</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1366</td>
-<td>0.061883</td>
-<td>0.062385</td>
-<td>0.008684</td>
-<td>0.006037</td>
-<td>0.008951</td>
-<td>86</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1367</td>
-<td>0.051103</td>
-<td>0.050074</td>
-<td>0.006332</td>
-<td>0.002375</td>
-<td>0.003521</td>
-<td>116</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1372</td>
-<td>0.058407</td>
-<td>0.058615</td>
-<td>0.007742</td>
-<td>0.005122</td>
-<td>0.007594</td>
-<td>116</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1373</td>
-<td>0.052792</td>
-<td>0.052738</td>
-<td>0.009365</td>
-<td>0.004715</td>
-<td>0.006991</td>
-<td>143</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">1374</td>
-<td>0.056128</td>
-<td>0.054841</td>
-<td>0.006303</td>
-<td>0.004398</td>
-<td>0.006521</td>
-<td>111</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1375</td>
-<td>0.055762</td>
-<td>0.054951</td>
-<td>0.008210</td>
-<td>0.006297</td>
-<td>0.009336</td>
-<td>134</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-
-## Step 3: Densify for Complete HEALPix Grid
-
-Fill in empty cells to create a complete HEALPix map:
-
 ``` python
-if value_columns and sidecars:
-    # Densify the sparse aggregated data
-    aggregated_dense = densify_healpix_aggregates(
-        agg_sparse_df=aggregated,
-        nside=nside,
-        healpix_col='healpix_id'
-    )
-    
-    total_cells = 12 * nside ** 2
-    filled_cells = aggregated[f'{value_columns[0]}_mean'].notna().sum()
-    empty_cells = total_cells - filled_cells
-    
-    print(f"HEALPix Grid (nside={nside}):")
-    print(f"  Total cells: {total_cells}")
-    print(f"  Cells with data: {filled_cells}")
-    print(f"  Empty cells: {empty_cells}")
-    print(f"  Coverage: {100 * filled_cells / total_cells:.2f}%")
-    
-    display(aggregated_dense.head(10))
+# Step 5a: Enrich Aggregated Data with HEALPix Cell Geometries
+
+from healpyxel.geospatial import healpix_to_geodataframe
+
+print("=" * 70)
+print("STEP 5a: Enriching Aggregated Data with Cell Geometries")
+print("=" * 70)
+
+# Extract unique HEALPix cell IDs from aggregated results (data-driven, not hardcoded)
+print("\n1. Extracting HEALPix cell IDs from aggregated data...")
+cell_ids_in_aggregated = full_aggregated['healpix_id'].unique()
+print(f"   ✓ Found {len(cell_ids_in_aggregated)} unique cells in aggregated data")
+
+# Fetch cell geometries from HEALPix grid
+print(f"\n2. Fetching cell geometries (nside={nside}, order='nested')...")
+gdf_cells = healpix_to_geodataframe(
+    nside=nside,
+    order='nested',
+    lon_convention=lon_convention,
+    pixels=np.array(cell_ids_in_aggregated, dtype=np.int64),  # ← Actual cells from data
+    fix_antimeridian=True,
+    cache_mode='use'
+).reset_index(drop=False)
+
+print(f"   ✓ Retrieved {len(gdf_cells)} cell geometries")
+print(f"   Columns: {list(gdf_cells.columns)}")
+print(f"   Example: {gdf_cells.iloc[0][['healpix_id', 'geometry']]}")
+
+# Merge aggregated statistics with cell geometries
+print(f"\n3. Merging aggregated statistics with cell geometries...")
+aggregated_with_geoms = full_aggregated.merge(
+    gdf_cells[['healpix_id', 'geometry']],
+    on='healpix_id',
+    how='left'
+)
+
+print(f"   ✓ Merged {len(aggregated_with_geoms)} rows")
+print(f"   Columns: {list(aggregated_with_geoms.columns)}")
+
+# Verify no NaN geometries (sanity check)
+nan_geoms = aggregated_with_geoms['geometry'].isna().sum()
+if nan_geoms > 0:
+    print(f"   ⚠️  Warning: {nan_geoms} rows have missing geometries (cells not found)")
+else:
+    print(f"   ✓ All cell geometries present")
+
+# Convert to GeoDataFrame for spatial operations
+aggregated_gdf = gpd.GeoDataFrame(
+    aggregated_with_geoms,
+    geometry='geometry',
+    crs='EPSG:4326'  # WGS84, standard for lon/lat
+)
+
+print(f"\n4. Result as GeoDataFrame:")
+print(f"   Shape: {aggregated_gdf.shape}")
+print(f"   Geometry type: {aggregated_gdf.geometry.type.unique()}")
+print(f"   CRS: {aggregated_gdf.crs}")
+print(f"\n   First row:")
+print(aggregated_gdf.iloc[0])
+
+# Optional: Save enriched GeoDataFrame
+enriched_output_path = Path("aggregated_with_cells.parquet")
+aggregated_gdf.to_parquet(enriched_output_path)
+print(f"\n   ✓ Saved enriched data to {enriched_output_path}")
 ```
 
-    2026-02-13 13:31:35,234 INFO Densified from 458 to 12288 cells (nside=32)
-
-    HEALPix Grid (nside=32):
-      Total cells: 12288
-      Cells with data: 458
-      Empty cells: 11830
-      Coverage: 3.73%
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-&#10;    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-&#10;    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-
-<table class="dataframe" data-quarto-postprocess="true" data-border="1">
-<thead>
-<tr class="header" style="text-align: right;">
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th">r1050_mean</th>
-<th data-quarto-table-cell-role="th">r1050_median</th>
-<th data-quarto-table-cell-role="th">r1050_std</th>
-<th data-quarto-table-cell-role="th">r1050_mad</th>
-<th data-quarto-table-cell-role="th">r1050_robust_std</th>
-<th data-quarto-table-cell-role="th">n_sources</th>
-</tr>
-<tr class="odd">
-<th data-quarto-table-cell-role="th">healpix_id</th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-<th data-quarto-table-cell-role="th"></th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">0</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">1</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">2</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">3</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">4</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">5</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">6</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">7</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="odd">
-<td data-quarto-table-cell-role="th">8</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-<tr class="even">
-<td data-quarto-table-cell-role="th">9</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-<td>NaN</td>
-</tr>
-</tbody>
-</table>
-
-</div>
-
-## Step 4: Visualize HEALPix Map
-
-Create a visualization of the aggregated data:
+## Step 3: Apply healpyxel.accumulate on Raw Data
 
 ``` python
-if value_columns and sidecars:
-    import healpy as hp
-    import matplotlib.pyplot as plt
+# Step 3: Apply healpyxel.accumulate on Raw Data
+
+from healpyxel.accumulator import accumulate_batch, save_state, load_state
+from healpyxel.metadata import HEALPyxelxMetadata
+
+# Configuration
+state_output_dir = Path("state/")
+state_output_dir.mkdir(exist_ok=True)
+value_columns = ['r1050']  # Adjust based on your data
+use_tdigest = True  # Enable T-Digest for percentiles
+
+# Initialize metadata for HEALPix grid
+meta = HEALPyxelxMetadata(
+    nside=nside,
+    mode="nested",
+    order="nested",
+    npix=12 * nside**2,
+    lon_convention=lon_convention
+)
+
+# Initialize accumulator state
+accumulated_state = None
+state_history = []  # Track growth of accumulation
+
+# Process each BATCH OF RAW DATA incrementally
+for i, gdf in enumerate(batch_files_loaded[:n_batches_to_process]):
+    print(f"\n[{i+1}/{n_batches_to_process}] Processing batch {i+1}...")
     
-    # Choose which statistic to visualize
-    stat_column = f'{value_columns[0]}_median'
+    # Get the sidecar for THIS batch
+    batch_sidecar = sidecars[i]  # Sidecar mapping for this batch
     
-    # Extract map values (NaN for empty cells)
-    healpix_map = aggregated_dense[stat_column].values.astype(float)
+    # Get the raw DATA for THIS batch
+    # IMPORTANT: Set index to source_id BEFORE passing to accumulate_batch
+    batch_data = gdf.drop(columns=['geometry']).copy()
+    batch_data.index = batch_data.index.astype(np.int64)  # ← Set index, don't add column
+    batch_data.index.name = 'source_id'  # ← Name the index for clarity
     
-    # Create visualization
-    plt.figure(figsize=(12, 8))
-    hp.mollview(
-        healpix_map,
-        nest=True,
-        title=f'HEALPix Map: {stat_column} (nside={nside})',
-        cmap='Spectral_r',
-        flip='geo',
-        xsize=2000
+    # Accumulate statistics from raw data
+    accumulated_state = accumulate_batch(
+        new_data=batch_data,           # ← Index will be converted to source_id column
+        sidecar=batch_sidecar,         # ← Sidecar mapping for this batch
+        value_columns=value_columns,
+        existing_state=accumulated_state,  # ← Previous state (None for first batch)
+        use_tdigest=use_tdigest
     )
-    hp.graticule()
-    plt.show()
     
-    # Statistics of the mapped data
-    valid_data = healpix_map[~np.isnan(healpix_map)]
-    print(f"\nMap Statistics:")
-    print(f"  Min: {valid_data.min():.4f}")
-    print(f"  Max: {valid_data.max():.4f}")
-    print(f"  Mean: {valid_data.mean():.4f}")
-    print(f"  Median: {np.median(valid_data):.4f}")
+    # Track state growth
+    state_history.append({
+        'batch': i + 1,
+        'n_cells': len(accumulated_state),
+        'observations': sum(
+            acc.stats_by_column[value_columns[0]].n 
+            for acc in accumulated_state.values()
+            if value_columns[0] in acc.stats_by_column
+        )
+    })
+    
+    # Save intermediate state
+    state_output_path = state_output_dir / f"state_v{i+1:03d}.parquet"
+    save_state(
+        state=accumulated_state,
+        output_path=state_output_path,
+        meta=meta,
+        processing_metadata={
+            "batch_id": f"batch_{i+1}",
+            "columns": value_columns,
+            "n_cells": len(accumulated_state)
+        }
+    )
+    print(f"  ✓ Accumulated state: {len(accumulated_state)} cells, "
+          f"{state_history[-1]['observations']:,} observations")
+    print(f"  ✓ Saved state to {state_output_path}")
+
+# Print accumulation growth
+print("\n" + "="*60)
+print("Accumulation Growth Summary:")
+print("="*60)
+for record in state_history:
+    print(f"Batch {record['batch']:2d}: {record['n_cells']:5d} cells, "
+          f"{record['observations']:8,d} observations")
+
+print(f"\nFinal accumulated state: {len(accumulated_state)} cells")
 ```
 
-    2025-12-11 15:11:07,965 INFO 0.0 180.0 -180.0 180.0
-    2025-12-11 15:11:07,966 INFO The interval between parallels is 30 deg -0.00'.
-    2025-12-11 15:11:07,967 INFO The interval between meridians is 30 deg -0.00'.
-    2025-12-11 15:11:07,966 INFO The interval between parallels is 30 deg -0.00'.
-    2025-12-11 15:11:07,967 INFO The interval between meridians is 30 deg -0.00'.
+## Step 4: Load accumulated state and extract statistics for comparison
 
-    <Figure size 1200x800 with 0 Axes>
+``` python
+# Step 4: Load accumulated state and extract statistics for comparison
 
-![](83_example_accumulation_files/figure-commonmark/cell-12-output-3.png)
+print("=" * 70)
+print("STEP 4: Approximate (Streaming) vs Full Aggregation Comparison")
+print("=" * 70)
 
+# Reload the final accumulated state from disk
+state_path = state_output_dir / f"state_v{n_batches_to_process:03d}.parquet"
+print(f"\n1. Loading accumulated state from {state_path.name}...")
 
-    Map Statistics:
-      Min: 0.0362
-      Max: 0.0777
-      Mean: 0.0535
-      Median: 0.0527
+accumulated_state_loaded, state_meta = load_state(state_path, use_tdigest=True)
+print(f"   ✓ Loaded {len(accumulated_state_loaded)} cells")
+
+# Convert accumulated state (Dict[int, CellAccumulator]) → DataFrame for comparison
+print(f"\n2. Extracting statistics from StreamingStats...")
+
+accumulated_stats_rows = []
+for healpix_id, accumulator in accumulated_state_loaded.items():
+    row = {'healpix_id': int(healpix_id)}
+    
+    # Extract per-column statistics
+    for col in value_columns:
+        if col in accumulator.stats_by_column:
+            stats = accumulator.stats_by_column[col]
+            row[f'{col}_mean'] = stats.mean
+            row[f'{col}_std'] = stats.std
+            row[f'{col}_n'] = stats.n
+            row[f'{col}_min'] = stats.min_val if np.isfinite(stats.min_val) else np.nan
+            row[f'{col}_max'] = stats.max_val if np.isfinite(stats.max_val) else np.nan
+    
+    accumulated_stats_rows.append(row)
+
+accumulated_df = pd.DataFrame(accumulated_stats_rows)
+print(f"   ✓ Extracted {len(accumulated_df)} cells with statistics")
+print(f"   Columns: {list(accumulated_df.columns)}")
+
+# Perform full batch aggregation for ground truth
+print(f"\n3. Computing full batch aggregation (ground truth)...")
+
+full_aggregated = aggregate_by_sidecar(
+    original=combined_data,
+    sidecar=combined_sidecar,
+    value_columns=value_columns,
+    aggs=['mean', 'median', 'std', 'min', 'max', 'mad', 'robust_std'],
+    source_id_col='source_id',
+    healpix_col='healpix_id',
+    min_count=1,
+    sentinel_threshold=1e30
+)
+print(f"   ✓ Aggregated {len(full_aggregated)} cells")
+print(f"   Columns: {list(full_aggregated.columns)}")
+
+# Merge for comparison (inner join on healpix_id)
+print(f"\n4. Merging for comparison...")
+
+# Rename accumulated columns for clarity
+accumulated_df_renamed = accumulated_df.copy()
+for col in value_columns:
+    accumulated_df_renamed = accumulated_df_renamed.rename(columns={
+        f'{col}_mean': f'{col}_approx_mean',
+        f'{col}_std': f'{col}_approx_std',
+        f'{col}_n': f'{col}_approx_n',
+    })
+
+# Inner join on healpix_id
+comparison = accumulated_df_renamed.merge(
+    full_aggregated,
+    on='healpix_id',
+    how='inner',
+    suffixes=('_approx', '_full')
+)
+print(f"   ✓ {len(comparison)} cells matched between methods")
+
+# Statistical comparison
+print(f"\n" + "=" * 70)
+print("COMPARISON RESULTS")
+print("=" * 70)
+
+for col in value_columns:
+    approx_mean_col = f'{col}_approx_mean'
+    full_mean_col = f'{col}_mean'
+    approx_n_col = f'{col}_approx_n'
+    
+    if approx_mean_col not in comparison.columns or full_mean_col not in comparison.columns:
+        print(f"\n⚠️  Column {col}: Missing in comparison (skipped)")
+        continue
+    
+    print(f"\n{col}:")
+    
+    # Observation count validation
+    print(f"  Observation count:")
+    print(f"    Approx (StreamingStats): {comparison[approx_n_col].sum():.0f} total")
+    print(f"    Full (n_sources):        {comparison['n_sources'].sum():.0f} total")
+    count_match = np.isclose(comparison[approx_n_col].sum(), comparison['n_sources'].sum())
+    print(f"    {'✓ Counts match' if count_match else '✗ MISMATCH DETECTED'}")
+    
+    # Mean comparison
+    print(f"  Mean comparison:")
+    print(f"    Approximate mean:  {comparison[approx_mean_col].mean():.6f} (std: {comparison[approx_mean_col].std():.6f})")
+    print(f"    Full aggregation:  {comparison[full_mean_col].mean():.6f} (std: {comparison[full_mean_col].std():.6f})")
+    
+    # Compute per-cell differences
+    mean_diff = comparison[approx_mean_col] - comparison[full_mean_col]
+    mean_pct_diff = np.abs(mean_diff) / np.abs(comparison[full_mean_col] + 1e-10) * 100
+    
+    print(f"  Absolute difference: {mean_diff.mean():.6e} (max: {mean_diff.abs().max():.6e})")
+    print(f"  % difference:        {mean_pct_diff.mean():.4f}% (max: {mean_pct_diff.max():.4f}%)")
+    
+    # Show top discrepancies
+    top_disc = mean_pct_diff.nlargest(3)
+    if len(top_disc) > 0:
+        print(f"  Top 3 discrepancies:")
+        for idx in top_disc.index:
+            cell_id = comparison.iloc[idx]['healpix_id']
+            approx_val = comparison.iloc[idx][approx_mean_col]
+            full_val = comparison.iloc[idx][full_mean_col]
+            n_obs = comparison.iloc[idx]['n_sources']
+            pct = mean_pct_diff.iloc[idx]
+            print(f"    Cell {cell_id}: approx={approx_val:.6f}, full={full_val:.6f}, "
+                  f"diff={pct:.4f}% (n_sources={n_obs:.0f})")
+
+print("\n" + "=" * 70)
+print("✓ COMPARISON COMPLETE")
+print("=" * 70)
+```
+
+``` python
+# Step 5: Visualize Results (Approximate vs Full)
+
+import healpy as hp
+import matplotlib.pyplot as plt
+
+print("=" * 70)
+print("STEP 5: Visualization - Approximate vs Full Aggregation")
+print("=" * 70)
+
+# Ensure healpix_id is a column (not index) in both DataFrames
+accumulated_df_clean = accumulated_df_renamed.reset_index(drop=True)
+full_agg_clean = comparison.reset_index(drop=True)
+
+print(f"\n1. Verifying schema...")
+if 'healpix_id' not in accumulated_df_clean.columns:
+    raise ValueError("healpix_id missing from accumulated_df_clean")
+if 'healpix_id' not in full_agg_clean.columns:
+    raise ValueError("healpix_id missing from full_agg_clean")
+print(f"   ✓ Schema validated")
+
+# Create HEALPix maps for both methods
+nside = state_meta.nside
+npix = hp.nside2npix(nside)
+
+print(f"\n2. Creating HEALPix maps (nside={nside}, npix={npix})...")
+
+# Method 1: Approximate (StreamingStats)
+approx_map = np.full(npix, hp.UNSEEN, dtype=np.float64)
+for col in value_columns:
+    approx_col = f'{col}_approx_mean'
+    if approx_col in accumulated_df_clean.columns:
+        healpix_ids = accumulated_df_clean['healpix_id'].values.astype(int)
+        means = accumulated_df_clean[approx_col].values
+        
+        # Validate indices
+        if np.any((healpix_ids < 0) | (healpix_ids >= npix)):
+            bad_indices = healpix_ids[(healpix_ids < 0) | (healpix_ids >= npix)]
+            raise ValueError(f"Invalid healpix_id values (out of range [0, {npix})): {bad_indices[:5]}")
+        
+        approx_map[healpix_ids] = means
+        print(f"   ✓ Populated {np.sum(approx_map != hp.UNSEEN):.0f} cells in approx_map")
+        break
+
+# Method 2: Full Aggregation
+full_map = np.full(npix, hp.UNSEEN, dtype=np.float64)
+for col in value_columns:
+    full_col = f'{col}_mean'
+    if full_col in full_agg_clean.columns:
+        healpix_ids = full_agg_clean['healpix_id'].values.astype(int)
+        means = full_agg_clean[full_col].values
+        
+        # Validate indices
+        if np.any((healpix_ids < 0) | (healpix_ids >= npix)):
+            bad_indices = healpix_ids[(healpix_ids < 0) | (healpix_ids >= npix)]
+            raise ValueError(f"Invalid healpix_id values (out of range [0, {npix})): {bad_indices[:5]}")
+        
+        full_map[healpix_ids] = means
+        print(f"   ✓ Populated {np.sum(full_map != hp.UNSEEN):.0f} cells in full_map")
+        break
+
+# Compute difference map
+print(f"\n3. Computing difference map...")
+diff_map = approx_map.copy()
+valid_mask = (approx_map != hp.UNSEEN) & (full_map != hp.UNSEEN)
+diff_map[~valid_mask] = hp.UNSEEN
+diff_map[valid_mask] = approx_map[valid_mask] - full_map[valid_mask]
+print(f"   ✓ Difference map has {np.sum(diff_map != hp.UNSEEN):.0f} valid cells")
+
+# Render three separate figures (healpy limitation workaround)
+print(f"\n4. Rendering visualizations...")
+
+# Approximate map
+print("   Rendering approx_map...")
+hp.mollview(approx_map, title="Approximate (StreamingStats)", unit=f"{value_columns[0]}")
+# plt.savefig('comparison_approx.png', dpi=150, bbox_inches='tight')
+# plt.close()
+
+# Full aggregation map
+print("   Rendering full_map...")
+hp.mollview(full_map, title="Full Aggregation", unit=f"{value_columns[0]}")
+# plt.savefig('comparison_full.png', dpi=150, bbox_inches='tight')
+# plt.close()
+
+# Difference map
+print("   Rendering diff_map...")
+hp.mollview(diff_map, title="Difference (Approx - Full)", unit=f"Δ{value_columns[0]}")
+# plt.savefig('comparison_diff.png', dpi=150, bbox_inches='tight')
+# plt.close()
+
+# print("\n✓ Saved comparison visualizations:")
+# print("  - comparison_approx.png")
+# print("  - comparison_full.png")
+# print("  - comparison_diff.png")
+
+# # Optional: Create a composite image with PIL (if available)
+# try:
+#     from PIL import Image
+#     print(f"\n5. Creating composite image...")
+    
+#     approx_img = Image.open('comparison_approx.png')
+#     full_img = Image.open('comparison_full.png')
+#     diff_img = Image.open('comparison_diff.png')
+    
+#     # Resize to same height for horizontal concat
+#     target_height = 600
+#     approx_img = approx_img.resize((int(approx_img.width * target_height / approx_img.height), target_height))
+#     full_img = full_img.resize((int(full_img.width * target_height / full_img.height), target_height))
+#     diff_img = diff_img.resize((int(diff_img.width * target_height / diff_img.height), target_height))
+    
+#     # Concatenate horizontally
+#     total_width = approx_img.width + full_img.width + diff_img.width
+#     max_height = target_height
+#     composite = Image.new('RGB', (total_width, max_height))
+#     composite.paste(approx_img, (0, 0))
+#     composite.paste(full_img, (approx_img.width, 0))
+#     composite.paste(diff_img, (approx_img.width + full_img.width, 0))
+    
+#     composite.save('comparison_maps_composite.png', dpi=(150, 150))
+#     print(f"   ✓ Saved composite: comparison_maps_composite.png")
+    
+# except ImportError:
+#     print(f"   ⚠️  PIL not available; skipping composite image creation")
+
+# print("\n" + "=" * 70)
+# print("✓ VISUALIZATION COMPLETE")
+# print("=" * 70)
+```
 
 ## Summary
 

@@ -90,20 +90,26 @@ found\*
 ### process_partition
 
 >      process_partition (gdf, nside:int, mode:str, base_index:int|None=None,
->                         lon_convention:str='None', data_psf=None,
->                         cell_psf=None, combine_method='multiply')
+>                         lon_convention:str='minus_plus180',
+>                         lon_col:str|None=None, lat_col:str|None=None,
+>                         data_psf=None, cell_psf=None,
+>                         combine_method='multiply')
 
-\*Process a single dask partition (GeoDataFrame) and return DataFrame of
-assignments.
+\*Process a single dask partition and return DataFrame of assignments.
 
-The returned D/ataFrame has columns \[‘source_id’, ‘healpix_id’\] and
-one row per assignment (for strict mode: at most one row per source_id;
-for fuzzy mode: one row per touched healpix cell).
+Supports two workflows: 1. Scalar lon/lat columns (efficient for strict
+mode): pass lon_col, lat_col 2. Geometry-based (for fuzzy mode): pass
+geometries via gdf.geometry
 
-Args: gdf: GeoDataFrame partition nside: HEALPix nside parameter mode:
-‘strict’ or ‘fuzzy’ assignment mode base_index: Base index for source_id
-generation lon_convention: Longitude convention - ‘0_360’ for \[0,360)
-or ‘minus_plus180’ for \[-180,180)\*
+Args: gdf: GeoDataFrame or DataFrame partition nside: HEALPix nside
+parameter mode: ‘strict’ or ‘fuzzy’ assignment mode base_index: Base
+index for global source_id generation lon_convention: ‘minus_plus180’ or
+‘0_360’ lon_col: Longitude column name (if None, use geometry) lat_col:
+Latitude column name (if None, use geometry) data_psf, cell_psf:
+Optional PSF functions combine_method: How to combine PSF weights
+
+Returns: DataFrame with columns \[‘source_id’, ‘healpix_id’\] and
+optional ‘weight’\*
 
 ------------------------------------------------------------------------
 
@@ -262,51 +268,36 @@ performing sidecar calculations. This allows you to:
 
 ### Usage
 
-\`\`\`bash \# Step 1: Inspect your data (raw, no filtering -
-auto-detects lon/lat columns) healpyxel-sidecar -i data.parquet
-–geo-stats
+``` bash
+# Step 1: Inspect your data (raw, no filtering - auto-detects lon/lat columns)
+healpyxel-sidecar -i data.parquet --geo-stats
 
 # Step 1b: Inspect with filtering to see what will be processed
-
-healpyxel-sidecar -i data.parquet –geo-stats –lon-convention 0_360
+healpyxel-sidecar -i data.parquet --geo-stats --lon-convention 0_360
 
 # Step 2: Run actual processing with appropriate convention
-
-healpyxel-sidecar -i data.parquet –nside 64 –lon-convention 0_360 –mode
-fuzzy
+healpyxel-sidecar -i data.parquet --nside 64 --lon-convention 0_360 --mode fuzzy
 
 # Optional: Specify explicit lon/lat columns
-
-healpyxel-sidecar -i data.parquet –geo-stats  
-–lon-col longitude –lat-col latitude
+healpyxel-sidecar -i data.parquet --geo-stats \
+  --lon-col longitude --lat-col latitude
 
 # Optional: Control sample size for geometry-based extraction
-
-healpyxel-sidecar -i data.parquet –geo-stats  
-–stats-sample-size 50000
+healpyxel-sidecar -i data.parquet --geo-stats \
+  --stats-sample-size 50000
 
 # Compare raw vs filtered statistics
-
-2.  **Flexible analysis modes**:
-    - **Raw data** (default): No filtering, shows actual data ranges
-    - **Filtered data** (with `--lon-convention`): Apply same filtering
-      as HEALPix processing
-3.  **Automatic column detection**: Intelligently detects lon/lat
-    columns using common naming patterns
-4.  **Geometry extraction**: Falls back to extracting coordinates from
-    geometry column (centroids for polygons)
-5.  **Efficient computation**: Uses DuckDB SQL with WHERE clauses for
-    fast filtered statistics
-6.  **Filtering impact**: Shows total records, filtered records, and
-    drop percentage
-7.  **Convention suggestion**: Recommends appropriate `--lon-convention`
-    based on data ranges
-8.  **Validation warnings**: Checks if coordinates are within valid
-    ranges
-9.  **Beautiful output**: Uses Rich library for formatted tables (falls
-    back to plain text if unavailable)
-10. **JSON export**: Saves statistics to `.geo_stats.json` file for
-    reference
+2. **Flexible analysis modes**:
+   - **Raw data** (default): No filtering, shows actual data ranges
+   - **Filtered data** (with `--lon-convention`): Apply same filtering as HEALPix processing
+3. **Automatic column detection**: Intelligently detects lon/lat columns using common naming patterns
+4. **Geometry extraction**: Falls back to extracting coordinates from geometry column (centroids for polygons)
+5. **Efficient computation**: Uses DuckDB SQL with WHERE clauses for fast filtered statistics
+6. **Filtering impact**: Shows total records, filtered records, and drop percentage
+7. **Convention suggestion**: Recommends appropriate `--lon-convention` based on data ranges
+8. **Validation warnings**: Checks if coordinates are within valid ranges
+9. **Beautiful output**: Uses Rich library for formatted tables (falls back to plain text if unavailable)
+10. **JSON export**: Saves statistics to `.geo_stats.json` file for reference
 
 ### Statistics Computed
 
@@ -318,23 +309,77 @@ healpyxel-sidecar -i data.parquet –geo-stats
 ### Why This Matters
 
 - **Workflow efficiency**: Quick data inspection before heavy processing
+- **Convention detection**: Tool suggests the right `--lon-convention` for your data
 
-- **Convention detection**: Tool suggests the right `--lon-convention`
-  for your data
-
-- **Data validation**: Catch coordinate system issues early \### Why
-  This Matters- **Performance**: Statistics computed efficiently without
-  loading entire dataset into memory
+- **Data validation**: Catch coordinate system issues early
+### Why This Matters- **Performance**: Statistics computed efficiently without loading entire dataset into memory
 
 - **Quality control**: Identify outliers or invalid coordinates
-
 - **Quality control**: Identify outliers or invalid coordinates
 
-- **Performance**: Statistics computed efficiently without loading
-  entire dataset into memory
+- **Performance**: Statistics computed efficiently without loading entire dataset into memory
+- **Workflow efficiency**: Quick data inspection before heavy processing- **Data validation**: Catch coordinate system issues early
+- **Convention detection**: Tool suggests the right `--lon-convention` for your data
 
-- **Workflow efficiency**: Quick data inspection before heavy
-  processing- **Data validation**: Catch coordinate system issues early
+::: {.cell execution_count=18}
+``` {.python .cell-code}
+# Test: _read_input_lazy three-tier fallback
+import tempfile
+from pathlib import Path
+from unittest.mock import patch
 
-- **Convention detection**: Tool suggests the right `--lon-convention`
-  for your data
+import numpy as np
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+
+# Create a minimal parquet file (no geometry — forces Tier 2)
+n = 500
+rng = np.random.default_rng(42)
+df = pd.DataFrame({
+    "spot_lon": rng.uniform(-180, 180, n).astype(np.float32),
+    "spot_lat": rng.uniform(-90, 90, n).astype(np.float32),
+    "reflectance": rng.normal(0.05, 0.01, n).astype(np.float32),
+})
+
+with tempfile.TemporaryDirectory() as tmpdir:
+    path = Path(tmpdir) / "test_no_geom.parquet"
+    df.to_parquet(path, index=False)
+
+    # Should succeed via Tier 2 (no geometry → dask_geopandas may fail)
+    ddf = _read_input_lazy(path, ncores=4)
+    result = ddf.compute()
+    assert result.shape[0] == n, f"Expected {n} rows, got {result.shape[0]}"
+    assert "spot_lon" in result.columns
+    assert "spot_lat" in result.columns
+    assert np.allclose(result["spot_lon"].values, df["spot_lon"].values, atol=1e-6)
+
+    # Verify healpy works on the output
+    import healpy as hp
+    phi = np.radians(result["spot_lon"].values.astype(np.float64) % 360)
+    theta = np.radians(90.0 - result["spot_lat"].values.astype(np.float64))
+    cells = hp.ang2pix(64, theta, phi, nest=True)
+    assert cells.shape == (n,)
+    assert np.all(cells >= 0)
+    assert np.all(cells < 12 * 64**2)
+
+# Test: simulate broken spatial partitions (force Tier 1 failure → Tier 2 success)
+with tempfile.TemporaryDirectory() as tmpdir:
+    path = Path(tmpdir) / "test_broken_spatial.parquet"
+    df.to_parquet(path, index=False)
+
+    with patch("dask_geopandas.read_parquet", side_effect=ValueError("Expected spatial partitions of length 6, got 115 instead.")):
+        ddf = _read_input_lazy(path, ncores=4)
+        result = ddf.compute()
+        assert result.shape[0] == n, f"Tier 2 fallback failed: expected {n} rows, got {result.shape[0]}"
+
+print(f"✓ _read_input_lazy verified: {n} rows, Tier 1→2 fallback works, healpy compatible")
+```
+
+<div class="cell-output cell-output-stdout">
+
+    ✓ _read_input_lazy verified: 500 rows, Tier 1→2 fallback works, healpy compatible
+
+</div>
+
+:::

@@ -17,7 +17,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Implemented
 
+## [0.2.2] - 2026-02-18 
+
+### Summary
+v0.2.2 improves streaming accumulator robustness and sidecar I/O flexibility. Key changes: `StreamingStats.update()` now accepts flexible input types, TDigest serialization guarantees centroid materialization, and a new three-tier lazy parquet reader gracefully handles broken spatial partition metadata. The sidecar module gains a dual-workflow architecture for efficient scalar lon/lat processing.
+
+#### Accumulator Module
+- **ENHANCED:** `StreamingStats.update()` now accepts scalars, lists, and numpy arrays
+  - Auto-converts to 1D float64 array internally
+  - Raises `ValueError` for non-1D inputs with clear shape message
+- **NEW:** `_serialize_tdigest_raw()` function for aggressive TDigest serialization
+  - Uses native TDigest `.to_dict()` method to force centroid materialization
+  - Fallback to empty state on serialization failure
+- **REFACTORED:** `CellAccumulator.to_dict()` uses aggressive serialization
+  - Guarantees centroids are materialized even if percentiles were never queried
+  - Fixes edge case where lazy TDigest state could produce empty serialization
+- **ENHANCED:** `accumulate_batch()` improved robustness
+  - Source_id uniqueness validation with actionable error
+  - Proper `state.copy()` to avoid mutation of existing state
+  - Improved fuzzy mode documentation (one row per touched HEALPix cell)
+  - Better handling of DataFrame index → source_id conversion
+- **REFACTORED:** `save_state()` rewritten for flat metadata schema
+  - Uses pyarrow `schema` parameter for proper metadata embedding
+  - Flat metadata structure consistent with `HEALPyxelxMetadata.to_dict()`
+  - Direct JSON sidecar write (bypasses internal validation)
+
+#### CLI Module
+- **ENHANCED:** `sidecar_cli()` now validates input before invoking main
+  - Logs mode, lon-convention, and nside parameters
+  - Raises `FileNotFoundError` with path for missing input
+- **NEW:** `validate_lon_lat_columns()` function for column detection
+  - Auto-detects from common names: lon/longitude/spot_lon/x, lat/latitude/spot_lat/y
+  - Provides actionable error messages with available columns listed
+  - Returns validated (lon_col, lat_col) tuple
+
+#### Sidecar Module
+- **REFACTORED:** `process_partition()` dual-workflow architecture
+  - Workflow 1: Scalar lon/lat columns (efficient for strict mode, no geometry overhead)
+  - Workflow 2: Geometry-based (for fuzzy mode with polygon overlap)
+  - Clear error when neither workflow is available
+- **NEW:** `_read_input_lazy()` three-tier lazy parquet reader
+  - Tier 1: dask_geopandas (preserves spatial metadata)
+  - Tier 2: plain dask.dataframe (graceful fallback for broken spatial partitions)
+  - Tier 3: IOError with clear diagnostic
+  - Documents that spatial partitions provide zero benefit for HEALPix assignment
+- **ENHANCED:** `main()` passes `lon_col`/`lat_col` to partition processing
+  - Enables scalar workflow when geometry is not required
+
+## [0.2.1] - 2026-02-18 
+
+### Summary
+v0.2.1 fixes the GeoParquet CLI output (now correctly writes merged geometry + aggregate data) and adds geometry validation utilities. Includes overwrite control for `save_healpix_to_geoparquet()`, enhanced docstrings across core modules, and expanded test coverage for sidecar type coercion.
+
 #### Geospatial Module
+- **FIXED:** `to_geoparquet` CLI writes merged GeoDataFrame
+  - Previously called `save_healpix_to_geoparquet()` which produced empty grid
+  - Now writes geometry + aggregate data columns correctly
 - **NEW:** `is_geometry_valid()` function to validate geometries for spherical projection
   - Checks bounds: latitude ∈ [-90, 90], longitude ∈ [-180, 360]
   - Returns False for empty or invalid geometries

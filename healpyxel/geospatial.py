@@ -1456,7 +1456,6 @@ def main():
         
         # Resolve order (CLI > metadata > default)
         if order == 'nested' and metadata and meta_params['order']:
-            # 'nested' is the default; only use metadata if explicitly in there
             order = meta_params['order']
             click.echo(f'Using order={order} from metadata')
         
@@ -1468,13 +1467,10 @@ def main():
             else:
                 lon_convention = '0_360'
                 click.echo(f'Using default lon_convention={lon_convention}')
-        else:
-            # Explicit user choice, skip metadata
-            pass
         
         # Construct output path
         output_dir = Path(output_dir) if output_dir else agg_path.parent
-        output_stem = agg_path.stem  # e.g., 'sample_50k_nside256_aggregate'
+        output_stem = agg_path.stem
         output_path = output_dir / f'{output_stem}{output_suffix}.parquet'
         
         # Safety check: warn if file exists
@@ -1514,16 +1510,9 @@ def main():
             merged = gdf.join(agg, how='inner')
             click.echo(f'Sparse join: kept {len(merged)} cells (skipped {expected_npix - len(merged)} empty cells)')
         
+        # Write the MERGED GeoDataFrame (geometry + aggregate data)
         output_path.parent.mkdir(parents=True, exist_ok=True)
-        save_healpix_to_geoparquet(
-            nside=nside,
-            output_path=output_path,
-            order=order,
-            lon_convention=lon_convention,
-            fix_antimeridian=fix_antimeridian,
-            chunk_size=chunk_size,
-            overwrite=yes,
-            interactive=not yes
-        )
+        merged.to_parquet(output_path)
+        click.echo(f'✓ Wrote GeoParquet: {output_path} ({len(merged)} rows, {len(merged.columns)} columns)')
     
     return cmd()
