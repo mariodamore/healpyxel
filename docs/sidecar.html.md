@@ -321,7 +321,7 @@ healpyxel-sidecar -i data.parquet --geo-stats \
 - **Workflow efficiency**: Quick data inspection before heavy processing- **Data validation**: Catch coordinate system issues early
 - **Convention detection**: Tool suggests the right `--lon-convention` for your data
 
-::: {.cell execution_count=18}
+::: {.cell}
 ``` {.python .cell-code}
 # Test: _read_input_lazy three-tier fallback
 import tempfile
