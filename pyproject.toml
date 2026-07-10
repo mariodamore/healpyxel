@@ -1,95 +1,36 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=64"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name="healpyxel"
-version = "0.2.2"
+name = "healpyxel"
+dynamic = ["version"]
 description = "HEALPix-based spatial aggregation for planetary science data"
 readme = "README.md"
-requires-python=">=3.10"
-license = "Apache-2.0"
-authors = [
-    {name = "Mario D'Amore", email = "mario.damore@dlr.de"}
-]
-keywords = ["healpix", "planetary-science", "spatial-aggregation", "streaming"]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Intended Audience :: Science/Research",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Topic :: Scientific/Engineering :: Astronomy",
-]
-
-dependencies = [
-    "pandas>=2.0",
-    "numpy>=1.24",
-    "pyarrow>=12.0",
-    "healpy>=1.16",
-    "click>=8.0",
-    "tqdm",
-]
-
-[project.optional-dependencies]
-geospatial = [
-    "geopandas>=0.14",
-    "shapely>=2.0",
-    "dask-geopandas>=0.3",
-    "antimeridian",
-]
-streaming = [
-    "tdigest",
-]
-viz = [
-    "matplotlib>=3.5",
-    "scikit-image>=0.20",
-    "skyproj>=0.2",
-]
-dev = [
-    "nbdev>=2.3.12",
-    "jupyter",
-    "pytest>=7.0",
-    "pytest-cov>=4.0",
-    "black>=23.0",
-    "ruff>=0.1.0",
-    "mypy>=1.0",
-    "build>=0.10",
-    "twine>=4.0",
-]
-all = [
-    "geopandas>=0.14",
-    "shapely>=2.0",
-    "dask-geopandas>=0.3",
-    "antimeridian",
-    "tdigest",
-    "matplotlib>=3.5",
-    "scikit-image>=0.20",
-    "skyproj>=0.2",
-]
-
-[project.scripts]
-healpyxel_sidecar = "healpyxel.cli:sidecar_cli"
-healpyxel_aggregate = "healpyxel.cli:aggregate_cli"
-healpyxel_accumulator = "healpyxel.cli:accumulator_cli"
-healpyxel_finalize = "healpyxel.cli:finalize_cli"
-healpyxel_to_geoparquet = "healpyxel.cli:to_geoparquet_cli"
-healpyxel_cache = "healpyxel.cli:cache_cli"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "Mario D'Amore", email = "mario.damore@dlr.de"}]
+keywords = ['healpix', 'planetary-science', 'spatial-aggregation', 'streaming']
+classifiers = ["Natural Language :: English", "Intended Audience :: Science/Research", "Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Programming Language :: Python :: 3 :: Only"]
+dependencies = ['pandas>=2.0', 'numpy>=1.24', 'pyarrow>=12.0', 'shapely>=2.0', 'healpy>=1.16', 'dask-geopandas>=0.3', 'antimeridian', 'tqdm', 'duckdb>=0.9.0', 'rich>=13.0']
 
 [project.urls]
-Homepage = "https://github.com/mariodamore/healpyxel"
-Documentation = "https://mariodamore.github.io/healpyxel"
 Repository = "https://github.com/mariodamore/healpyxel"
-"Bug Tracker" = "https://github.com/mariodamore/healpyxel/issues"
+Documentation = "https://mariodamore.github.io/healpyxel/"
+
+[project.entry-points.nbdev]
+healpyxel = "healpyxel._modidx:d"
+
+[project.optional-dependencies]
+dev = ['nbdev>=2.3.12', 'jupyter']
+
+[tool.setuptools.dynamic]
+version = {attr = "healpyxel.__version__"}
 
 [tool.setuptools.packages.find]
-where = ["."]
-include = ["healpyxel*"]
+include = ["healpyxel"]
 
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "--cov=healpyxel --cov-report=term-missing --cov-report=html --cov-report=json"
-testpaths = ["tests"]
+[tool.nbdev]
+doc_path = 'docs'
+jupyter_hooks = true
+title = 'Healpyxel'

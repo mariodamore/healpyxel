@@ -10,9 +10,9 @@
 #
 # Output:
 #   test_data/
-#   ├── batches/                    # Sequential "daily" batches
-#   │   ├── batch_001.parquet       # Lon 175-176° (~4k obs, ~1.6MB)
-#   │   ├── batch_002.parquet       # Lon 176-177°
+#   ├── batches/                    # Sequential "daily" batches with overlap
+#   │   ├── batch_001.parquet       # Lon 10.00-11.00° / Lat -20/20° 568K (1468 obs)
+#   │   ├── batch_002.parquet       # Lon 10.75-11.75° / Lat -20/20° 716K (1859 obs)
 #   │   └── ...
 #   ├── samples/                    # Size-based samples
 #   │   ├── sample_5k.parquet       # Small (5k obs)
@@ -33,8 +33,8 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-# SOURCE_FILE in not included in the repo due to size constraints, 15GB
-SOURCE_FILE="../mascs_data_MeSS.parquet"
+SOURCE_FILE="${SOURCE_MERTIS_FILE:-mascs_data_MeSS.parquet}"
+
 TEST_DATA_DIR="test_data"
 DUCKDB_CMD="duckdb"
 
@@ -79,7 +79,7 @@ check_requirements() {
     print_info "Source file found: $SOURCE_FILE ($(du -h "$SOURCE_FILE" | cut -f1))"
     
     # Check if DuckDB is available
-    if ! command -v duckdb &> /dev/null; then
+    if ! command -v $DUCKDB_CMD &> /dev/null; then
         print_error "DuckDB not found"
         echo ""
         echo "  Install DuckDB:"
@@ -106,16 +106,13 @@ execute_duckdb_query() {
     
     echo -n "  Creating $(basename "$output_file")... "
     
-    # Execute query with spatial extension loaded inline
-    # DuckDB will execute statements separated by semicolons in order
-    local full_query="INSTALL spatial; LOAD spatial; $query"
-    
-    echo "$full_query" | $DUCKDB_CMD 2>&1 | grep -v "Warning" || true
+    # Execute query
+    $DUCKDB_CMD -c "$query" 2>&1 | grep -v "Warning" || true
     
     # Check if file was created successfully
     if [ -f "$output_file" ]; then
         local size=$(du -h "$output_file" | cut -f1)
-        local count=$(echo "SELECT COUNT(*) FROM '$output_file'" | $DUCKDB_CMD 2>/dev/null | tail -1 || echo "?")
+        local count=$($DUCKDB_CMD -noheader -list -c "SELECT COUNT(*) FROM '$output_file'" 2>/dev/null || echo "?")
         echo -e "${GREEN}✓${NC} ${size} (${count} obs)"
     else
         echo -e "${RED}✗ Failed${NC}"
@@ -133,30 +130,37 @@ create_sequential_batches() {
     echo "  Slicing by longitude to simulate temporal progression..."
     echo ""
     
-    # Create batches around longitude 180° (interesting region with north/south data)
+    # Create batches with 1° width and 0.25° overlap (step = 0.75°)
     # Each batch: 1° longitude slice ≈ 4k observations ≈ 1.6 MB
+    # Overlap allows testing streaming updates with spatial continuity
     
-    local start_lon=175
-    local end_lon=185
-    local batch_num=1
+    local start_lon=10
+    local n_batches=9
+    local batch_width=1.0
+    local overlap=0.25
+    local max_lat=20
+    local min_lat=-20
+    local step=$(awk "BEGIN {print $batch_width - $overlap}")  # 0.75
     
-    for lon in $(seq $start_lon $((end_lon-1))); do
-        local next_lon=$((lon + 1))
+    for i in $(seq 0 $((n_batches - 1))); do
+        local batch_num=$((i + 1))
+        local lon_start=$(awk "BEGIN {print $start_lon + $i * $step}")
+        local lon_end=$(awk "BEGIN {print $lon_start + $batch_width}")
         local output_file="$TEST_DATA_DIR/batches/batch_$(printf "%03d" $batch_num).parquet"
         
         local query="COPY (
             SELECT * EXCLUDE($EXCLUDE_COLS)
             FROM '$SOURCE_FILE'
-            WHERE lon_center BETWEEN $lon AND $next_lon
+            WHERE lon_center BETWEEN $lon_start AND $lon_end AND 
+            lat_center BETWEEN $min_lat AND $max_lat
         ) TO '$output_file' (FORMAT parquet, COMPRESSION snappy);"
         
-        execute_duckdb_query "$query" "$output_file" "Lon ${lon}-${next_lon}°"
-        
-        batch_num=$((batch_num + 1))
+        execute_duckdb_query "$query" "$output_file" "Lon ${lon_start}-${lon_end}°"
     done
     
     echo ""
-    print_info "Created $((batch_num - 1)) sequential batches"
+    local end_lon=$(awk "BEGIN {print $start_lon + ($n_batches - 1) * $step + $batch_width}")
+    print_info "Created $n_batches sequential batches with ${overlap}° overlap (${start_lon}° - ${end_lon}°)"
     echo "  Use these to simulate streaming data ingestion"
 }
 
@@ -413,7 +417,6 @@ main() {
     fi
     
     # Print header
-    clear
     print_header "MASCS Test Data Generator"
     echo ""
     echo "  Generating test datasets for healpyxel package"
@@ -425,7 +428,7 @@ main() {
     check_requirements
     echo ""
     
-    create_directory_structure
+    # create_directory_structure
     echo ""
     
     create_sequential_batches
