@@ -1,0 +1,7 @@
+# cli.cache_cli { #healpyxel.cli.cache_cli }
+
+```python
+cli.cache_cli()
+```
+
+CLI entry point for healpyxel-cache command.

@@ -1,0 +1,21 @@
+# core.robust_std { #healpyxel.core.robust_std }
+
+```python
+core.robust_std(arr)
+```
+
+Compute robust standard deviation using MAD * 1.4826.
+
+The factor 1.4826 makes MAD consistent with standard deviation
+for normally distributed data.
+
+Args:
+    arr: Input array
+
+Returns:
+    Robust standard deviation (float)
+
+Examples:
+    >>> arr = np.array([1, 2, 3, 4, 5])
+    >>> robust_std(arr)
+    1.4826

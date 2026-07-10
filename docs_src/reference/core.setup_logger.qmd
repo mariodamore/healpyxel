@@ -1,0 +1,14 @@
+# core.setup_logger { #healpyxel.core.setup_logger }
+
+```python
+core.setup_logger(name, level=logging.INFO)
+```
+
+Setup a logger with standard formatting.
+
+Args:
+    name: Logger name
+    level: Logging level (default: INFO)
+
+Returns:
+    Configured logger

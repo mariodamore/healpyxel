@@ -1,0 +1,24 @@
+# accumulator.load_state { #healpyxel.accumulator.load_state }
+
+```python
+accumulator.load_state(input_path, use_tdigest=True)
+```
+
+Load accumulator state, HEALPix metadata, AND processing history from parquet file.
+
+Reads both embedded Arrow metadata and companion .meta.json sidecar to reconstruct
+full state including processed input fingerprints for idempotency checks.
+
+Args:
+    input_path: Path to state parquet file
+    use_tdigest: Whether to restore T-Digest data
+
+Returns:
+    Tuple of (state dict, metadata, processing_metadata) where:
+        - state: Dict[int, CellAccumulator] deserialized from parquet
+        - metadata: HEALPyxelxMetadata (or None if not found)
+        - processing_metadata: Dict with 'processed_inputs', 'last_updated', etc.
+                               (empty dict if sidecar not found)
+
+Raises:
+    FileNotFoundError: If state file does not exist

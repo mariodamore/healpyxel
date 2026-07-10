@@ -1,0 +1,69 @@
+# accumulator.StreamingStats { #healpyxel.accumulator.StreamingStats }
+
+```python
+accumulator.StreamingStats()
+```
+
+Container for streaming statistics using Welford's algorithm.
+
+Maintains running statistics (mean, std, min, max) without storing raw data.
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [mean](#healpyxel.accumulator.StreamingStats.mean) | Compute mean from running statistics. |
+| [std](#healpyxel.accumulator.StreamingStats.std) | Compute standard deviation from running statistics. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_dict](#healpyxel.accumulator.StreamingStats.from_dict) | Deserialize from dictionary. |
+| [merge](#healpyxel.accumulator.StreamingStats.merge) | Merge with another StreamingStats object (for parallel processing). |
+| [to_dict](#healpyxel.accumulator.StreamingStats.to_dict) | Serialize to dictionary for storage. |
+| [update](#healpyxel.accumulator.StreamingStats.update) | Add new observations to the running statistics. |
+
+### from_dict { #healpyxel.accumulator.StreamingStats.from_dict }
+
+```python
+accumulator.StreamingStats.from_dict(d)
+```
+
+Deserialize from dictionary.
+
+### merge { #healpyxel.accumulator.StreamingStats.merge }
+
+```python
+accumulator.StreamingStats.merge(other)
+```
+
+Merge with another StreamingStats object (for parallel processing).
+
+### to_dict { #healpyxel.accumulator.StreamingStats.to_dict }
+
+```python
+accumulator.StreamingStats.to_dict()
+```
+
+Serialize to dictionary for storage.
+
+### update { #healpyxel.accumulator.StreamingStats.update }
+
+```python
+accumulator.StreamingStats.update(values)
+```
+
+Add new observations to the running statistics.
+
+Args:
+    values: Scalar (float/int), list, or NumPy array.
+           Automatically converted to 1D float64 array.
+
+Examples:
+    >>> stats = StreamingStats()
+    >>> stats.update(1.0)              # Scalar
+    >>> stats.update([2.0, 3.0])       # List
+    >>> stats.update(np.array([4.0]))  # Array
+    >>> stats.n
+    4

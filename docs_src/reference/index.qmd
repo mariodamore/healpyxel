@@ -1,0 +1,98 @@
+# Function reference {.doc .doc-index}
+
+## Core
+
+Validation, robust statistics, and logging utilities.
+
+| | |
+| --- | --- |
+| [core.validate_nside](core.validate_nside.qmd#healpyxel.core.validate_nside) | Validate that nside is a power of 2. |
+| [core.mad](core.mad.qmd#healpyxel.core.mad) | Compute Median Absolute Deviation. |
+| [core.robust_std](core.robust_std.qmd#healpyxel.core.robust_std) | Compute robust standard deviation using MAD * 1.4826. |
+| [core.setup_logger](core.setup_logger.qmd#healpyxel.core.setup_logger) | Setup a logger with standard formatting. |
+
+## Sidecar
+
+HEALPix sidecar generation and PSF-weighted assignment.
+
+| | |
+| --- | --- |
+| [sidecar.compute_healpix_ids_from_lonlat](sidecar.compute_healpix_ids_from_lonlat.qmd#healpyxel.sidecar.compute_healpix_ids_from_lonlat) | Compute HEALPix indices for arrays of lon,lat in degrees. |
+| [sidecar.detect_lonlat_columns](sidecar.detect_lonlat_columns.qmd#healpyxel.sidecar.detect_lonlat_columns) | Auto-detect longitude and latitude columns from a GeoDataFrame sample. |
+| [sidecar.process_partition](sidecar.process_partition.qmd#healpyxel.sidecar.process_partition) | Process a single dask partition and return DataFrame of assignments. |
+| [sidecar.add_psf_weights_to_sidecar](sidecar.add_psf_weights_to_sidecar.qmd#healpyxel.sidecar.add_psf_weights_to_sidecar) | Add a 'weight' column to the sidecar DataFrame using PSF functions. |
+| [sidecar.normalize_weights_per_cell](sidecar.normalize_weights_per_cell.qmd#healpyxel.sidecar.normalize_weights_per_cell) | Normalize weights so that sum of weights per cell is 1.0. |
+| [sidecar.build_output_path](sidecar.build_output_path.qmd#healpyxel.sidecar.build_output_path) | Build output path for sidecar file based on input and parameters. |
+| [sidecar.write_sidecar_metadata](sidecar.write_sidecar_metadata.qmd#healpyxel.sidecar.write_sidecar_metadata) | Write sidecar processing metadata to JSON file. |
+| [sidecar.validate_nside](sidecar.validate_nside.qmd#healpyxel.sidecar.validate_nside) | Validate that nside is a positive power of two. |
+| [sidecar.get_healpix_cell_geometry](sidecar.get_healpix_cell_geometry.qmd#healpyxel.sidecar.get_healpix_cell_geometry) | Return a shapely Polygon for the given HEALPix cell. |
+| [sidecar.get_psf](sidecar.get_psf.qmd#healpyxel.sidecar.get_psf) |  |
+| [sidecar.GaussianPSF](sidecar.GaussianPSF.qmd#healpyxel.sidecar.GaussianPSF) | 2D Gaussian PSF centered at (0,0). |
+
+## Aggregate
+
+Sidecar aggregation and output generation.
+
+| | |
+| --- | --- |
+| [aggregate.aggregate_by_sidecar](aggregate.aggregate_by_sidecar.qmd#healpyxel.aggregate.aggregate_by_sidecar) | Aggregate original DataFrame by HEALPix cells using a sidecar mapping. |
+| [aggregate.collect_sidecar_outputs](aggregate.collect_sidecar_outputs.qmd#healpyxel.aggregate.collect_sidecar_outputs) | Scan output_dir for sidecar parquet files that match the input file stem. |
+| [aggregate.densify_healpix_aggregates](aggregate.densify_healpix_aggregates.qmd#healpyxel.aggregate.densify_healpix_aggregates) | Densify aggregated DataFrame to include all HEALPix cells. |
+| [aggregate.generate_output_filename](aggregate.generate_output_filename.qmd#healpyxel.aggregate.generate_output_filename) | Generate output filename that matches the parseable structure of the sidecar. |
+| [aggregate.extract_nside_from_filename](aggregate.extract_nside_from_filename.qmd#healpyxel.aggregate.extract_nside_from_filename) | Extract nside value from sidecar filename using regex. |
+| [aggregate.validate_sidecar_metadata](aggregate.validate_sidecar_metadata.qmd#healpyxel.aggregate.validate_sidecar_metadata) | Validate sidecar metadata file and check source_file match. |
+| [aggregate.process_single_sidecar](aggregate.process_single_sidecar.qmd#healpyxel.aggregate.process_single_sidecar) | Process a single sidecar file (aggregation workflow). |
+
+## Accumulator
+
+Streaming accumulation with TDigest percentiles.
+
+| | |
+| --- | --- |
+| [accumulator.StreamingStats](accumulator.StreamingStats.qmd#healpyxel.accumulator.StreamingStats) | Container for streaming statistics using Welford's algorithm. |
+| [accumulator.CellAccumulator](accumulator.CellAccumulator.qmd#healpyxel.accumulator.CellAccumulator) | Accumulator for a single HEALPix cell. |
+| [accumulator.accumulate_batch](accumulator.accumulate_batch.qmd#healpyxel.accumulator.accumulate_batch) | Process one batch of data and update accumulator state. |
+| [accumulator.save_state](accumulator.save_state.qmd#healpyxel.accumulator.save_state) | Serialize accumulated state to Parquet with metadata. |
+| [accumulator.load_state](accumulator.load_state.qmd#healpyxel.accumulator.load_state) | Load accumulator state, HEALPix metadata, AND processing history from parquet file. |
+| [accumulator.state_to_dataframe](accumulator.state_to_dataframe.qmd#healpyxel.accumulator.state_to_dataframe) | Convert accumulated state dict → DataFrame with explicit healpix_id column. |
+| [accumulator.validate_accumulator_sidecar_compatibility](accumulator.validate_accumulator_sidecar_compatibility.qmd#healpyxel.accumulator.validate_accumulator_sidecar_compatibility) | Validate that accumulator state is compatible with sidecar file. |
+| [accumulator.find_sidecar](accumulator.find_sidecar.qmd#healpyxel.accumulator.find_sidecar) | Attempt to find matching sidecar file for input data. |
+| [accumulator.ensure_not_processed](accumulator.ensure_not_processed.qmd#healpyxel.accumulator.ensure_not_processed) | Check/add input fingerprint in state metadata. |
+
+## Finalize
+
+Statistics finalization and export.
+
+| | |
+| --- | --- |
+| [finalize.finalize_statistics](finalize.finalize_statistics.qmd#healpyxel.finalize.finalize_statistics) | Convert accumulator state to final statistics DataFrame. |
+| [finalize.densify_healpix_map](finalize.densify_healpix_map.qmd#healpyxel.finalize.densify_healpix_map) | Create a complete HEALPix grid by filling empty cells with fill_value. |
+| [finalize.export_to_geotiff](finalize.export_to_geotiff.qmd#healpyxel.finalize.export_to_geotiff) | Export a column to GeoTIFF format (requires rasterio and healpy). |
+| [finalize.load_state](finalize.load_state.qmd#healpyxel.finalize.load_state) | Load accumulator state, HEALPix metadata, AND processing history from parquet file. |
+
+## Metadata
+
+HEALPyxelxMetadata embedding and validation.
+
+| | |
+| --- | --- |
+| [metadata.HEALPyxelxMetadata](metadata.HEALPyxelxMetadata.qmd#healpyxel.metadata.HEALPyxelxMetadata) | Validated HEALPix grid metadata with embedded parquet I/O. |
+| [metadata.FileType](metadata.FileType.qmd#healpyxel.metadata.FileType) | Pipeline file type discriminator. |
+| [metadata.read_metadata_from_file](metadata.read_metadata_from_file.qmd#healpyxel.metadata.read_metadata_from_file) | Unified metadata reader with intelligent fallback strategy. |
+| [metadata.save_with_metadata](metadata.save_with_metadata.qmd#healpyxel.metadata.save_with_metadata) | Save DataFrame with embedded HEALPix metadata. |
+| [metadata.validate_sidecar](metadata.validate_sidecar.qmd#healpyxel.metadata.validate_sidecar) | Validate sidecar structure and return diagnostic metrics. |
+| [metadata.validate_aggregate](metadata.validate_aggregate.qmd#healpyxel.metadata.validate_aggregate) | Validate aggregate DataFrame structure. |
+
+## CLI
+
+Command-line interface entry points.
+
+| | |
+| --- | --- |
+| [cli.sidecar_cli](cli.sidecar_cli.qmd#healpyxel.cli.sidecar_cli) | CLI entry point for healpyxel_sidecar. |
+| [cli.aggregate_cli](cli.aggregate_cli.qmd#healpyxel.cli.aggregate_cli) | CLI entry point for healpix_aggregate command. |
+| [cli.accumulator_cli](cli.accumulator_cli.qmd#healpyxel.cli.accumulator_cli) | CLI entry point for healpix_accumulator command. |
+| [cli.finalize_cli](cli.finalize_cli.qmd#healpyxel.cli.finalize_cli) | CLI entry point for healpix_finalize command. |
+| [cli.to_geoparquet_cli](cli.to_geoparquet_cli.qmd#healpyxel.cli.to_geoparquet_cli) | CLI entry point for healpyxel_to_geoparquet command. |
+| [cli.cache_cli](cli.cache_cli.qmd#healpyxel.cli.cache_cli) | CLI entry point for healpyxel-cache command. |
+| [cli.validate_lon_lat_columns](cli.validate_lon_lat_columns.qmd#healpyxel.cli.validate_lon_lat_columns) | Validate or auto-detect lon/lat columns. Fail fast with context. |

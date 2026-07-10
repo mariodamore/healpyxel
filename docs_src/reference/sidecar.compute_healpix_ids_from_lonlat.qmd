@@ -1,0 +1,10 @@
+# sidecar.compute_healpix_ids_from_lonlat { #healpyxel.sidecar.compute_healpix_ids_from_lonlat }
+
+```python
+sidecar.compute_healpix_ids_from_lonlat(nside, lons, lats)
+```
+
+Compute HEALPix indices for arrays of lon,lat in degrees.
+
+Tries to use cdshealpix if available, otherwise falls back to healpy.
+Returns a 1D integer numpy array of same length as inputs.

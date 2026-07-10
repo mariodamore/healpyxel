@@ -1,0 +1,7 @@
+# sidecar.GaussianPSF { #healpyxel.sidecar.GaussianPSF }
+
+```python
+sidecar.GaussianPSF(sigma=None)
+```
+
+2D Gaussian PSF centered at (0,0).

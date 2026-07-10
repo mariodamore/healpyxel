@@ -1,0 +1,21 @@
+# finalize.finalize_statistics { #healpyxel.finalize.finalize_statistics }
+
+```python
+finalize.finalize_statistics(state, percentiles=None, min_count=1)
+```
+
+Convert accumulator state to final statistics DataFrame.
+
+Args:
+    state: Accumulator state dictionary {healpix_id: CellAccumulator}
+    percentiles: List of percentiles to compute (e.g., [25, 50, 75])
+    min_count: Minimum observations required per cell (cells below this are NaN)
+
+Returns:
+    DataFrame indexed by healpix_id with statistics columns:
+    - {col}_n: observation count
+    - {col}_mean: mean value
+    - {col}_std: standard deviation
+    - {col}_min: minimum value
+    - {col}_max: maximum value
+    - {col}_p{N}: percentile (if T-Digest available)

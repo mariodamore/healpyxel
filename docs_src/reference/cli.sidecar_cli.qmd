@@ -1,0 +1,10 @@
+# cli.sidecar_cli { #healpyxel.cli.sidecar_cli }
+
+```python
+cli.sidecar_cli(argv=None)
+```
+
+CLI entry point for healpyxel_sidecar.
+
+Thin wrapper around sidecar.main() that handles argparse setup.
+All argument validation and parsing happens here; core logic stays in sidecar.main().

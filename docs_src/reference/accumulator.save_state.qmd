@@ -1,0 +1,28 @@
+# accumulator.save_state { #healpyxel.accumulator.save_state }
+
+```python
+accumulator.save_state(
+    state,
+    output_path,
+    meta,
+    processing_metadata=None,
+    input_path=None,
+    on_duplicate='error',
+)
+```
+
+Serialize accumulated state to Parquet with metadata.
+
+Includes idempotency checks via input fingerprinting to prevent
+accidental double-accumulation of the same batch.
+
+Args:
+    state: Dict[int, CellAccumulator] from accumulate_batch()
+    output_path: Path to write parquet file
+    meta: HEALPyxelxMetadata instance
+    processing_metadata: Optional batch info dict
+    input_path: Path to input data file (for fingerprint tracking)
+    on_duplicate: 'error' | 'skip' — action if input already processed
+
+Raises:
+    ValueError: If input_path already in processed_inputs and on_duplicate='error'

@@ -1,0 +1,36 @@
+# sidecar.process_partition { #healpyxel.sidecar.process_partition }
+
+```python
+sidecar.process_partition(
+    gdf,
+    nside,
+    mode,
+    base_index=None,
+    lon_convention='minus_plus180',
+    lon_col=None,
+    lat_col=None,
+    data_psf=None,
+    cell_psf=None,
+    combine_method='multiply',
+)
+```
+
+Process a single dask partition and return DataFrame of assignments.
+
+Supports two workflows:
+1. Scalar lon/lat columns (efficient for strict mode): pass lon_col, lat_col
+2. Geometry-based (for fuzzy mode): pass geometries via gdf.geometry
+
+Args:
+    gdf: GeoDataFrame or DataFrame partition
+    nside: HEALPix nside parameter
+    mode: 'strict' or 'fuzzy' assignment mode
+    base_index: Base index for global source_id generation
+    lon_convention: 'minus_plus180' (alias for '-180_180') or '0_360'. Both accepted; stored as '-180_180' in metadata.
+    lon_col: Longitude column name (if None, use geometry)
+    lat_col: Latitude column name (if None, use geometry)
+    data_psf, cell_psf: Optional PSF functions
+    combine_method: How to combine PSF weights
+
+Returns:
+    DataFrame with columns ['source_id', 'healpix_id'] and optional 'weight'

@@ -1,0 +1,18 @@
+# aggregate.extract_nside_from_filename { #healpyxel.aggregate.extract_nside_from_filename }
+
+```python
+aggregate.extract_nside_from_filename(filename)
+```
+
+Extract nside value from sidecar filename using regex.
+
+Conservative: returns None if ambiguous or not found.
+
+Args:
+    filename: Sidecar filename string
+
+Returns:
+    nside value as integer, or None if not found/ambiguous
+
+Example:
+    extract_nside_from_filename("data.nside-128.parquet") -> 128

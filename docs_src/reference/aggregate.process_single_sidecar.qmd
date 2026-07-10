@@ -1,0 +1,27 @@
+# aggregate.process_single_sidecar { #healpyxel.aggregate.process_single_sidecar }
+
+```python
+aggregate.process_single_sidecar(
+    input_file,
+    sidecar_path,
+    sidecar_metadata_json,
+    sidecars_df,
+    sidecar_index,
+    args,
+    use_duckdb,
+)
+```
+
+Process a single sidecar file (aggregation workflow).
+
+Args:
+    input_file: Original input parquet file
+    sidecar_path: Path to sidecar parquet file
+    sidecar_metadata_json: Loaded metadata from .meta.json
+    sidecars_df: DataFrame with all sidecar metadata
+    sidecar_index: Index of this sidecar in sidecars_df
+    args: Parsed command-line arguments
+    use_duckdb: Whether DuckDB is available and enabled
+
+Returns:
+    Dictionary with processing summary (status, output_path, etc.)

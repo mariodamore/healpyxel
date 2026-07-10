@@ -1,0 +1,15 @@
+# accumulator.find_sidecar { #healpyxel.accumulator.find_sidecar }
+
+```python
+accumulator.find_sidecar(input_path, nside=None, mode='fuzzy')
+```
+
+Attempt to find matching sidecar file for input data.
+
+Args:
+    input_path: Path to input parquet file
+    nside: Desired nside (if None, finds any matching sidecar)
+    mode: Assignment mode ('fuzzy' or 'strict')
+
+Returns:
+    Path to matching sidecar file, or None if not found

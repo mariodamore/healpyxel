@@ -1,0 +1,7 @@
+# sidecar.build_output_path { #healpyxel.sidecar.build_output_path }
+
+```python
+sidecar.build_output_path(input_path, mode, nside)
+```
+
+Build output path for sidecar file based on input and parameters.

@@ -1,0 +1,715 @@
+import pytest
+import pandas as pd
+import numpy as np
+import json
+from pathlib import Path
+import tempfile
+import healpy as hp
+
+from healpyxel.metadata import (
+    FileType,
+    HEALPyxelxMetadata,
+    validate_sidecar,
+    validate_aggregate,
+    save_with_metadata,
+    load_with_validation,
+    write_metadata_with_file,
+    read_metadata_from_file,
+    validate_file_type,
+    load_cli_aggregate,
+)
+
+# ============================================================================
+# Test FileType Enum
+# ============================================================================
+
+class TestFileType:
+    """Test FileType enum."""
+
+    def test_filetype_sidecar(self):
+        """Test SIDECAR value."""
+        assert FileType.SIDECAR.value == 'sidecar'
+
+    def test_filetype_aggregate(self):
+        """Test AGGREGATE value."""
+        assert FileType.AGGREGATE.value == 'aggregate'
+
+    def test_filetype_accumulator(self):
+        """Test ACCUMULATOR value."""
+        assert FileType.ACCUMULATOR.value == 'accumulator'
+
+    def test_filetype_finalize(self):
+        """Test FINALIZE value."""
+        assert FileType.FINALIZE.value == 'finalize'
+
+    def test_filetype_geospatial(self):
+        """Test GEOSPATIAL value."""
+        assert FileType.GEOSPATIAL.value == 'geospatial'
+
+    def test_filetype_from_string(self):
+        """Test creating enum from string."""
+        ft = FileType('aggregate')
+        assert ft == FileType.AGGREGATE
+
+    def test_filetype_string_conversion(self):
+        """Test enum is a string subclass."""
+        assert isinstance(FileType.SIDECAR, str)
+        assert FileType.AGGREGATE == 'aggregate'
+
+# ============================================================================
+# Test HEALPyxelxMetadata
+# ============================================================================
+
+class TestHEALPyxelxMetadata:
+    """Test HEALPyxelxMetadata class."""
+
+    def test_basic_construction(self):
+        """Test basic metadata construction."""
+        meta = HEALPyxelxMetadata(nside=32, order='nested')
+        assert meta.nside == 32
+        assert meta.order == 'nested'
+        assert meta.mode == 'fuzzy'
+        assert meta.lon_convention == '0_360'
+        assert meta.npix == hp.nside2npix(32)
+
+    def test_default_npix_computation(self):
+        """Test that npix is computed from nside if None."""
+        meta = HEALPyxelxMetadata(nside=64, npix=None)
+        expected = hp.nside2npix(64)
+        assert meta.npix == expected
+
+    def test_invalid_npix_raises(self):
+        """Test that inconsistent npix raises AssertionError."""
+        with pytest.raises(AssertionError, match="npix.*inconsistent"):
+            HEALPyxelxMetadata(nside=32, npix=9999)
+
+    def test_invalid_nside_raises(self):
+        """Test that invalid nside (not power of 2) raises."""
+        with pytest.raises((AssertionError, ValueError)):
+            HEALPyxelxMetadata(nside=33)
+
+    def test_ring_order(self):
+        """Test ring ordering."""
+        meta = HEALPyxelxMetadata(nside=32, order='ring')
+        assert meta.order == 'ring'
+        assert meta.nest == False
+
+    def test_nested_order_flag(self):
+        """Test nest property for nested ordering."""
+        meta = HEALPyxelxMetadata(nside=32, order='nested')
+        assert meta.nest == True
+
+    def test_strict_mode(self):
+        """Test strict mode setting."""
+        meta = HEALPyxelxMetadata(nside=32, mode='strict')
+        assert meta.mode == 'strict'
+
+    def test_lon_convention_180(self):
+        """Test -180_180 longitude convention."""
+        meta = HEALPyxelxMetadata(nside=32, lon_convention='-180_180')
+        assert meta.lon_convention == '-180_180'
+
+    def test_file_type_enum(self):
+        """Test FileType enum assignment."""
+        meta = HEALPyxelxMetadata(nside=32, file_type=FileType.AGGREGATE)
+        assert meta.file_type == FileType.AGGREGATE
+
+    def test_file_type_string_conversion(self):
+        """Test FileType string is converted to enum in __post_init__."""
+        meta = HEALPyxelxMetadata(nside=32, file_type='sidecar')
+        assert meta.file_type == FileType.SIDECAR
+        assert isinstance(meta.file_type, FileType)
+
+    def test_to_dict(self):
+        """Test serialization to dict."""
+        meta = HEALPyxelxMetadata(
+            nside=32, order='nested', mode='fuzzy',
+            lon_convention='0_360', file_type=FileType.AGGREGATE
+        )
+        d = meta.to_dict()
+        assert d['nside'] == 32
+        assert d['order'] == 'nested'
+        assert d['mode'] == 'fuzzy'
+        assert d['file_type'] == 'aggregate'  # String in dict
+
+    def test_from_dict_flat(self):
+        """Test deserialization from flat dict."""
+        d = {'nside': 64, 'order': 'ring', 'mode': 'strict'}
+        meta = HEALPyxelxMetadata.from_dict(d)
+        assert meta.nside == 64
+        assert meta.order == 'ring'
+        assert meta.mode == 'strict'
+
+    def test_from_dict_nested(self):
+        """Test deserialization from nested dict (sidecar_metadata.healpix)."""
+        d = {
+            'sidecar_metadata': {
+                'healpix': {'nside': 128, 'order': 'nested', 'mode': 'fuzzy'},
+                'coordinates': {'lon_convention': '0_360'}
+            }
+        }
+        meta = HEALPyxelxMetadata.from_dict(d)
+        assert meta.nside == 128
+        assert meta.lon_convention == '0_360'
+
+    def test_to_parquet_metadata(self):
+        """Test conversion to parquet metadata dict."""
+        meta = HEALPyxelxMetadata(nside=32, file_type=FileType.AGGREGATE)
+        pq_meta = meta.to_parquet_metadata()
+        assert b'healpix_metadata' in pq_meta
+        # Decode and verify it's valid JSON
+        meta_dict = json.loads(pq_meta[b'healpix_metadata'])
+        assert meta_dict['nside'] == 32
+
+
+# ============================================================================
+# Test _extract_healpix_params_from_metadata
+# ============================================================================
+
+class TestExtractHealpixParamsFromMetadata:
+    """Test that metadata lon_convention is correctly normalized."""
+
+    def test_minus_plus180_is_normalized_to_minus_180_180(self):
+        """minus_plus180 convention from sidecar metadata must be normalized to -180_180."""
+        from healpyxel.geospatial import _extract_healpix_params_from_metadata
+        metadata = {
+            'sidecar_metadata': {
+                'healpix': {'nside': 32, 'order': 'nested', 'mode': 'fuzzy'},
+                'coordinates': {'lon_convention': 'minus_plus180'}
+            }
+        }
+        result = _extract_healpix_params_from_metadata(metadata)
+        assert result['lon_convention'] == '-180_180'
+
+    def test_0_360_preserved(self):
+        """0_360 convention should be preserved as-is."""
+        from healpyxel.geospatial import _extract_healpix_params_from_metadata
+        metadata = {
+            'sidecar_metadata': {
+                'coordinates': {'lon_convention': '0_360'}
+            }
+        }
+        result = _extract_healpix_params_from_metadata(metadata)
+        assert result['lon_convention'] == '0_360'
+
+    def test_minus_180_180_preserved(self):
+        """-180_180 convention should be preserved as-is."""
+        from healpyxel.geospatial import _extract_healpix_params_from_metadata
+        metadata = {
+            'sidecar_metadata': {
+                'coordinates': {'lon_convention': '-180_180'}
+            }
+        }
+        result = _extract_healpix_params_from_metadata(metadata)
+        assert result['lon_convention'] == '-180_180'
+
+    def test_unknown_lon_convention_dropped(self):
+        """Unknown lon_convention values should not be returned."""
+        from healpyxel.geospatial import _extract_healpix_params_from_metadata
+        metadata = {
+            'sidecar_metadata': {
+                'coordinates': {'lon_convention': 'unknown_value'}
+            }
+        }
+        result = _extract_healpix_params_from_metadata(metadata)
+        assert result['lon_convention'] is None
+
+    def test_missing_coordinates_returns_none(self):
+        """Missing coordinates section should return None for lon_convention."""
+        from healpyxel.geospatial import _extract_healpix_params_from_metadata
+        metadata = {'sidecar_metadata': {'healpix': {'nside': 32}}}
+        result = _extract_healpix_params_from_metadata(metadata)
+        assert result['lon_convention'] is None
+
+
+# ============================================================================
+# Test validate_sidecar
+# ============================================================================
+
+class TestValidateSidecar:
+    """Test validate_sidecar function."""
+
+    def test_valid_fuzzy_sidecar(self):
+        """Test validation of valid fuzzy sidecar."""
+        meta = HEALPyxelxMetadata(nside=32, mode='fuzzy')
+        df = pd.DataFrame({
+            'source_id': [0, 0, 1],
+            'healpix_id': [100, 101, 100],
+            'weight': [0.6, 0.4, 1.0]
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        assert result['valid'] == True
+        assert result['n_unique_sources'] == 2
+        assert result['n_unique_cells'] == 2
+
+    def test_valid_strict_sidecar(self):
+        """Test validation of valid strict mode sidecar (1:1 source:cell)."""
+        meta = HEALPyxelxMetadata(nside=32, mode='strict')
+        df = pd.DataFrame({
+            'source_id': [0, 1, 2],
+            'healpix_id': [100, 101, 102]
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        assert result['valid'] == True
+
+    def test_missing_required_columns(self):
+        """Test that missing columns are detected."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({'source_id': [0, 1]})
+        result = validate_sidecar(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('healpix_id' in err for err in result['errors'])
+
+    def test_invalid_healpix_id_range(self):
+        """Test detection of out-of-range healpix_id."""
+        meta = HEALPyxelxMetadata(nside=32, mode='fuzzy')  # npix=12288
+        df = pd.DataFrame({
+            'source_id': [0, 1],
+            'healpix_id': [100, 12288],  # 12288 is out of range
+            'weight': [1.0, 1.0]
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('out of range' in err for err in result['errors'])
+
+    def test_negative_healpix_id(self):
+        """Test detection of negative healpix_id."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'source_id': [0],
+            'healpix_id': [-1]
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        assert result['valid'] == False
+
+    def test_invalid_weight_range(self):
+        """Test detection of weights outside [0, 1]."""
+        meta = HEALPyxelxMetadata(nside=32, mode='fuzzy')
+        df = pd.DataFrame({
+            'source_id': [0, 1],
+            'healpix_id': [100, 101],
+            'weight': [1.5, -0.1]  # Invalid
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('weights outside' in err for err in result['errors'])
+
+    def test_weight_sum_tolerance(self):
+        """Test warning when weights don't sum to ~1.0 per source."""
+        meta = HEALPyxelxMetadata(nside=32, mode='fuzzy')
+        df = pd.DataFrame({
+            'source_id': [0, 0, 1],
+            'healpix_id': [100, 101, 102],
+            'weight': [0.5, 0.3, 0.9]  # Source 0: 0.8, Source 1: 0.9
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        # The function adds a warning but doesn't set valid=False
+        assert result['valid'] == True  # Weights are within range [0,1]
+        assert any('weight sums' in warn for warn in result['warnings'])
+
+    def test_strict_mode_multiple_cells_per_source(self):
+        """Test that strict mode rejects multiple cells per source."""
+        meta = HEALPyxelxMetadata(nside=32, mode='strict')
+        df = pd.DataFrame({
+            'source_id': [0, 0, 1],  # Source 0 maps to 2 cells
+            'healpix_id': [100, 101, 102]
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('multiple cells' in err for err in result['errors'])
+
+    def test_non_contiguous_source_ids_warning(self):
+        """Test warning for non-contiguous source IDs."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'source_id': [0, 2, 5],  # Missing 1, 3, 4
+            'healpix_id': [100, 101, 102]
+        })
+        result = validate_sidecar(df, meta, strict=False)
+        assert any('contiguous' in warn for warn in result['warnings'])
+
+    def test_strict_mode_raises(self):
+        """Test that strict=True raises on validation failure."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'source_id': [0],
+            'healpix_id': [-1]  # Invalid
+        })
+        with pytest.raises(AssertionError):
+            validate_sidecar(df, meta, strict=True)
+
+# ============================================================================
+# Test validate_aggregate
+# ============================================================================
+
+class TestValidateAggregate:
+    """Test validate_aggregate function."""
+
+    def test_valid_sparse_aggregate(self):
+        """Test validation of sparse aggregate (fewer rows than npix)."""
+        meta = HEALPyxelxMetadata(nside=32)  # 12288 pixels
+        df = pd.DataFrame({
+            'r1050_median': [0.5, 0.6],
+            'n_sources': [10, 15]
+        }, index=pd.Index([0, 100], name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == True
+        assert result['is_sparse'] == True
+        assert result['is_dense'] == False
+
+    def test_valid_dense_aggregate(self):
+        """Test validation of dense aggregate (all npix rows)."""
+        nside = 4  # Only 192 pixels
+        meta = HEALPyxelxMetadata(nside=nside)
+        npix = hp.nside2npix(nside)
+        df = pd.DataFrame({
+            'r1050_median': np.random.rand(npix),
+            'n_sources': np.ones(npix, dtype=int)
+        }, index=pd.RangeIndex(0, npix, name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == True
+        assert result['is_dense'] == True
+        assert result['is_sparse'] == False
+
+    def test_wrong_index_name(self):
+        """Test that wrong index name is detected."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'r1050_median': [0.5]
+        }, index=pd.Index([0], name='pixel_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any("Index must be 'healpix_id'" in err for err in result['errors'])
+
+    def test_row_count_exceeds_npix(self):
+        """Test detection when rows exceed npix."""
+        meta = HEALPyxelxMetadata(nside=4)  # 192 pixels
+        df = pd.DataFrame({
+            'r1050_median': np.ones(300)
+        }, index=pd.Index(range(300), name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('exceeds npix' in err for err in result['errors'])
+
+    def test_out_of_range_healpix_ids(self):
+        """Test detection of out-of-range healpix_id."""
+        meta = HEALPyxelxMetadata(nside=32)  # npix=12288
+        df = pd.DataFrame({
+            'r1050_median': [0.5, 0.6]
+        }, index=pd.Index([0, 12288], name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == False
+
+    def test_duplicate_healpix_ids(self):
+        """Test detection of duplicate healpix_id."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'r1050_median': [0.5, 0.6]
+        }, index=pd.Index([0, 0], name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('duplicate' in err for err in result['errors'])
+
+    def test_dense_map_index_must_be_sequential(self):
+        """Test that dense maps must have sequential index [0..npix-1]."""
+        nside = 4  # 192 pixels
+        meta = HEALPyxelxMetadata(nside=nside)
+        npix = hp.nside2npix(nside)
+        # All npix rows but wrong indices
+        df = pd.DataFrame({
+            'r1050_median': np.ones(npix)
+        }, index=pd.Index(np.arange(1, npix + 1), name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('not aligned' in err for err in result['errors'])
+
+    def test_expected_columns_warning(self):
+        """Test warning when expected columns are missing."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'r1050_median': [0.5]
+        }, index=pd.Index([0], name='healpix_id'))
+        result = validate_aggregate(
+            df, meta, expected_columns=['r310_median', 'r1050_median'],
+            strict=False
+        )
+        assert any('Missing expected columns' in w for w in result['warnings'])
+
+    def test_n_sources_column_stats(self):
+        """Test extraction of n_sources statistics."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'n_sources': [10, 20, 30]
+        }, index=pd.Index([0, 1, 2], name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['n_sources_min'] == 10
+        assert result['n_sources_max'] == 30
+        assert result['n_sources_mean'] == 20.0
+
+    def test_negative_n_sources_error(self):
+        """Test detection of negative n_sources."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'n_sources': [-1, 5]
+        }, index=pd.Index([0, 1], name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert result['valid'] == False
+        assert any('Negative' in err for err in result['errors'])
+
+    def test_infinite_values_warning(self):
+        """Test warning for infinite values in stat columns."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'r1050_median': [0.5, np.inf],
+            'n_sources': [10, 20]
+        }, index=pd.Index([0, 1], name='healpix_id'))
+        result = validate_aggregate(df, meta, strict=False)
+        assert any('infinite' in w for w in result['warnings'])
+
+    def test_strict_mode_raises(self):
+        """Test that strict=True raises on validation failure."""
+        meta = HEALPyxelxMetadata(nside=32)
+        df = pd.DataFrame({
+            'r1050_median': [0.5]
+        }, index=pd.Index([0], name='pixel_id'))  # Wrong name
+        with pytest.raises(AssertionError):
+            validate_aggregate(df, meta, strict=True)
+
+# ============================================================================
+# Test I/O Functions
+# ============================================================================
+
+class TestMetadataIO:
+    """Test save/load with metadata functions."""
+
+    def test_save_and_load_roundtrip(self, tmp_path):
+        """Test save_with_metadata and load_with_validation roundtrip."""
+        # Create test data
+        df = pd.DataFrame({
+            'r1050_median': [0.5, 0.6],
+            'n_sources': [10, 15]
+        }, index=pd.Index([0, 100], name='healpix_id'))
+
+        meta_original = HEALPyxelxMetadata(
+            nside=32, order='nested', mode='fuzzy',
+            file_type=FileType.AGGREGATE
+        )
+
+        # Save
+        output_path = tmp_path / 'test_agg.parquet'
+        save_with_metadata(df, output_path, meta_original)
+
+        # Load and validate
+        df_loaded, meta_loaded, results = load_with_validation(
+            output_path, validate=True
+        )
+
+        # Verify roundtrip
+        assert meta_loaded.nside == meta_original.nside
+        assert meta_loaded.order == meta_original.order
+        assert meta_loaded.mode == meta_original.mode
+        pd.testing.assert_frame_equal(df, df_loaded)
+
+    def test_write_metadata_with_file(self, tmp_path):
+        """Test write_metadata_with_file function."""
+        df = pd.DataFrame({
+            'r1050_median': [0.5, 0.6]
+        }, index=pd.Index([0, 1], name='healpix_id'))
+
+        output_path = tmp_path / 'agg.parquet'
+        meta = write_metadata_with_file(
+            df, output_path,
+            file_type=FileType.AGGREGATE,
+            nside=32,
+            mode='fuzzy',
+            order='nested'
+        )
+
+        # Verify files created
+        assert output_path.exists()
+        assert (output_path.with_suffix('.meta.json')).exists()
+        assert meta.nside == 32
+        assert meta.file_type == FileType.AGGREGATE
+
+    def test_read_metadata_from_file_embedded(self, tmp_path):
+        """Test read_metadata_from_file reads embedded parquet metadata."""
+        df = pd.DataFrame({'val': [1, 2]})
+        output_path = tmp_path / 'test.parquet'
+        meta_original = write_metadata_with_file(
+            df, output_path,
+            file_type=FileType.SIDECAR,
+            nside=64
+        )
+
+        # Read back
+        meta_loaded, file_type = read_metadata_from_file(output_path)
+        assert meta_loaded.nside == 64
+        assert file_type == FileType.SIDECAR
+
+    def test_metadata_json_fallback(self, tmp_path):
+        """Test fallback to .meta.json when parquet metadata unavailable."""
+        # Create a basic parquet without embedded metadata
+        df = pd.DataFrame({'val': [1, 2]})
+        parquet_path = tmp_path / 'test.parquet'
+        df.to_parquet(parquet_path)
+
+        # Write companion .meta.json
+        json_path = parquet_path.with_suffix('.meta.json')
+        meta_dict = {
+            'nside': 128,
+            'order': 'ring',
+            'mode': 'strict',
+            'lon_convention': '-180_180',
+            'file_type': 'finalize'
+        }
+        with open(json_path, 'w') as f:
+            json.dump(meta_dict, f)
+
+        # Load from JSON fallback
+        meta, file_type = read_metadata_from_file(parquet_path)
+        assert meta.nside == 128
+        assert meta.order == 'ring'
+        assert meta.mode == 'strict'
+        assert file_type == FileType.FINALIZE
+
+# ============================================================================
+# Test File Type Validation
+# ============================================================================
+
+class TestValidateFileType:
+    """Test validate_file_type function."""
+
+    def test_validate_file_type_match(self, tmp_path):
+        """Test validation when file type matches."""
+        df = pd.DataFrame({'val': [1, 2]})
+        output_path = tmp_path / 'agg.parquet'
+        write_metadata_with_file(
+            df, output_path,
+            file_type=FileType.AGGREGATE,
+            nside=32
+        )
+
+        result = validate_file_type(output_path, FileType.AGGREGATE, strict=False)
+        assert result['valid'] == True
+        assert result['found_type'] == 'aggregate'
+
+    def test_validate_file_type_mismatch(self, tmp_path):
+        """Test validation when file type doesn't match."""
+        df = pd.DataFrame({'val': [1, 2]})
+        output_path = tmp_path / 'agg.parquet'
+        write_metadata_with_file(
+            df, output_path,
+            file_type=FileType.AGGREGATE,
+            nside=32
+        )
+
+        result = validate_file_type(
+            output_path, FileType.SIDECAR, strict=False
+        )
+        assert result['valid'] == False
+        assert any('mismatch' in err for err in result['errors'])
+
+    def test_validate_file_type_not_found(self, tmp_path):
+        """Test validation when file doesn't exist."""
+        nonexistent = tmp_path / 'missing.parquet'
+        result = validate_file_type(nonexistent, FileType.AGGREGATE, strict=False)
+        assert result['valid'] == False
+        assert any('does not exist' in err for err in result['errors'])
+
+    def test_validate_file_type_strict_raises(self, tmp_path):
+        """Test that strict=True raises on validation failure."""
+        nonexistent = tmp_path / 'missing.parquet'
+        with pytest.raises(ValueError):
+            validate_file_type(nonexistent, FileType.AGGREGATE, strict=True)
+
+# ============================================================================
+# Test CLI Loading
+# ============================================================================
+
+class TestLoadCliAggregate:
+    """Test load_cli_aggregate function."""
+
+    def test_load_cli_aggregate_basic(self, tmp_path):
+        """Test loading aggregate file from CLI output directory."""
+        # Create a sparse aggregate file in standard CLI location
+        df = pd.DataFrame({
+            'r1050_median': [0.5, 0.6],
+            'n_sources': [10, 15]
+        }, index=pd.Index([0, 100], name='healpix_id'))
+
+        output_path = tmp_path / 'sample_sparse_aggregate.parquet'
+        write_metadata_with_file(
+            df, output_path,
+            file_type=FileType.AGGREGATE,
+            nside=32
+        )
+
+        # Load via CLI function
+        df_loaded, meta, results = load_cli_aggregate(tmp_path)
+        assert meta.nside == 32
+        assert meta.file_type == FileType.AGGREGATE
+        pd.testing.assert_frame_equal(df, df_loaded)
+
+    def test_load_cli_aggregate_no_files(self, tmp_path):
+        """Test error when no matching files found."""
+        with pytest.raises(FileNotFoundError):
+            load_cli_aggregate(tmp_path, filename_pattern='*sparse_aggregate.parquet')
+
+    def test_load_cli_aggregate_ambiguous(self, tmp_path):
+        """Test error when multiple files match pattern."""
+        # Create multiple files
+        for i in range(2):
+            df = pd.DataFrame({'val': [i]})
+            path = tmp_path / f'sample_{i}_sparse_aggregate.parquet'
+            write_metadata_with_file(
+                df, path,
+                file_type=FileType.AGGREGATE,
+                nside=32
+            )
+
+        with pytest.raises(ValueError, match='Ambiguous'):
+            load_cli_aggregate(tmp_path, filename_pattern='*sparse_aggregate.parquet')
+
+# ============================================================================
+# Test HEALPyxelxMetadata.write_json (Static Method)
+# ============================================================================
+
+class TestMetadataWriteJson:
+    """Test HEALPyxelxMetadata.write_json class method."""
+
+    def test_write_json_basic(self, tmp_path):
+        """Test writing metadata to JSON file."""
+        metadata = {
+            'nside': 32,
+            'order': 'nested',
+            'mode': 'fuzzy',
+            'lon_convention': '0_360'
+        }
+        output_file = tmp_path / 'data.parquet'
+        json_path = HEALPyxelxMetadata.write_json(
+            metadata, output_file, validate=False
+        )
+
+        assert json_path.exists()
+        # Path.suffix only returns the final suffix, so for 'data.meta.json' it's '.json'
+        assert json_path.name == 'data.meta.json'
+
+        # Load and verify
+        with open(json_path) as f:
+            loaded = json.load(f)
+        assert loaded['nside'] == 32
+        assert loaded['order'] == 'nested'
+
+    def test_write_json_with_validation(self, tmp_path):
+        """Test that write_json validates metadata when requested."""
+        metadata = {
+            'nside': 32,
+            'order': 'nested',
+            'npix': None
+        }
+        output_file = tmp_path / 'data.parquet'
+        # Should not raise if validation passes
+        json_path = HEALPyxelxMetadata.write_json(
+            metadata, output_file, validate=True
+        )
+        assert json_path.exists()

@@ -1,0 +1,7 @@
+# sidecar.validate_nside { #healpyxel.sidecar.validate_nside }
+
+```python
+sidecar.validate_nside(nside)
+```
+
+Validate that nside is a positive power of two.

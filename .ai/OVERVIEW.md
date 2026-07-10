@@ -320,7 +320,7 @@ healpyxel/
 | Risk | Mitigation |
 |------|------------|
 | Loss of nbdev test automation | Migrate all tests to pytest; add coverage reporting |
-| Docs drift from code | Use Sphinx or pdoc for API docs; Quarto for tutorials |
+| Docs drift from code | Use quartodoc for API docs within Quarto; .py:percent for tutorials |
 | Notebook examples not updated | Add pre-commit hook to validate notebooks |
 | Team unfamiliar with new workflow | Document migration; run training session |
 

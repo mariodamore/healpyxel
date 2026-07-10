@@ -1,0 +1,15 @@
+# finalize.densify_healpix_map { #healpyxel.finalize.densify_healpix_map }
+
+```python
+finalize.densify_healpix_map(sparse_df, nside, fill_value=np.nan)
+```
+
+Create a complete HEALPix grid by filling empty cells with fill_value.
+
+Args:
+    sparse_df: DataFrame with healpix_id index (sparse)
+    nside: HEALPix nside parameter
+    fill_value: Value for empty cells (default: NaN)
+
+Returns:
+    Dense DataFrame with all 12*nside**2 cells

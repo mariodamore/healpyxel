@@ -1,0 +1,18 @@
+---
+title: "Healpyxel"
+---
+
+# Healpyxel
+
+HEALPix-based spatial aggregation for planetary science data.
+
+## Overview
+
+This project provides HEALPix-based spatial aggregation for planetary science data, with streaming accumulation, sidecar generation, and batch aggregation capabilities.
+
+## Workflow
+
+1. **Sidecar** — assign MESSENGER/MASCS observations to HEALPix cells with PSF-weighted geometry
+2. **Aggregate** — batch sidecar outputs into per-cell statistics
+3. **Accumulate** — stream incremental updates with TDigest percentiles and fuzzy mode
+4. **Finalize** — densify maps, export to GeoTIFF, and embed metadata

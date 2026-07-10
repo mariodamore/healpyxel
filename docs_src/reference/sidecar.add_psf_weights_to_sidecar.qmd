@@ -1,0 +1,17 @@
+# sidecar.add_psf_weights_to_sidecar { #healpyxel.sidecar.add_psf_weights_to_sidecar }
+
+```python
+sidecar.add_psf_weights_to_sidecar(
+    sidecar_df,
+    src_geoms,
+    cell_geoms,
+    data_psf=None,
+    cell_psf=None,
+    combine_method='multiply',
+    normalize=True,
+)
+```
+
+Add a 'weight' column to the sidecar DataFrame using PSF functions.
+- src_geoms: sequence of source geometries (indexed by source_id)
+- cell_geoms: dict or sequence mapping healpix_id to cell geometry

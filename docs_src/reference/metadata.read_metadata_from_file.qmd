@@ -1,0 +1,24 @@
+# metadata.read_metadata_from_file { #healpyxel.metadata.read_metadata_from_file }
+
+```python
+metadata.read_metadata_from_file(path, fallback_to_json=True)
+```
+
+Unified metadata reader with intelligent fallback strategy.
+
+Tries parquet schema metadata first (embedded by write_metadata_with_file),
+then falls back to .meta.json if present.
+
+Args:
+    path: Path to parquet file
+    fallback_to_json: If True, fall back to .meta.json; if False, raise
+
+Returns:
+    (HEALPyxelxMetadata, FileType) tuple
+
+Raises:
+    ValueError: If no metadata found and fallback_to_json=False
+
+Examples:
+    >>> meta, file_type = read_metadata_from_file('aggregate.parquet')
+    >>> print(f"Type: {file_type}, nside={meta.nside}")

@@ -1,0 +1,8 @@
+# accumulator.ensure_not_processed { #healpyxel.accumulator.ensure_not_processed }
+
+```python
+accumulator.ensure_not_processed(meta, input_path, *, on_duplicate='error')
+```
+
+Check/add input fingerprint in state metadata.
+on_duplicate: 'error' | 'skip'

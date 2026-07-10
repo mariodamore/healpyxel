@@ -1,0 +1,9 @@
+# metadata.FileType { #healpyxel.metadata.FileType }
+
+```python
+metadata.FileType()
+```
+
+Pipeline file type discriminator.
+
+Used to identify which stage of the HEALPix pipeline produced a parquet file.

@@ -1,0 +1,9 @@
+# finalize.export_to_geotiff { #healpyxel.finalize.export_to_geotiff }
+
+```python
+finalize.export_to_geotiff(df, column, output_path, nside, crs='IAU:19900')
+```
+
+Export a column to GeoTIFF format (requires rasterio and healpy).
+
+Note: This creates an equirectangular projection from HEALPix data.

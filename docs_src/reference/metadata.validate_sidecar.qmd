@@ -1,0 +1,38 @@
+# metadata.validate_sidecar { #healpyxel.metadata.validate_sidecar }
+
+```python
+metadata.validate_sidecar(df, meta, strict=True)
+```
+
+Validate sidecar structure and return diagnostic metrics.
+
+Checks:
+- Required columns (source_id, healpix_id)
+- healpix_id range [0, npix)
+- Unique cells ≤ npix
+- Weight validity [0, 1] for fuzzy mode
+- Weight sum ≈ 1.0 per source for fuzzy mode
+- 1:1 mapping for strict mode
+
+Args:
+    df: Sidecar DataFrame (source_id, healpix_id, [weight])
+    meta: Expected HEALPix metadata
+    strict: If True, raise on violations; if False, return warnings
+
+Returns:
+    dict with validation results and metrics
+
+Raises:
+    AssertionError: If strict=True and validation fails
+
+Examples:
+    >>> import pandas as pd
+    >>> meta = HEALPyxelxMetadata(nside=32, mode='fuzzy')
+    >>> sidecar = pd.DataFrame({
+    ...     'source_id': [0, 0, 1],
+    ...     'healpix_id': [100, 101, 100],
+    ...     'weight': [0.6, 0.4, 1.0]
+    ... })
+    >>> result = validate_sidecar(sidecar, meta, strict=False)
+    >>> result['n_unique_cells']
+    2

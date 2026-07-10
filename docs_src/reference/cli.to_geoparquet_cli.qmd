@@ -1,0 +1,7 @@
+# cli.to_geoparquet_cli { #healpyxel.cli.to_geoparquet_cli }
+
+```python
+cli.to_geoparquet_cli()
+```
+
+CLI entry point for healpyxel_to_geoparquet command.

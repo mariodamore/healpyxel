@@ -1,0 +1,17 @@
+# metadata.save_with_metadata { #healpyxel.metadata.save_with_metadata }
+
+```python
+metadata.save_with_metadata(df, path, healpix_meta, **kwargs)
+```
+
+Save DataFrame with embedded HEALPix metadata.
+
+Args:
+    df: DataFrame to save
+    path: Output parquet path
+    healpix_meta: HEALPix metadata to embed
+    **kwargs: Additional arguments for pyarrow.parquet.write_table
+
+Example:
+    >>> meta = HEALPyxelxMetadata(nside=32, order='nested')
+    >>> save_with_metadata(agg_df, 'output.parquet', meta)

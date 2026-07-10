@@ -1,0 +1,174 @@
+project:
+  type: website
+  title: "Healpyxel"
+  output-dir: docs
+
+website:
+  sidebar:
+    - title: Tutorials
+      contents:
+        - 80_example_quickstart
+        - 81_example_visualization_workflow
+        - 82_example_visualization_psf
+        - 83_example_accumulation
+        - 83_example_accumulation-back
+        - 90_example_streaming
+    - title: API Reference
+      contents:
+        - reference/index
+        - section: Core
+          contents:
+            - reference/core.validate_nside
+            - reference/core.mad
+            - reference/core.robust_std
+            - reference/core.setup_logger
+        - section: Sidecar
+          contents:
+            - reference/sidecar.compute_healpix_ids_from_lonlat
+            - reference/sidecar.detect_lonlat_columns
+            - reference/sidecar.process_partition
+            - reference/sidecar.add_psf_weights_to_sidecar
+            - reference/sidecar.normalize_weights_per_cell
+            - reference/sidecar.build_output_path
+            - reference/sidecar.write_sidecar_metadata
+            - reference/sidecar.validate_nside
+            - reference/sidecar.get_healpix_cell_geometry
+            - reference/sidecar.get_psf
+            - reference/sidecar.GaussianPSF
+        - section: Aggregate
+          contents:
+            - reference/aggregate.aggregate_by_sidecar
+            - reference/aggregate.collect_sidecar_outputs
+            - reference/aggregate.densify_healpix_aggregates
+            - reference/aggregate.generate_output_filename
+            - reference/aggregate.extract_nside_from_filename
+            - reference/aggregate.validate_sidecar_metadata
+            - reference/aggregate.process_single_sidecar
+        - section: Accumulator
+          contents:
+            - reference/accumulator.StreamingStats
+            - reference/accumulator.CellAccumulator
+            - reference/accumulator.accumulate_batch
+            - reference/accumulator.save_state
+            - reference/accumulator.load_state
+            - reference/accumulator.state_to_dataframe
+            - reference/accumulator.validate_accumulator_sidecar_compatibility
+            - reference/accumulator.find_sidecar
+            - reference/accumulator.ensure_not_processed
+        - section: Finalize
+          contents:
+            - reference/finalize.finalize_statistics
+            - reference/finalize.densify_healpix_map
+            - reference/finalize.export_to_geotiff
+            - reference/finalize.load_state
+        - section: Metadata
+          contents:
+            - reference/metadata.HEALPyxelxMetadata
+            - reference/metadata.FileType
+            - reference/metadata.read_metadata_from_file
+            - reference/metadata.save_with_metadata
+            - reference/metadata.validate_sidecar
+            - reference/metadata.validate_aggregate
+        - section: CLI
+          contents:
+            - reference/cli.sidecar_cli
+            - reference/cli.aggregate_cli
+            - reference/cli.accumulator_cli
+            - reference/cli.finalize_cli
+            - reference/cli.to_geoparquet_cli
+            - reference/cli.cache_cli
+            - reference/cli.validate_lon_lat_columns
+
+format:
+  html:
+    theme: default
+    toc: true
+    code-fold: true
+    code-tools: true
+    css: reference/_styles-quartodoc.css
+
+execute:
+  echo: true
+  warning: false
+  error: false
+
+jupyter:
+  kernelspec:
+    name: python3
+    display_name: Python 3
+    language: python
+  notebook-dir: notebooks
+
+quartodoc:
+  package: healpyxel
+  dir: docs/reference
+  sections:
+    - title: Core
+      desc: Validation, robust statistics, and logging utilities.
+      contents:
+        - core.validate_nside
+        - core.mad
+        - core.robust_std
+        - core.setup_logger
+    - title: Sidecar
+      desc: HEALPix sidecar generation and PSF-weighted assignment.
+      contents:
+        - sidecar.compute_healpix_ids_from_lonlat
+        - sidecar.detect_lonlat_columns
+        - sidecar.process_partition
+        - sidecar.add_psf_weights_to_sidecar
+        - sidecar.normalize_weights_per_cell
+        - sidecar.build_output_path
+        - sidecar.write_sidecar_metadata
+        - sidecar.validate_nside
+        - sidecar.get_healpix_cell_geometry
+        - sidecar.get_psf
+        - sidecar.GaussianPSF
+    - title: Aggregate
+      desc: Sidecar aggregation and output generation.
+      contents:
+        - aggregate.aggregate_by_sidecar
+        - aggregate.collect_sidecar_outputs
+        - aggregate.densify_healpix_aggregates
+        - aggregate.generate_output_filename
+        - aggregate.extract_nside_from_filename
+        - aggregate.validate_sidecar_metadata
+        - aggregate.process_single_sidecar
+    - title: Accumulator
+      desc: Streaming accumulation with TDigest percentiles.
+      contents:
+        - accumulator.StreamingStats
+        - accumulator.CellAccumulator
+        - accumulator.accumulate_batch
+        - accumulator.save_state
+        - accumulator.load_state
+        - accumulator.state_to_dataframe
+        - accumulator.validate_accumulator_sidecar_compatibility
+        - accumulator.find_sidecar
+        - accumulator.ensure_not_processed
+    - title: Finalize
+      desc: Statistics finalization and export.
+      contents:
+        - finalize.finalize_statistics
+        - finalize.densify_healpix_map
+        - finalize.export_to_geotiff
+        - finalize.load_state
+    - title: Metadata
+      desc: HEALPyxelxMetadata embedding and validation.
+      contents:
+        - metadata.HEALPyxelxMetadata
+        - metadata.FileType
+        - metadata.read_metadata_from_file
+        - metadata.save_with_metadata
+        - metadata.validate_sidecar
+        - metadata.validate_aggregate
+    - title: CLI
+      desc: Command-line interface entry points.
+      contents:
+        - cli.sidecar_cli
+        - cli.aggregate_cli
+        - cli.accumulator_cli
+        - cli.finalize_cli
+        - cli.to_geoparquet_cli
+        - cli.cache_cli
+        - cli.validate_lon_lat_columns

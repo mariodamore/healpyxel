@@ -1,0 +1,8 @@
+# cli.validate_lon_lat_columns { #healpyxel.cli.validate_lon_lat_columns }
+
+```python
+cli.validate_lon_lat_columns(df, lon_col, lat_col, mode, input_file)
+```
+
+Validate or auto-detect lon/lat columns. Fail fast with context.
+Returns (lon_col, lat_col) or raises ValueError.

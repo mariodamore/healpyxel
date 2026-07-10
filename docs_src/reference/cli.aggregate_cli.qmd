@@ -1,0 +1,7 @@
+# cli.aggregate_cli { #healpyxel.cli.aggregate_cli }
+
+```python
+cli.aggregate_cli()
+```
+
+CLI entry point for healpix_aggregate command.

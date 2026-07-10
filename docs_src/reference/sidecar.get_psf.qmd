@@ -1,0 +1,6 @@
+# sidecar.get_psf { #healpyxel.sidecar.get_psf }
+
+```python
+sidecar.get_psf(psf_type, sigma=None)
+```
+

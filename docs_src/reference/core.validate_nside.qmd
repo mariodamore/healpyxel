@@ -1,0 +1,24 @@
+# core.validate_nside { #healpyxel.core.validate_nside }
+
+```python
+core.validate_nside(nside)
+```
+
+Validate that nside is a power of 2.
+
+Args:
+    nside: HEALPix resolution parameter
+
+Returns:
+    Validated nside value
+
+Raises:
+    ValueError: If nside is not a power of 2
+
+Examples:
+    >>> validate_nside(64)
+    64
+    >>> validate_nside(100)
+    Traceback (most recent call last):
+    ...
+    ValueError: nside must be a power of 2, got 100

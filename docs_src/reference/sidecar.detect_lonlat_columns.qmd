@@ -1,0 +1,10 @@
+# sidecar.detect_lonlat_columns { #healpyxel.sidecar.detect_lonlat_columns }
+
+```python
+sidecar.detect_lonlat_columns(gdf_sample)
+```
+
+Auto-detect longitude and latitude columns from a GeoDataFrame sample.
+
+Returns:
+    Tuple of (lon_column, lat_column) or (None, None) if not found

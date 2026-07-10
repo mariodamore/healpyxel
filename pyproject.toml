@@ -18,11 +18,9 @@ dependencies = ['pandas>=2.0', 'numpy>=1.24', 'pyarrow>=12.0', 'shapely>=2.0', '
 Repository = "https://github.com/mariodamore/healpyxel"
 Documentation = "https://mariodamore.github.io/healpyxel/"
 
-[project.entry-points.nbdev]
-healpyxel = "healpyxel._modidx:d"
 
 [project.optional-dependencies]
-dev = ['nbdev>=2.3.12', 'jupyter']
+dev = ['jupyter', 'jupytext', 'quartodoc>=0.7.0', 'griffe<2.0.0']
 
 [tool.setuptools.dynamic]
 version = {attr = "healpyxel.__version__"}
@@ -30,7 +28,13 @@ version = {attr = "healpyxel.__version__"}
 [tool.setuptools.packages.find]
 include = ["healpyxel"]
 
-[tool.nbdev]
-doc_path = 'docs'
-jupyter_hooks = true
-title = 'Healpyxel'
+[tool.setuptools.package-data]
+healpyxel = ["py.typed"]
+
+[project.scripts]
+healpyxel_sidecar = "healpyxel.cli:sidecar_cli"
+healpyxel_aggregate = "healpyxel.cli:aggregate_cli"
+healpyxel_accumulator = "healpyxel.cli:accumulator_cli"
+healpyxel_finalize = "healpyxel.cli:finalize_cli"
+healpyxel_to_geoparquet = "healpyxel.cli:to_geoparquet_cli"
+healpyxel_cache = "healpyxel.cli:cache_cli"

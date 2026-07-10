@@ -1,0 +1,27 @@
+# accumulator.state_to_dataframe { #healpyxel.accumulator.state_to_dataframe }
+
+```python
+accumulator.state_to_dataframe(state, use_tdigest=True)
+```
+
+Convert accumulated state dict → DataFrame with explicit healpix_id column.
+
+Pure function (no I/O). Ensures healpix_id is preserved as an explicit COLUMN,
+never as index. Safe for round-trip serialization + deserialization.
+
+Args:
+    state: Dict[int, CellAccumulator] from accumulate_batch()
+    use_tdigest: Include serialized TDigest data
+
+Returns:
+    DataFrame with healpix_id as COLUMN (not index):
+        - healpix_id (int): HEALPix cell ID
+        - stats_json (str): JSON-serialized StreamingStats per column
+        - tdigests_json (str, optional): JSON-serialized TDigest data
+
+Example:
+    >>> state = {32: CellAccumulator(), 64: CellAccumulator()}
+    >>> df = state_to_dataframe(state)
+    >>> assert 'healpix_id' in df.columns
+    >>> assert list(df['healpix_id']) == [32, 64]
+    >>> assert df.index.name is None  # Index is positional, not healpix_id

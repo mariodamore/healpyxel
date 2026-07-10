@@ -1,0 +1,20 @@
+# accumulator.validate_accumulator_sidecar_compatibility { #healpyxel.accumulator.validate_accumulator_sidecar_compatibility }
+
+```python
+accumulator.validate_accumulator_sidecar_compatibility(state_meta, sidecar_meta)
+```
+
+Validate that accumulator state is compatible with sidecar file.
+
+Checks that nside, mode, and order match to prevent silent corruption
+from mixing incompatible files.
+
+Args:
+    state_meta: Metadata from loaded state file
+    sidecar_meta: Metadata from sidecar file
+
+Returns:
+    dict with validation results
+
+Raises:
+    AssertionError: If critical parameters mismatch

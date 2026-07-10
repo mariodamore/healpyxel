@@ -1,0 +1,29 @@
+# aggregate.generate_output_filename { #healpyxel.aggregate.generate_output_filename }
+
+```python
+aggregate.generate_output_filename(
+    input_file,
+    sidecar_file,
+    output_dir=None,
+    densified=False,
+)
+```
+
+Generate output filename that matches the parseable structure of the sidecar.
+
+Pattern: <stem>-aggregated[-densified].<sidecar_suffix>.parquet
+
+Args:
+    input_file: Original input parquet file
+    sidecar_file: Sidecar file being used
+    output_dir: Optional output directory (default: same as sidecar_file)
+    densified: If True, append '-densified' marker to filename
+
+Returns:
+    Path to output file
+
+Example:
+    input: mascs_data_MeSS.parquet
+    sidecar: mascs_data_MeSS.cell-healpix_assignment-strict_nside-64_order-nested.parquet
+    sparse output: mascs_data_MeSS-aggregated.cell-healpix_assignment-strict_nside-64_order-nested.parquet
+    densified output: mascs_data_MeSS-aggregated-densified.cell-healpix_assignment-strict_nside-64_order-nested.parquet

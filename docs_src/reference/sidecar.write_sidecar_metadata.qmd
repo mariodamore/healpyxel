@@ -1,0 +1,27 @@
+# sidecar.write_sidecar_metadata { #healpyxel.sidecar.write_sidecar_metadata }
+
+```python
+sidecar.write_sidecar_metadata(
+    output_path,
+    input_path,
+    nside,
+    mode,
+    lon_convention,
+    ncores,
+    args,
+)
+```
+
+Write sidecar processing metadata to JSON file.
+
+Args:
+    output_path: Path to the sidecar parquet file
+    input_path: Path to the input file
+    nside: HEALPix nside parameter
+    mode: Assignment mode ('strict' or 'fuzzy')
+    lon_convention: Longitude convention used
+    ncores: Number of cores used
+    args: Parsed command-line arguments
+
+Returns:
+    Path to the written metadata file

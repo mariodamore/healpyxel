@@ -1,0 +1,30 @@
+# accumulator.accumulate_batch { #healpyxel.accumulator.accumulate_batch }
+
+```python
+accumulator.accumulate_batch(
+    new_data,
+    sidecar,
+    value_columns,
+    existing_state=None,
+    use_tdigest=True,
+    filter_expr=None,
+)
+```
+
+Process one batch of data and update accumulator state.
+
+Args:
+    new_data: DataFrame with observations (index = source_id, implicit or explicit)
+    sidecar: HEALPix mapping with columns ['source_id', 'healpix_id']
+             (source_id may be duplicated in fuzzy mode—one row per cell)
+    value_columns: Columns to accumulate
+    existing_state: Previous accumulator state (None for first batch)
+    use_tdigest: Enable T-Digest for approximate percentiles
+    filter_expr: Optional pandas query expression to filter data
+
+Returns:
+    Updated state dictionary {healpix_id: CellAccumulator}
+
+Note:
+    In fuzzy mode, sidecar has multiple rows per source_id (one per touched HEALPix cell).
+    This function handles the many-to-one relationship correctly by grouping on healpix_id.

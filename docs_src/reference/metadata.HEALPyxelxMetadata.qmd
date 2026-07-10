@@ -1,0 +1,121 @@
+# metadata.HEALPyxelxMetadata { #healpyxel.metadata.HEALPyxelxMetadata }
+
+```python
+metadata.HEALPyxelxMetadata(
+    nside,
+    order='nested',
+    npix=None,
+    mode='fuzzy',
+    lon_convention='0_360',
+    file_type=None,
+)
+```
+
+Validated HEALPix grid metadata with embedded parquet I/O.
+
+All aggregate/sidecar parquet files should embed this in their schema
+to ensure metadata/data consistency.
+
+Attributes:
+    nside: HEALPix resolution parameter (must be power of 2)
+    order: Pixel ordering scheme ('nested' or 'ring')
+    npix: Total number of pixels (auto-computed from nside if None)
+    mode: Cell assignment mode ('strict' or 'fuzzy')
+    lon_convention: Longitude convention ('0_360' or '-180_180')
+    file_type: Pipeline stage that produced this file (optional)
+
+Examples:
+    >>> meta = HEALPyxelxMetadata(nside=32, order='nested')
+    >>> meta.npix
+    12288
+    >>> meta.nest
+    True
+
+## Attributes
+
+| Name | Description |
+| --- | --- |
+| [nest](#healpyxel.metadata.HEALPyxelxMetadata.nest) | Convenience flag for healpy calls. |
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_dict](#healpyxel.metadata.HEALPyxelxMetadata.from_dict) | Parse from nested or flat metadata dict. |
+| [from_parquet](#healpyxel.metadata.HEALPyxelxMetadata.from_parquet) | Extract metadata from parquet schema or companion JSON. |
+| [to_dict](#healpyxel.metadata.HEALPyxelxMetadata.to_dict) | Serialize to dictionary, converting Enum to string. |
+| [to_parquet_metadata](#healpyxel.metadata.HEALPyxelxMetadata.to_parquet_metadata) | Serialize for embedding in parquet schema. |
+| [write_json](#healpyxel.metadata.HEALPyxelxMetadata.write_json) | Validate metadata (optional), sanitize for JSON, and write .meta.json. |
+
+### from_dict { #healpyxel.metadata.HEALPyxelxMetadata.from_dict }
+
+```python
+metadata.HEALPyxelxMetadata.from_dict(d)
+```
+
+Parse from nested or flat metadata dict.
+
+Supports both nested structure (from JSON sidecars) and flat dicts.
+
+Args:
+    d: Dictionary with HEALPix parameters
+
+Returns:
+    Validated HEALPyxelxMetadata instance
+
+### from_parquet { #healpyxel.metadata.HEALPyxelxMetadata.from_parquet }
+
+```python
+metadata.HEALPyxelxMetadata.from_parquet(path)
+```
+
+Extract metadata from parquet schema or companion JSON.
+
+Tries embedded parquet metadata first, falls back to .meta.json file.
+
+Args:
+    path: Path to parquet file
+
+Returns:
+    Parsed HEALPyxelxMetadata
+
+Raises:
+    ValueError: If no metadata found
+
+### to_dict { #healpyxel.metadata.HEALPyxelxMetadata.to_dict }
+
+```python
+metadata.HEALPyxelxMetadata.to_dict()
+```
+
+Serialize to dictionary, converting Enum to string.
+
+Returns:
+    Dictionary with all metadata fields
+
+### to_parquet_metadata { #healpyxel.metadata.HEALPyxelxMetadata.to_parquet_metadata }
+
+```python
+metadata.HEALPyxelxMetadata.to_parquet_metadata()
+```
+
+Serialize for embedding in parquet schema.
+
+Returns:
+    Dictionary suitable for pyarrow schema metadata
+
+### write_json { #healpyxel.metadata.HEALPyxelxMetadata.write_json }
+
+```python
+metadata.HEALPyxelxMetadata.write_json(metadata, output_file, validate=True)
+```
+
+Validate metadata (optional), sanitize for JSON, and write .meta.json.
+
+Args:
+    metadata: Metadata dict to serialize
+    output_file: Full path to data file being described
+    validate: If True, run HEALPyxelxMetadata.from_dict() sanity checks
+
+Returns:
+    Path to written .meta.json file

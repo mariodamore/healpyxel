@@ -1,0 +1,40 @@
+# metadata.validate_aggregate { #healpyxel.metadata.validate_aggregate }
+
+```python
+metadata.validate_aggregate(df, meta, expected_columns=None, strict=True)
+```
+
+Validate aggregate DataFrame structure.
+
+Checks:
+- Index must be 'healpix_id'
+- Row count ≤ npix
+- healpix_id range [0, npix)
+- No duplicate healpix_id
+- Dense maps have sequential index [0..npix-1]
+- Expected columns present
+- n_sources column sanity
+- Finite values in stat columns
+
+Args:
+    df: Aggregate DataFrame (index: healpix_id)
+    meta: Expected HEALPix metadata
+    expected_columns: Optional list of expected stat columns
+    strict: If True, raise on violations
+
+Returns:
+    dict with validation results
+
+Raises:
+    AssertionError: If strict=True and validation fails
+
+Examples:
+    >>> import pandas as pd
+    >>> meta = HEALPyxelxMetadata(nside=32)
+    >>> agg = pd.DataFrame({
+    ...     'r1050_median': [0.5, 0.6],
+    ...     'n_sources': [10, 15]
+    ... }, index=pd.Index([0, 1], name='healpix_id'))
+    >>> result = validate_aggregate(agg, meta, strict=False)
+    >>> result['is_sparse']
+    True

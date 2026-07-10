@@ -1,0 +1,61 @@
+# accumulator.CellAccumulator { #healpyxel.accumulator.CellAccumulator }
+
+```python
+accumulator.CellAccumulator(use_tdigest=True)
+```
+
+Accumulator for a single HEALPix cell.
+
+Maintains streaming statistics for multiple columns plus optional T-Digest
+for approximate percentile computation.
+
+## Methods
+
+| Name | Description |
+| --- | --- |
+| [from_dict](#healpyxel.accumulator.CellAccumulator.from_dict) | Deserialize from dictionary. |
+| [merge](#healpyxel.accumulator.CellAccumulator.merge) | Merge with another CellAccumulator (for parallel processing). |
+| [to_dict](#healpyxel.accumulator.CellAccumulator.to_dict) | Convert accumulator state to dictionary for serialization. |
+| [update](#healpyxel.accumulator.CellAccumulator.update) | Add observations for a specific column. |
+
+### from_dict { #healpyxel.accumulator.CellAccumulator.from_dict }
+
+```python
+accumulator.CellAccumulator.from_dict(d, use_tdigest=True)
+```
+
+Deserialize from dictionary.
+
+### merge { #healpyxel.accumulator.CellAccumulator.merge }
+
+```python
+accumulator.CellAccumulator.merge(other)
+```
+
+Merge with another CellAccumulator (for parallel processing).
+
+### to_dict { #healpyxel.accumulator.CellAccumulator.to_dict }
+
+```python
+accumulator.CellAccumulator.to_dict()
+```
+
+Convert accumulator state to dictionary for serialization.
+
+Uses aggressive (raw) TDigest serialization to ensure centroids are
+materialized even if percentiles were never queried.
+
+Returns:
+    Dict with 'stats' (per-column StreamingStats) and optionally 'tdigests'
+
+### update { #healpyxel.accumulator.CellAccumulator.update }
+
+```python
+accumulator.CellAccumulator.update(column, values)
+```
+
+Add observations for a specific column.
+
+Args:
+    column: Column name
+    values: Array of new observations

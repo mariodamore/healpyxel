@@ -1,0 +1,21 @@
+# aggregate.densify_healpix_aggregates { #healpyxel.aggregate.densify_healpix_aggregates }
+
+```python
+aggregate.densify_healpix_aggregates(
+    agg_sparse_df,
+    nside,
+    healpix_col='healpix_id',
+)
+```
+
+Densify aggregated DataFrame to include all HEALPix cells.
+
+Fills missing cells with NaN for numeric columns and None for others.
+
+Args:
+    agg_df: Aggregated DataFrame with healpix_id as index
+    nside: HEALPix nside parameter
+    healpix_col: Name of the HEALPix ID column (used as index)
+
+Returns:
+    Densified DataFrame with all HEALPix cells (0 to 12*nside**2 - 1)

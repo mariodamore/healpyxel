@@ -1,0 +1,7 @@
+# cli.accumulator_cli { #healpyxel.cli.accumulator_cli }
+
+```python
+cli.accumulator_cli()
+```
+
+CLI entry point for healpix_accumulator command.

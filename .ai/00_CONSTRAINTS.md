@@ -7,8 +7,11 @@ Hard rules. These are non-negotiable unless an ADR with a Waiver field explicitl
 - **healpy** (NEST ordering) — Reason: HEALPix as single coordinate system; consistency across notebooks
 - **pathlib** — Reason: Modern Python path handling; consistent with project style
 - **antimeridian** — Reason: Required for geometries crossing longitude 180/-180
+- **Percent format (.py:percent)** — Reason: Bridge format for Quarto docs and Jupyter notebooks
+- **Quarto** — Reason: Documentation rendering for .py:percent examples (replaces nbdev)
+- **quartodoc** — Reason: API reference generation within Quarto (replaces nbdev showdoc)
+- **jupytext** — Reason: .ipynb ↔ .py:percent conversion for tutorial notebooks
 - **dask-geopandas** — Reason: Lazy loading for scale; context collapse is the enemy
-- **nbdev** — Reason: Literate programming as debugging discipline; notebooks are source of truth
 
 ## Forbidden Technologies
 
@@ -18,18 +21,18 @@ Hard rules. These are non-negotiable unless an ADR with a Waiver field explicitl
 
 ## Forbidden Patterns
 
-- **Editing healpyxel/*.py directly** — Reason: Notebooks in nbs/ are the source of truth; Python files are auto-generated
 - **Speculative optimization** — Reason: Don't suggest "maybe use Numba" without profiling; optimize for predictability first
 - **Error handling for impossible cases** — Reason: Trust internal code and framework guarantees; validate only at system boundaries
 
-## nbdev Directive Requirements
+## Percent Format Requirements
 
-All notebook cells must use appropriate directives:
+All tutorial notebooks must use the `.py:percent` format (ADR-007):
 
-- `#| export` — Marks code for inclusion in Python module (required for all library code)
-- `#| hide` — Hide from docs (for imports like `from nbdev.showdoc import *`)
-- `#| eval: false` — Don't execute during docs builds (for CLI scripts)
-- `#| output: false` — Suppress debug output
+- `# %%` cell markers for code cells
+- `# %% [markdown]` for markdown cells
+- Works with Jupyter, VS Code, and Quarto `jupyter` engine
+- Source files in `notebooks/*.py` (not `nbs/*.ipynb`)
+- No notebook-specific tooling required
 
 ## Data Type Requirements
 
@@ -47,4 +50,4 @@ All notebook cells must use appropriate directives:
 - **ADR comments in code** — Add `# ADR-NNN` comments when code implements architectural decisions
 - **Session logging** — Dead ends are as important as progress; record both
 
-_Last updated: 2026-05-22_
+_Last updated: 2026-07-10_

@@ -1,17 +1,32 @@
-nbs/state/
+# Python
 *.pyc
 __pycache__/
-.ipynb_checkpoints/
-dist/
 *.egg-info/
 .pytest_cache/
-coverage.json
+.coverage
+htmlcov/
+dist/
+build/
 .DS_Store
 *.swp
 .vscode/
 .idea/
+tags
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Quarto
+docs/_site/
+docs/.quarto/
+
+# Notebook artifacts (nbdev cleanup leftovers)
+nbs/
 _proc/
-tags 
+index_files/
+
+# Coverage
+coverage.json
 # Created by https://www.toptal.com/developers/gitignore/api/vim
 # Edit at https://www.toptal.com/developers/gitignore?templates=vim
 
@@ -219,3 +234,6 @@ poetry.toml
 pyrightconfig.json
 
 # End of https://www.toptal.com/developers/gitignore/api/python
+
+/.quarto/
+**/*.quarto_ipynb

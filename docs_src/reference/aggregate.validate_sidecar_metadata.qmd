@@ -1,0 +1,23 @@
+# aggregate.validate_sidecar_metadata { #healpyxel.aggregate.validate_sidecar_metadata }
+
+```python
+aggregate.validate_sidecar_metadata(
+    sidecar_path,
+    input_file,
+    require_metadata=False,
+)
+```
+
+Validate sidecar metadata file and check source_file match.
+
+Args:
+    sidecar_path: Path to sidecar parquet file
+    input_file: Expected source input file path
+    require_metadata: If True, raise error when metadata missing
+
+Returns:
+    Dictionary with metadata (empty dict if not found and not required)
+
+Raises:
+    FileNotFoundError: If require_metadata=True and .meta.json not found
+    ValueError: If source_file mismatch detected

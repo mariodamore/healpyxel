@@ -1,0 +1,11 @@
+# sidecar.normalize_weights_per_cell { #healpyxel.sidecar.normalize_weights_per_cell }
+
+```python
+sidecar.normalize_weights_per_cell(
+    df,
+    cell_col='healpix_id',
+    weight_col='weight',
+)
+```
+
+Normalize weights so that sum of weights per cell is 1.0.
