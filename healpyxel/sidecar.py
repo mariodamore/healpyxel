@@ -1301,7 +1301,7 @@ def run(config):
     if _get_config(config, 'lon_col') is None or _get_config(config, 'lat_col') is None:
         logger.info(f"Auto-detecting lon/lat columns (user provided: lon_col={_get_config(config, 'lon_col')}, lat_col={_get_config(config, 'lat_col')})")
         try:
-            df_sample = pd.read_parquet(str(input_path), engine="pyarrow", nrows=100)
+            df_sample = pd.read_parquet(str(input_path), engine="pyarrow").head(100)
             detected_lon, detected_lat = detect_lonlat_columns(df_sample)
             lon_col = _get_config(config, 'lon_col') or detected_lon
             lat_col = _get_config(config, 'lat_col') or detected_lat
