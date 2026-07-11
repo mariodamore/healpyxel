@@ -715,7 +715,7 @@ def _get_config(config, key, default=None):
         return config.get(key, default)
     return getattr(config, key, default)
 
-def parse_arguments() -> argparse.Namespace:
+def parse_arguments(argv=None) -> argparse.Namespace:
     """Parse command-line arguments with educational help text."""
     parser = argparse.ArgumentParser(
         description="Aggregate spatial data by HEALPix cells using sidecar files (split-apply-combine workflow)",
@@ -1027,7 +1027,7 @@ EXAMPLES:
     # =========================================================================
     # PARSE & POST-PROCESSING
     # =========================================================================
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # Set default sidecar_dir if not provided
     if args.sidecar_dir is None:
