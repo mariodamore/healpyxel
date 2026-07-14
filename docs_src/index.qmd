@@ -39,3 +39,123 @@ The repository root [README.md](../README.md) has the installation and local set
 2. **Aggregate** — batch sidecar outputs into per-cell statistics
 3. **Accumulate** — stream incremental updates with TDigest percentiles and fuzzy mode
 4. **Finalize** — densify maps, export to GeoTIFF, and embed metadata
+
+
+## HEALPix Cell Sizes: Mercury, Moon, Venus
+
+The table below shows how HEALPix cell size scales with `nside` for
+the three bodies most relevant to this project.  Values are generated
+by [`healpyxel.core.healpix_cell_sizes()`](reference/core.healpix_cell_sizes.qmd)
+using a spherical approximation (radius as input).
+
+```{python}
+from healpyxel.core import healpix_cell_sizes
+import pandas as pd
+
+bodies = [
+    ("Mercury", 2439.7),
+    ("Moon", 1737.4),
+    ("Venus", 6051.8),
+]
+
+nsides = [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192]
+
+parts = []
+for name, radius in bodies:
+    df = healpix_cell_sizes(radius, nside=nsides)
+    df["body"] = name
+    parts.append(df.reset_index().set_index(["body", "nside"]))
+
+table = pd.concat(parts)
+body_order = pd.CategoricalIndex(table.index.get_level_values("body"), categories=bodies, ordered=True)
+table.index = pd.MultiIndex.from_arrays([body_order, table.index.get_level_values("nside")])
+table = table.sort_index()[["cells", "angular_size_deg", "cell_size_km"]]
+table
+```
+
+## Test diagram 
+
+### Pipeline_End-to-End
+
+```{mermaid}
+flowchart TD
+    subgraph Phase1["PHASE 1: SPLIT"]
+        A[Observations<br/>shape: sql_table<br/>source_id, column] -->|split geometries| B[healpyxel_sidecar]
+        B -->|.parquet<br/>.meta.json| C[("Sidecar<br/>healpix_id : source_id")]
+    end
+
+    subgraph Phase2["PHASE 2: APPLY"]
+        C -->|group by healpix_id| D[healpyxel_aggregate]
+        A -->|join via source_id| D
+    end
+
+    subgraph Phase3["PHASE 3: COMBINE"]
+        D -->|.parquet| E[("Aggregated<br/>healpix_id : mean(column)")]
+    end
+```{mermaid}
+
+### Sidecar
+
+```{mermaid}
+flowchart TD
+    A[Observations<br/>source_id, value, geometry] -->|healpyxel_sidecar<br/>Assign: strict/fuzzy| B[("Sidecar<br/>source_id | healpix_id")]
+
+    C[("Healpix Target Grid<br/>healpix_id")] <-->|nside=32| B
+
+    style A fill:#f8cecc
+    style B fill:#dae8fc
+    style C fill:#d5e8d4
+```
+
+## Aggregate
+
+```{mermaid}
+flowchart LR
+    A[Observations<br/>source_id, value, geometry] -->|group by healpix_id| C[healpyxel_aggregate<br/>Median(value)]
+    B[("Sidecar<br/>source_id | healpix_id")] -->|via source_id| C
+    C --> D[("Aggregated<br/>healpix_id, median, n_sources")]
+
+    style A fill:#f8cecc
+    style B fill:#dae8fc
+    style C fill:#fff4e6
+    style D fill:#d5e8d4
+```
+
+## Combine 
+
+```{mermaid}
+flowchart LR
+    A[("Aggregated<br/>healpix_id | median | n_sources<br/>pix_A: 015000 | 2<br/>pix_B: 030000 | 1")]
+    --> B[healpyxel_to_geoparquet<br/>HEALPix Cell Geometry via healpy]
+    --> C[("Aggregated_Geo<br/>healpix_id | median | n_sources | geometry<br/>pix_A: ... | POLY(..)<br/>pix_B: ... | POLY(..)")]
+
+    style A fill:#d5e8d4
+    style B fill:#fff4e6
+    style C fill:#e1d5e7
+
+```
+
+## Pipeline_End-to-End_Geo
+
+```{mermaid}
+flowchart TD
+    subgraph Phase1["PHASE 1: SPLIT"]
+        A[Observations<br/>shape: sql_table<br/>source_id, column] -->|split geometries| B[healpyxel_sidecar]
+        B -->|.parquet<br/>.meta.json| C[("Sidecar<br/>healpix_id : source_id")]
+    end
+
+    subgraph Phase2["PHASE 2: APPLY"]
+        C -->|group by healpix_id| D[healpyxel_aggregate]
+        A -->|join via source_id| D
+    end
+
+    subgraph Phase3a["PHASE 3: COMBINE"]
+        D -->|.parquet| E[("Aggregated<br/>healpix_id : mean(column)")]
+    end
+
+    subgraph Phase3b["GEOPARQUET"]
+        E -->|attach geometry| F[healpyxel_to_geoparquet]
+        F -->|.geo.parquet| G[("Geoparquet<br/>healpix_id : mean(column) : geometry")]
+    end
+
+```

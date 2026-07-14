@@ -110,6 +110,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 <link rel="stylesheet" href="../docs_src/reference/custom.css">
@@ -704,6 +707,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#start-here" id="toc-start-here" class="nav-link" data-scroll-target="#start-here">Start Here</a></li>
   <li><a href="#install" id="toc-install" class="nav-link" data-scroll-target="#install">Install</a></li>
   <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow">Workflow</a></li>
+  <li><a href="#test-diagram" id="toc-test-diagram" class="nav-link" data-scroll-target="#test-diagram">Test diagram</a>
+  <ul class="collapse">
+  <li><a href="#pipeline_end-to-end" id="toc-pipeline_end-to-end" class="nav-link" data-scroll-target="#pipeline_end-to-end">Pipeline_End-to-End</a></li>
+  </ul></li>
+  <li><a href="#aggregate" id="toc-aggregate" class="nav-link" data-scroll-target="#aggregate">Aggregate</a></li>
+  <li><a href="#combine" id="toc-combine" class="nav-link" data-scroll-target="#combine">Combine</a></li>
+  <li><a href="#pipeline_end-to-end_geo" id="toc-pipeline_end-to-end_geo" class="nav-link" data-scroll-target="#pipeline_end-to-end_geo">Pipeline_End-to-End_Geo</a></li>
   </ul>
 </nav>
     </div>
@@ -713,7 +723,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../docs_src/index.html">Home</a></li><li class="breadcrumb-item"><a href="../docs_src/index.html">Healpyxel</a></li></ol></nav>
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Healpyxel</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">Healpyxel</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
 </div>
 
 
@@ -769,6 +779,205 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li><strong>Accumulate</strong> — stream incremental updates with TDigest percentiles and fuzzy mode</li>
 <li><strong>Finalize</strong> — densify maps, export to GeoTIFF, and embed metadata</li>
 </ol>
+</section>
+<section id="test-diagram" class="level2">
+<h2 class="anchored" data-anchor-id="test-diagram">Test diagram</h2>
+<section id="pipeline_end-to-end" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline_end-to-end">Pipeline_End-to-End</h3>
+<div class="cell" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    subgraph Phase1["PHASE 1: SPLIT"]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[("Sidecar&lt;br/&gt;healpix_id : source_id")]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    subgraph Phase2["PHASE 2: APPLY"]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>        C --&gt;|group by healpix_id| D[healpyxel_aggregate]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        A --&gt;|join via source_id| D</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    subgraph Phase3["PHASE 3: COMBINE"]</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        D --&gt;|.parquet| E[("Aggregated&lt;br/&gt;healpix_id : mean(column)")]</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>```{mermaid}</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>### Sidecar</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>```{mermaid}</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|healpyxel_sidecar&lt;br/&gt;Assign: strict/fuzzy| B[("Sidecar&lt;br/&gt;source_id | healpix_id")]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    C[("Healpix Target Grid&lt;br/&gt;healpix_id")] &lt;--&gt;|nside=32| B</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    style A fill:#f8cecc</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    style B fill:#dae8fc</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    style C fill:#d5e8d4</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    subgraph Phase1["PHASE 1: SPLIT"]
+        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]
+        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[("Sidecar&lt;br/&gt;healpix_id : source_id")]
+    end
+
+    subgraph Phase2["PHASE 2: APPLY"]
+        C --&gt;|group by healpix_id| D[healpyxel_aggregate]
+        A --&gt;|join via source_id| D
+    end
+
+    subgraph Phase3["PHASE 3: COMBINE"]
+        D --&gt;|.parquet| E[("Aggregated&lt;br/&gt;healpix_id : mean(column)")]
+    end
+```zialhqaxw
+
+### Sidecar
+
+```zialhqaxw
+flowchart TD
+    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|healpyxel_sidecar&lt;br/&gt;Assign: strict/fuzzy| B[("Sidecar&lt;br/&gt;source_id | healpix_id")]
+
+    C[("Healpix Target Grid&lt;br/&gt;healpix_id")] &lt;--&gt;|nside=32| B
+
+    style A fill:#f8cecc
+    style B fill:#dae8fc
+    style C fill:#d5e8d4
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="aggregate" class="level2">
+<h2 class="anchored" data-anchor-id="aggregate">Aggregate</h2>
+<div class="cell" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|group by healpix_id| C[healpyxel_aggregate&lt;br/&gt;Median(value)]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    B[("Sidecar&lt;br/&gt;source_id | healpix_id")] --&gt;|via source_id| C</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    C --&gt; D[("Aggregated&lt;br/&gt;healpix_id, median, n_sources")]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    style A fill:#f8cecc</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    style B fill:#dae8fc</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    style C fill:#fff4e6</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    style D fill:#d5e8d4</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|group by healpix_id| C[healpyxel_aggregate&lt;br/&gt;Median(value)]
+    B[("Sidecar&lt;br/&gt;source_id | healpix_id")] --&gt;|via source_id| C
+    C --&gt; D[("Aggregated&lt;br/&gt;healpix_id, median, n_sources")]
+
+    style A fill:#f8cecc
+    style B fill:#dae8fc
+    style C fill:#fff4e6
+    style D fill:#d5e8d4
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="combine" class="level2">
+<h2 class="anchored" data-anchor-id="combine">Combine</h2>
+<div class="cell" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    A[("Aggregated&lt;br/&gt;healpix_id | median | n_sources&lt;br/&gt;pix_A: 015000 | 2&lt;br/&gt;pix_B: 030000 | 1")]</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    --&gt; B[healpyxel_to_geoparquet&lt;br/&gt;HEALPix Cell Geometry via healpy]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    --&gt; C[("Aggregated_Geo&lt;br/&gt;healpix_id | median | n_sources | geometry&lt;br/&gt;pix_A: ... | POLY(..)&lt;br/&gt;pix_B: ... | POLY(..)")]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    style A fill:#d5e8d4</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    style B fill:#fff4e6</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    style C fill:#e1d5e7</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A[("Aggregated&lt;br/&gt;healpix_id | median | n_sources&lt;br/&gt;pix_A: 015000 | 2&lt;br/&gt;pix_B: 030000 | 1")]
+    --&gt; B[healpyxel_to_geoparquet&lt;br/&gt;HEALPix Cell Geometry via healpy]
+    --&gt; C[("Aggregated_Geo&lt;br/&gt;healpix_id | median | n_sources | geometry&lt;br/&gt;pix_A: ... | POLY(..)&lt;br/&gt;pix_B: ... | POLY(..)")]
+
+    style A fill:#d5e8d4
+    style B fill:#fff4e6
+    style C fill:#e1d5e7
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="pipeline_end-to-end_geo" class="level2">
+<h2 class="anchored" data-anchor-id="pipeline_end-to-end_geo">Pipeline_End-to-End_Geo</h2>
+<div class="cell" data-layout-align="default">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    subgraph Phase1["PHASE 1: SPLIT"]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[("Sidecar&lt;br/&gt;healpix_id : source_id")]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    subgraph Phase2["PHASE 2: APPLY"]</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        C --&gt;|group by healpix_id| D[healpyxel_aggregate]</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        A --&gt;|join via source_id| D</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    subgraph Phase3a["PHASE 3: COMBINE"]</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        D --&gt;|.parquet| E[("Aggregated&lt;br/&gt;healpix_id : mean(column)")]</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>    subgraph Phase3b["GEOPARQUET"]</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>        E --&gt;|attach geometry| F[healpyxel_to_geoparquet]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>        F --&gt;|.geo.parquet| G[("Geoparquet&lt;br/&gt;healpix_id : mean(column) : geometry")]</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    end</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart TD
+    subgraph Phase1["PHASE 1: SPLIT"]
+        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]
+        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[("Sidecar&lt;br/&gt;healpix_id : source_id")]
+    end
+
+    subgraph Phase2["PHASE 2: APPLY"]
+        C --&gt;|group by healpix_id| D[healpyxel_aggregate]
+        A --&gt;|join via source_id| D
+    end
+
+    subgraph Phase3a["PHASE 3: COMBINE"]
+        D --&gt;|.parquet| E[("Aggregated&lt;br/&gt;healpix_id : mean(column)")]
+    end
+
+    subgraph Phase3b["GEOPARQUET"]
+        E --&gt;|attach geometry| F[healpyxel_to_geoparquet]
+        F --&gt;|.geo.parquet| G[("Geoparquet&lt;br/&gt;healpix_id : mean(column) : geometry")]
+    end
+
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
 
 
 <!-- -->
@@ -1264,47 +1473,135 @@ document.addEventListener('DOMContentLoaded', function() {
       </a>
   </div>
 </nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Healpyxel"</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display: flex; align-items: center; gap: 1rem;"</span><span class="dt">&gt;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">img</span><span class="ot"> src</span><span class="op">=</span><span class="st">"../docs_src/logo_cutout.png"</span><span class="ot"> style</span><span class="op">=</span><span class="st">"width: 150px;"</span><span class="ot"> alt</span><span class="op">=</span><span class="st">"Healpyxel logo"</span><span class="dt">/&gt;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">strong</span><span class="dt">&gt;</span>HEALPyxel<span class="dt">&lt;/</span><span class="kw">strong</span><span class="dt">&gt;</span> — HEALPix-based spatial aggregation for planetary science data.</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>This project provides HEALPix-based spatial aggregation for planetary science data, with streaming accumulation, sidecar generation, and batch aggregation capabilities.</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## What You'll Learn</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>Start with the linear path below if you are new to healpyxel:</span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span><span class="co">[</span><span class="ot">Core concepts tutorial</span><span class="co">](../notebooks/01_core_concepts.py.html)</span> — HEALPix basics, sidecar generation, aggregation</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span><span class="co">[</span><span class="ot">Full workflow tutorial</span><span class="co">](../notebooks/02_full_workflow.py.html)</span> — end-to-end pipeline with visualizations</span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span><span class="co">[</span><span class="ot">Sphere-native sidecar tutorial</span><span class="co">](../notebooks/03_sphere_native_sidecar.py.html)</span> — great-circle SLERP, antimeridian-safe cells</span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">API reference</span><span class="co">](reference/index.qmd)</span> is best used after the tutorial path above.</span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="fu">## Start Here</span></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Core concepts tutorial</span><span class="co">](../notebooks/01_core_concepts.py.html)</span> — the fastest way to get started.</span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Full workflow tutorial</span><span class="co">](../notebooks/02_full_workflow.py.html)</span> — complete pipeline with plots.</span>
-<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Install</span></span>
-<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>The repository root <span class="co">[</span><span class="ot">README.md</span><span class="co">](../README.md)</span> has the installation and local setup instructions, including optional dependencies.</span>
-<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Workflow</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Sidecar** — assign MESSENGER/MASCS observations to HEALPix cells with PSF-weighted geometry</span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Aggregate** — batch sidecar outputs into per-cell statistics</span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Accumulate** — stream incremental updates with TDigest percentiles and fuzzy mode</span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Finalize** — densify maps, export to GeoTIFF, and embed metadata</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Healpyxel"</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display: flex; align-items: center; gap: 1rem;"</span><span class="dt">&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">img</span><span class="ot"> src</span><span class="op">=</span><span class="st">"../docs_src/logo_cutout.png"</span><span class="ot"> style</span><span class="op">=</span><span class="st">"width: 150px;"</span><span class="ot"> alt</span><span class="op">=</span><span class="st">"Healpyxel logo"</span><span class="dt">/&gt;</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;</span><span class="kw">strong</span><span class="dt">&gt;</span>HEALPyxel<span class="dt">&lt;/</span><span class="kw">strong</span><span class="dt">&gt;</span> — HEALPix-based spatial aggregation for planetary science data.</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="dt">&lt;/</span><span class="kw">div</span><span class="dt">&gt;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="fu">## Overview</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>This project provides HEALPix-based spatial aggregation for planetary science data, with streaming accumulation, sidecar generation, and batch aggregation capabilities.</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## What You'll Learn</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>Start with the linear path below if you are new to healpyxel:</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span><span class="co">[</span><span class="ot">Core concepts tutorial</span><span class="co">](../notebooks/01_core_concepts.py.html)</span> — HEALPix basics, sidecar generation, aggregation</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span><span class="co">[</span><span class="ot">Full workflow tutorial</span><span class="co">](../notebooks/02_full_workflow.py.html)</span> — end-to-end pipeline with visualizations</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span><span class="co">[</span><span class="ot">Sphere-native sidecar tutorial</span><span class="co">](../notebooks/03_sphere_native_sidecar.py.html)</span> — great-circle SLERP, antimeridian-safe cells</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>The <span class="co">[</span><span class="ot">API reference</span><span class="co">](reference/index.qmd)</span> is best used after the tutorial path above.</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="fu">## Start Here</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Core concepts tutorial</span><span class="co">](../notebooks/01_core_concepts.py.html)</span> — the fastest way to get started.</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="co">[</span><span class="ot">Full workflow tutorial</span><span class="co">](../notebooks/02_full_workflow.py.html)</span> — complete pipeline with plots.</span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Install</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>The repository root <span class="co">[</span><span class="ot">README.md</span><span class="co">](../README.md)</span> has the installation and local setup instructions, including optional dependencies.</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Workflow</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Sidecar** — assign MESSENGER/MASCS observations to HEALPix cells with PSF-weighted geometry</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Aggregate** — batch sidecar outputs into per-cell statistics</span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Accumulate** — stream incremental updates with TDigest percentiles and fuzzy mode</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Finalize** — densify maps, export to GeoTIFF, and embed metadata</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## Test diagram </span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pipeline_End-to-End</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a>    subgraph Phase1[<span class="ot">"</span><span class="st">PHASE 1: SPLIT</span><span class="ot">"</span>]</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|<span class="fu">split</span> geometries| B[healpyxel_sidecar]</span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a>        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[(<span class="ot">"</span><span class="st">Sidecar&lt;br/&gt;healpix_id : source_id</span><span class="ot">"</span>)]</span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>    subgraph Phase2[<span class="ot">"</span><span class="st">PHASE 2: APPLY</span><span class="ot">"</span>]</span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>        C --&gt;|group by healpix_id| D[healpyxel_aggregate]</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>        A --&gt;|<span class="fu">join</span> via source_id| D</span>
+<span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a>    subgraph Phase3[<span class="ot">"</span><span class="st">PHASE 3: COMBINE</span><span class="ot">"</span>]</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>        D --&gt;|.parquet| E[(<span class="ot">"</span><span class="st">Aggregated&lt;br/&gt;healpix_id : mean(column)</span><span class="ot">"</span>)]</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a><span class="st">### Sidecar</span></span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a>    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|healpyxel_sidecar&lt;br/&gt;Assign: <span class="kw">strict</span><span class="ot">/fuzzy</span><span class="ch">|</span><span class="ot"> B</span><span class="ch">[</span><span class="bn">("Sidecar&lt;br/&gt;source_id | healpix_id")</span><span class="ch">]</span></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a><span class="ot">    C</span><span class="ch">[</span><span class="bn">("Healpix Target Grid&lt;br/&gt;healpix_id")</span><span class="ch">]</span><span class="ot"> &lt;--&gt;</span><span class="ch">|</span><span class="ot">nside=32</span><span class="ch">|</span><span class="ot"> B</span></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a><span class="ot">    style A fill:#f8cecc</span></span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="ot">    style B fill:#dae8fc</span></span>
+<span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a><span class="ot">    style C fill:#d5e8d4</span></span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="co">## Aggregate</span></span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a><span class="ot">flowchart LR</span></span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="ot">    A</span><span class="ch">[</span><span class="bn">Observations&lt;br/&gt;source_id, value, geometry</span><span class="ch">]</span><span class="ot"> --&gt;</span><span class="ch">|</span><span class="ot">group by healpix_id</span><span class="ch">|</span><span class="ot"> C</span><span class="ch">[</span><span class="bn">healpyxel_aggregate&lt;br/&gt;Median(value)</span><span class="ch">]</span></span>
+<span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a><span class="ot">    B</span><span class="ch">[</span><span class="bn">("Sidecar&lt;br/&gt;source_id | healpix_id")</span><span class="ch">]</span><span class="ot"> --&gt;</span><span class="ch">|</span><span class="ot">via source_id</span><span class="ch">|</span><span class="ot"> C</span></span>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a><span class="ot">    C --&gt; D</span><span class="ch">[</span><span class="bn">("Aggregated&lt;br/&gt;healpix_id, median, n_sources")</span><span class="ch">]</span></span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="ot">    style A fill:#f8cecc</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="ot">    style B fill:#dae8fc</span></span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="ot">    style C fill:#fff4e6</span></span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="ot">    style D fill:#d5e8d4</span></span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a><span class="co">## Combine </span></span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-103"><a href="#cb5-103" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb5-104"><a href="#cb5-104" aria-hidden="true" tabindex="-1"></a><span class="ot">flowchart LR</span></span>
+<span id="cb5-105"><a href="#cb5-105" aria-hidden="true" tabindex="-1"></a><span class="ot">    A</span><span class="ch">[</span><span class="bn">("Aggregated&lt;br/&gt;healpix_id | median | n_sources&lt;br/&gt;pix_A: 015000 | 2&lt;br/&gt;pix_B: 030000 | 1")</span><span class="ch">]</span></span>
+<span id="cb5-106"><a href="#cb5-106" aria-hidden="true" tabindex="-1"></a><span class="ot">    --&gt; B</span><span class="ch">[</span><span class="bn">healpyxel_to_geoparquet&lt;br/&gt;HEALPix Cell Geometry via healpy</span><span class="ch">]</span></span>
+<span id="cb5-107"><a href="#cb5-107" aria-hidden="true" tabindex="-1"></a><span class="ot">    --&gt; C</span><span class="ch">[</span><span class="bn">("Aggregated_Geo&lt;br/&gt;healpix_id | median | n_sources | geometry&lt;br/&gt;pix_A: ... | POLY(..)&lt;br/&gt;pix_B: ... | POLY(..)")</span><span class="ch">]</span></span>
+<span id="cb5-108"><a href="#cb5-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-109"><a href="#cb5-109" aria-hidden="true" tabindex="-1"></a><span class="ot">    style A fill:#d5e8d4</span></span>
+<span id="cb5-110"><a href="#cb5-110" aria-hidden="true" tabindex="-1"></a><span class="ot">    style B fill:#fff4e6</span></span>
+<span id="cb5-111"><a href="#cb5-111" aria-hidden="true" tabindex="-1"></a><span class="ot">    style C fill:#e1d5e7</span></span>
+<span id="cb5-112"><a href="#cb5-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-113"><a href="#cb5-113" aria-hidden="true" tabindex="-1"></a><span class="ot">```</span></span>
+<span id="cb5-114"><a href="#cb5-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-115"><a href="#cb5-115" aria-hidden="true" tabindex="-1"></a><span class="co">## Pipeline_End-to-End_Geo</span></span>
+<span id="cb5-116"><a href="#cb5-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-119"><a href="#cb5-119" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb5-120"><a href="#cb5-120" aria-hidden="true" tabindex="-1"></a><span class="ot">flowchart TD</span></span>
+<span id="cb5-121"><a href="#cb5-121" aria-hidden="true" tabindex="-1"></a><span class="ot">    subgraph Phase1</span><span class="ch">[</span><span class="bn">"PHASE 1: SPLIT"</span><span class="ch">]</span></span>
+<span id="cb5-122"><a href="#cb5-122" aria-hidden="true" tabindex="-1"></a><span class="ot">        A</span><span class="ch">[</span><span class="bn">Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column</span><span class="ch">]</span><span class="ot"> --&gt;</span><span class="ch">|</span><span class="ot">split geometries</span><span class="ch">|</span><span class="ot"> B</span><span class="ch">[</span><span class="bn">healpyxel_sidecar</span><span class="ch">]</span></span>
+<span id="cb5-123"><a href="#cb5-123" aria-hidden="true" tabindex="-1"></a><span class="ot">        B --&gt;</span><span class="ch">|</span><span class="ot">.parquet&lt;br/</span>&gt;.meta.json| C[(<span class="ot">"</span><span class="st">Sidecar&lt;br/&gt;healpix_id : source_id</span><span class="ot">"</span>)]</span>
+<span id="cb5-124"><a href="#cb5-124" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb5-125"><a href="#cb5-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-126"><a href="#cb5-126" aria-hidden="true" tabindex="-1"></a>    subgraph Phase2[<span class="ot">"</span><span class="st">PHASE 2: APPLY</span><span class="ot">"</span>]</span>
+<span id="cb5-127"><a href="#cb5-127" aria-hidden="true" tabindex="-1"></a>        C --&gt;|group by healpix_id| D[healpyxel_aggregate]</span>
+<span id="cb5-128"><a href="#cb5-128" aria-hidden="true" tabindex="-1"></a>        A --&gt;|<span class="fu">join</span> via source_id| D</span>
+<span id="cb5-129"><a href="#cb5-129" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb5-130"><a href="#cb5-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-131"><a href="#cb5-131" aria-hidden="true" tabindex="-1"></a>    subgraph Phase3a[<span class="ot">"</span><span class="st">PHASE 3: COMBINE</span><span class="ot">"</span>]</span>
+<span id="cb5-132"><a href="#cb5-132" aria-hidden="true" tabindex="-1"></a>        D --&gt;|.parquet| E[(<span class="ot">"</span><span class="st">Aggregated&lt;br/&gt;healpix_id : mean(column)</span><span class="ot">"</span>)]</span>
+<span id="cb5-133"><a href="#cb5-133" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb5-134"><a href="#cb5-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-135"><a href="#cb5-135" aria-hidden="true" tabindex="-1"></a>    subgraph Phase3b[<span class="ot">"</span><span class="st">GEOPARQUET</span><span class="ot">"</span>]</span>
+<span id="cb5-136"><a href="#cb5-136" aria-hidden="true" tabindex="-1"></a>        E --&gt;|attach geometry| F[healpyxel_to_geoparquet]</span>
+<span id="cb5-137"><a href="#cb5-137" aria-hidden="true" tabindex="-1"></a>        F --&gt;|.geo.parquet| G[(<span class="ot">"</span><span class="st">Geoparquet&lt;br/&gt;healpix_id : mean(column) : geometry</span><span class="ot">"</span>)]</span>
+<span id="cb5-138"><a href="#cb5-138" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb5-139"><a href="#cb5-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-140"><a href="#cb5-140" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

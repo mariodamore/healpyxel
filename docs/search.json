@@ -266,6 +266,50 @@
     ]
   },
   {
+    "objectID": "docs_src/index.html#test-diagram",
+    "href": "docs_src/index.html#test-diagram",
+    "title": "Healpyxel",
+    "section": "Test diagram",
+    "text": "Test diagram\n\nPipeline_End-to-End\n\n\nCode\nflowchart TD\n    subgraph Phase1[\"PHASE 1: SPLIT\"]\n        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]\n        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[(\"Sidecar&lt;br/&gt;healpix_id : source_id\")]\n    end\n\n    subgraph Phase2[\"PHASE 2: APPLY\"]\n        C --&gt;|group by healpix_id| D[healpyxel_aggregate]\n        A --&gt;|join via source_id| D\n    end\n\n    subgraph Phase3[\"PHASE 3: COMBINE\"]\n        D --&gt;|.parquet| E[(\"Aggregated&lt;br/&gt;healpix_id : mean(column)\")]\n    end\n```{mermaid}\n\n### Sidecar\n\n```{mermaid}\nflowchart TD\n    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|healpyxel_sidecar&lt;br/&gt;Assign: strict/fuzzy| B[(\"Sidecar&lt;br/&gt;source_id | healpix_id\")]\n\n    C[(\"Healpix Target Grid&lt;br/&gt;healpix_id\")] &lt;--&gt;|nside=32| B\n\n    style A fill:#f8cecc\n    style B fill:#dae8fc\n    style C fill:#d5e8d4\n\n\n\n\n\nflowchart TD\n    subgraph Phase1[\"PHASE 1: SPLIT\"]\n        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]\n        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[(\"Sidecar&lt;br/&gt;healpix_id : source_id\")]\n    end\n\n    subgraph Phase2[\"PHASE 2: APPLY\"]\n        C --&gt;|group by healpix_id| D[healpyxel_aggregate]\n        A --&gt;|join via source_id| D\n    end\n\n    subgraph Phase3[\"PHASE 3: COMBINE\"]\n        D --&gt;|.parquet| E[(\"Aggregated&lt;br/&gt;healpix_id : mean(column)\")]\n    end\n```zialhqaxw\n\n### Sidecar\n\n```zialhqaxw\nflowchart TD\n    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|healpyxel_sidecar&lt;br/&gt;Assign: strict/fuzzy| B[(\"Sidecar&lt;br/&gt;source_id | healpix_id\")]\n\n    C[(\"Healpix Target Grid&lt;br/&gt;healpix_id\")] &lt;--&gt;|nside=32| B\n\n    style A fill:#f8cecc\n    style B fill:#dae8fc\n    style C fill:#d5e8d4",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#aggregate",
+    "href": "docs_src/index.html#aggregate",
+    "title": "Healpyxel",
+    "section": "Aggregate",
+    "text": "Aggregate\n\n\nCode\nflowchart LR\n    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|group by healpix_id| C[healpyxel_aggregate&lt;br/&gt;Median(value)]\n    B[(\"Sidecar&lt;br/&gt;source_id | healpix_id\")] --&gt;|via source_id| C\n    C --&gt; D[(\"Aggregated&lt;br/&gt;healpix_id, median, n_sources\")]\n\n    style A fill:#f8cecc\n    style B fill:#dae8fc\n    style C fill:#fff4e6\n    style D fill:#d5e8d4\n\n\n\n\n\nflowchart LR\n    A[Observations&lt;br/&gt;source_id, value, geometry] --&gt;|group by healpix_id| C[healpyxel_aggregate&lt;br/&gt;Median(value)]\n    B[(\"Sidecar&lt;br/&gt;source_id | healpix_id\")] --&gt;|via source_id| C\n    C --&gt; D[(\"Aggregated&lt;br/&gt;healpix_id, median, n_sources\")]\n\n    style A fill:#f8cecc\n    style B fill:#dae8fc\n    style C fill:#fff4e6\n    style D fill:#d5e8d4",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#combine",
+    "href": "docs_src/index.html#combine",
+    "title": "Healpyxel",
+    "section": "Combine",
+    "text": "Combine\n\n\nCode\nflowchart LR\n    A[(\"Aggregated&lt;br/&gt;healpix_id | median | n_sources&lt;br/&gt;pix_A: 015000 | 2&lt;br/&gt;pix_B: 030000 | 1\")]\n    --&gt; B[healpyxel_to_geoparquet&lt;br/&gt;HEALPix Cell Geometry via healpy]\n    --&gt; C[(\"Aggregated_Geo&lt;br/&gt;healpix_id | median | n_sources | geometry&lt;br/&gt;pix_A: ... | POLY(..)&lt;br/&gt;pix_B: ... | POLY(..)\")]\n\n    style A fill:#d5e8d4\n    style B fill:#fff4e6\n    style C fill:#e1d5e7\n\n\n\n\n\nflowchart LR\n    A[(\"Aggregated&lt;br/&gt;healpix_id | median | n_sources&lt;br/&gt;pix_A: 015000 | 2&lt;br/&gt;pix_B: 030000 | 1\")]\n    --&gt; B[healpyxel_to_geoparquet&lt;br/&gt;HEALPix Cell Geometry via healpy]\n    --&gt; C[(\"Aggregated_Geo&lt;br/&gt;healpix_id | median | n_sources | geometry&lt;br/&gt;pix_A: ... | POLY(..)&lt;br/&gt;pix_B: ... | POLY(..)\")]\n\n    style A fill:#d5e8d4\n    style B fill:#fff4e6\n    style C fill:#e1d5e7",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#pipeline_end-to-end_geo",
+    "href": "docs_src/index.html#pipeline_end-to-end_geo",
+    "title": "Healpyxel",
+    "section": "Pipeline_End-to-End_Geo",
+    "text": "Pipeline_End-to-End_Geo\n\n\nCode\nflowchart TD\n    subgraph Phase1[\"PHASE 1: SPLIT\"]\n        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]\n        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[(\"Sidecar&lt;br/&gt;healpix_id : source_id\")]\n    end\n\n    subgraph Phase2[\"PHASE 2: APPLY\"]\n        C --&gt;|group by healpix_id| D[healpyxel_aggregate]\n        A --&gt;|join via source_id| D\n    end\n\n    subgraph Phase3a[\"PHASE 3: COMBINE\"]\n        D --&gt;|.parquet| E[(\"Aggregated&lt;br/&gt;healpix_id : mean(column)\")]\n    end\n\n    subgraph Phase3b[\"GEOPARQUET\"]\n        E --&gt;|attach geometry| F[healpyxel_to_geoparquet]\n        F --&gt;|.geo.parquet| G[(\"Geoparquet&lt;br/&gt;healpix_id : mean(column) : geometry\")]\n    end\n\n\n\n\n\nflowchart TD\n    subgraph Phase1[\"PHASE 1: SPLIT\"]\n        A[Observations&lt;br/&gt;shape: sql_table&lt;br/&gt;source_id, column] --&gt;|split geometries| B[healpyxel_sidecar]\n        B --&gt;|.parquet&lt;br/&gt;.meta.json| C[(\"Sidecar&lt;br/&gt;healpix_id : source_id\")]\n    end\n\n    subgraph Phase2[\"PHASE 2: APPLY\"]\n        C --&gt;|group by healpix_id| D[healpyxel_aggregate]\n        A --&gt;|join via source_id| D\n    end\n\n    subgraph Phase3a[\"PHASE 3: COMBINE\"]\n        D --&gt;|.parquet| E[(\"Aggregated&lt;br/&gt;healpix_id : mean(column)\")]\n    end\n\n    subgraph Phase3b[\"GEOPARQUET\"]\n        E --&gt;|attach geometry| F[healpyxel_to_geoparquet]\n        F --&gt;|.geo.parquet| G[(\"Geoparquet&lt;br/&gt;healpix_id : mean(column) : geometry\")]\n    end",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
     "objectID": "docs_src/reference/index.html",
     "href": "docs_src/reference/index.html",
     "title": "",

@@ -170,7 +170,7 @@ core steps:
 2.  and 3. *Apply+Combine*: Aggregate values per HEALPix cell
     `healpyxel_aggregate`
 
-![Pipeline_End-to-End](Pipeline_End-to-End.svg)
+![Pipeline_End-to-End](docs_src/diagrams/svg/Pipeline_End-to-End.svg)
 
 ### 1. **Split**: Map observations to HEALPix cells
 
@@ -188,7 +188,7 @@ HEALPix cells at your target resolution (`nside`).
 **CLI:**
 `healpyxel_sidecar --input observations.parquet --nside 64 128 --mode fuzzy`
 
-![Sidecar](Sidecar.svg)
+![Sidecar](docs_src/diagrams/svg/Sidecar.svg)
 
 ### 2. **Apply + Combine**: Aggregate values per HEALPix cell
 
@@ -204,7 +204,7 @@ Group all observations assigned to the same cell and compute statistics
 **CLI:**
 `healpyxel_aggregate --input observations.parquet --sidecar-dir output/ --columns value --aggs median robust_std`
 
-![Aggregate](Aggregate.svg)
+![Aggregate](docs_src/diagrams/svg/Aggregate.svg)
 
 ### Optional : Attach HEALPix cell geometry
 
@@ -223,7 +223,7 @@ GIS programs.
 **CLI:**
 `healpyxel_to_geoparquet --aggregate-path observations-aggregated.parquet --output-dir output/`
 
-![Combine](Combine.svg)
+![Combine](docs_src/diagrams/svg/Combine.svg)
 
 ## Optional: Cache geometries
 

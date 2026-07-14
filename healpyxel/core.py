@@ -1,8 +1,10 @@
+import logging
+from pathlib import Path
+from typing import Optional, Sequence, Union
+
+import healpy as hp
 import numpy as np
 import pandas as pd
-from pathlib import Path
-from typing import Optional, Union
-import logging
 
 def validate_nside(nside: int) -> int:
     """Validate that nside is a power of 2.
@@ -88,3 +90,45 @@ def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
         logger.addHandler(handler)
 
     return logger
+
+
+# ADR-size-recovery: HEALPix cell size utility
+def healpix_cell_sizes(
+    body_radius_km: float,
+    nside: Sequence[int] = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192),
+) -> pd.DataFrame:
+    """Return cell angular and linear sizes for a spherical body.
+
+    Computes the cell angular size (deg) and arc-length (km) for each
+    HEALPix ``nside`` resolution, assuming a spherical body of given
+    radius.  Useful for building reference tables like those in the
+    docs.
+
+    Args:
+        body_radius_km: Radius of the spherical body in km.
+        nside: Sequence of NSIDE values to compute.  Defaults to the
+            standard set (1 .. 8192).
+
+    Returns:
+        DataFrame with columns ``nside``, ``cells`` (total count),
+        ``angular_size_deg``, ``cell_size_km``.
+
+    Examples:
+        >>> df = healpix_cell_sizes(body_radius_km=1737.4)
+        >>> df.loc[df["nside"] == 64, "cell_size_km"].round(3).iloc[0]
+        27.78
+    """
+    results = []
+    for n in nside:
+        pix_area_sr = hp.nside2pixarea(n)
+        area_deg2 = pix_area_sr * (180.0 / np.pi) ** 2
+        ang_deg = np.sqrt(area_deg2)
+        ang_rad = np.radians(ang_deg)
+        cell_km = body_radius_km * ang_rad
+        results.append({
+            "nside": n,
+            "cells": hp.nside2npix(n),
+            "angular_size_deg": round(ang_deg, 3),
+            "cell_size_km": round(cell_km, 3),
+        })
+    return pd.DataFrame(results).set_index("nside")
