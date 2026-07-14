@@ -62,28 +62,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
-<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
 <script src="../../site_libs/clipboard/clipboard.min.js"></script>
 <script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
 <script src="../../site_libs/quarto-search/fuse.min.js"></script>
 <script src="../../site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="../../">
+<link href="../../notebooks/90_example_streaming.html" rel="prev">
+<link href="../../docs_src/favicon.ico" rel="icon">
 <script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="../../site_libs/quarto-html/popper.min.js"></script>
 <script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
 <script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../../site_libs/bootstrap/bootstrap-6ed5593a8d9ea8709c140b084688f76b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark-4f7210a01128827e17b2825bab7455c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
-  "location": "sidebar",
+  "location": "navbar",
   "copy-button": false,
   "collapse-after": 3,
-  "panel-placement": "start",
-  "type": "textbox",
+  "panel-placement": "end",
+  "type": "overlay",
   "limit": 50,
   "keyboard-shortcut": [
     "f",
@@ -107,15 +112,587 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }</script>
 
 
-<link rel="stylesheet" href="reference/_styles-quartodoc.css">
+<link rel="stylesheet" href="../../docs_src/reference/custom.css">
 </head>
 
-<body class="quarto-light">
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
 
 <div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../../docs_src/logo_cutout_128.png" alt="" class="navbar-logo light-content">
+    <img src="../../docs_src/logo_cutout_128.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Healpyxel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../../docs_src/index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notebooks/01_core_concepts.py.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../notebooks/03_sphere_native_sidecar.py.html"> 
+<span class="menu-text">Sphere-Native Sidecar</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../docs_src/reference/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs_src/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs_src/reference/index.html">Function reference</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Home</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs_src/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Healpyxel</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/01_core_concepts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core Concepts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/02_full_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Full Workflow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Visualization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/82_example_visualization_psf.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Geometry Engine</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/03_sphere_native_sidecar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sphere-Native Sidecar Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Streaming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../notebooks/90_example_streaming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Streaming WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">API Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../docs_src/reference/index.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Function reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Core</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.mad</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.robust_std</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.setup_logger</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sidecar</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.compute_healpix_ids_from_lonlat</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.detect_lonlat_columns</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.process_partition</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.add_psf_weights_to_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.normalize_weights_per_cell</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.build_output_path</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.write_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_healpix_cell_geometry</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_psf</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.GaussianPSF</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Aggregate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.aggregate_by_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.collect_sidecar_outputs</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.densify_healpix_aggregates</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.generate_output_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.extract_nside_from_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.validate_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.process_single_sidecar</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Accumulator</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.StreamingStats</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.CellAccumulator</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.accumulate_batch</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.save_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.load_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.state_to_dataframe</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.find_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.ensure_not_processed</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Finalize</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.finalize_statistics</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.densify_healpix_map</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.export_to_geotiff</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.load_state</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Metadata</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.HEALPyxelxMetadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.FileType</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.read_metadata_from_file</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.save_with_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_aggregate</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">CLI</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.sidecar_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.aggregate_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.accumulator_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.finalize_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.to_geoparquet_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.cache_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.validate_lon_lat_columns</span>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
         <nav id="TOC" role="doc-toc" class="toc-active">
@@ -136,7 +713,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </nav>
     </div>
 <!-- main -->
-<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7"></h1></header><div class="quarto-title-block"><div class="quarto-title-tools-only"><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../docs_src/reference/index.html">API Reference</a></li><li class="breadcrumb-item"><a href="../../docs_src/reference/index.html">Function reference</a></li></ol></nav><h1 class="title display-7"></h1></header><div class="quarto-title-block"><div class="quarto-title-tools-only"><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+
 
 
 
@@ -149,19 +727,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../../docs_src/reference/core.validate_nside.html#healpyxel.core.validate_nside">core.validate_nside</a></td>
+<td><a href="core.validate_nside.qmd#healpyxel.core.validate_nside">core.validate_nside</a></td>
 <td>Validate that nside is a power of 2.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/core.mad.html#healpyxel.core.mad">core.mad</a></td>
+<td><a href="core.mad.qmd#healpyxel.core.mad">core.mad</a></td>
 <td>Compute Median Absolute Deviation.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/core.robust_std.html#healpyxel.core.robust_std">core.robust_std</a></td>
+<td><a href="core.robust_std.qmd#healpyxel.core.robust_std">core.robust_std</a></td>
 <td>Compute robust standard deviation using MAD * 1.4826.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/core.setup_logger.html#healpyxel.core.setup_logger">core.setup_logger</a></td>
+<td><a href="core.setup_logger.qmd#healpyxel.core.setup_logger">core.setup_logger</a></td>
 <td>Setup a logger with standard formatting.</td>
 </tr>
 </tbody>
@@ -173,47 +751,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../../docs_src/reference/sidecar.compute_healpix_ids_from_lonlat.html#healpyxel.sidecar.compute_healpix_ids_from_lonlat">sidecar.compute_healpix_ids_from_lonlat</a></td>
+<td><a href="sidecar.compute_healpix_ids_from_lonlat.qmd#healpyxel.sidecar.compute_healpix_ids_from_lonlat">sidecar.compute_healpix_ids_from_lonlat</a></td>
 <td>Compute HEALPix indices for arrays of lon,lat in degrees.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/sidecar.detect_lonlat_columns.html#healpyxel.sidecar.detect_lonlat_columns">sidecar.detect_lonlat_columns</a></td>
+<td><a href="sidecar.detect_lonlat_columns.qmd#healpyxel.sidecar.detect_lonlat_columns">sidecar.detect_lonlat_columns</a></td>
 <td>Auto-detect longitude and latitude columns from a GeoDataFrame sample.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/sidecar.process_partition.html#healpyxel.sidecar.process_partition">sidecar.process_partition</a></td>
+<td><a href="sidecar.process_partition.qmd#healpyxel.sidecar.process_partition">sidecar.process_partition</a></td>
 <td>Process a single dask partition and return DataFrame of assignments.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/sidecar.add_psf_weights_to_sidecar.html#healpyxel.sidecar.add_psf_weights_to_sidecar">sidecar.add_psf_weights_to_sidecar</a></td>
+<td><a href="sidecar.add_psf_weights_to_sidecar.qmd#healpyxel.sidecar.add_psf_weights_to_sidecar">sidecar.add_psf_weights_to_sidecar</a></td>
 <td>Add a ‘weight’ column to the sidecar DataFrame using PSF functions.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/sidecar.normalize_weights_per_cell.html#healpyxel.sidecar.normalize_weights_per_cell">sidecar.normalize_weights_per_cell</a></td>
+<td><a href="sidecar.normalize_weights_per_cell.qmd#healpyxel.sidecar.normalize_weights_per_cell">sidecar.normalize_weights_per_cell</a></td>
 <td>Normalize weights so that sum of weights per cell is 1.0.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/sidecar.build_output_path.html#healpyxel.sidecar.build_output_path">sidecar.build_output_path</a></td>
+<td><a href="sidecar.build_output_path.qmd#healpyxel.sidecar.build_output_path">sidecar.build_output_path</a></td>
 <td>Build output path for sidecar file based on input and parameters.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/sidecar.write_sidecar_metadata.html#healpyxel.sidecar.write_sidecar_metadata">sidecar.write_sidecar_metadata</a></td>
+<td><a href="sidecar.write_sidecar_metadata.qmd#healpyxel.sidecar.write_sidecar_metadata">sidecar.write_sidecar_metadata</a></td>
 <td>Write sidecar processing metadata to JSON file.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/sidecar.validate_nside.html#healpyxel.sidecar.validate_nside">sidecar.validate_nside</a></td>
+<td><a href="sidecar.validate_nside.qmd#healpyxel.sidecar.validate_nside">sidecar.validate_nside</a></td>
 <td>Validate that nside is a positive power of two.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/sidecar.get_healpix_cell_geometry.html#healpyxel.sidecar.get_healpix_cell_geometry">sidecar.get_healpix_cell_geometry</a></td>
+<td><a href="sidecar.get_healpix_cell_geometry.qmd#healpyxel.sidecar.get_healpix_cell_geometry">sidecar.get_healpix_cell_geometry</a></td>
 <td>Return a shapely Polygon for the given HEALPix cell.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/sidecar.get_psf.html#healpyxel.sidecar.get_psf">sidecar.get_psf</a></td>
+<td><a href="sidecar.get_psf.qmd#healpyxel.sidecar.get_psf">sidecar.get_psf</a></td>
 <td></td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/sidecar.GaussianPSF.html#healpyxel.sidecar.GaussianPSF">sidecar.GaussianPSF</a></td>
+<td><a href="sidecar.GaussianPSF.qmd#healpyxel.sidecar.GaussianPSF">sidecar.GaussianPSF</a></td>
 <td>2D Gaussian PSF centered at (0,0).</td>
 </tr>
 </tbody>
@@ -225,31 +803,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../../docs_src/reference/aggregate.aggregate_by_sidecar.html#healpyxel.aggregate.aggregate_by_sidecar">aggregate.aggregate_by_sidecar</a></td>
+<td><a href="aggregate.aggregate_by_sidecar.qmd#healpyxel.aggregate.aggregate_by_sidecar">aggregate.aggregate_by_sidecar</a></td>
 <td>Aggregate original DataFrame by HEALPix cells using a sidecar mapping.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/aggregate.collect_sidecar_outputs.html#healpyxel.aggregate.collect_sidecar_outputs">aggregate.collect_sidecar_outputs</a></td>
+<td><a href="aggregate.collect_sidecar_outputs.qmd#healpyxel.aggregate.collect_sidecar_outputs">aggregate.collect_sidecar_outputs</a></td>
 <td>Scan output_dir for sidecar parquet files that match the input file stem.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/aggregate.densify_healpix_aggregates.html#healpyxel.aggregate.densify_healpix_aggregates">aggregate.densify_healpix_aggregates</a></td>
+<td><a href="aggregate.densify_healpix_aggregates.qmd#healpyxel.aggregate.densify_healpix_aggregates">aggregate.densify_healpix_aggregates</a></td>
 <td>Densify aggregated DataFrame to include all HEALPix cells.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/aggregate.generate_output_filename.html#healpyxel.aggregate.generate_output_filename">aggregate.generate_output_filename</a></td>
+<td><a href="aggregate.generate_output_filename.qmd#healpyxel.aggregate.generate_output_filename">aggregate.generate_output_filename</a></td>
 <td>Generate output filename that matches the parseable structure of the sidecar.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/aggregate.extract_nside_from_filename.html#healpyxel.aggregate.extract_nside_from_filename">aggregate.extract_nside_from_filename</a></td>
+<td><a href="aggregate.extract_nside_from_filename.qmd#healpyxel.aggregate.extract_nside_from_filename">aggregate.extract_nside_from_filename</a></td>
 <td>Extract nside value from sidecar filename using regex.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/aggregate.validate_sidecar_metadata.html#healpyxel.aggregate.validate_sidecar_metadata">aggregate.validate_sidecar_metadata</a></td>
+<td><a href="aggregate.validate_sidecar_metadata.qmd#healpyxel.aggregate.validate_sidecar_metadata">aggregate.validate_sidecar_metadata</a></td>
 <td>Validate sidecar metadata file and check source_file match.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/aggregate.process_single_sidecar.html#healpyxel.aggregate.process_single_sidecar">aggregate.process_single_sidecar</a></td>
+<td><a href="aggregate.process_single_sidecar.qmd#healpyxel.aggregate.process_single_sidecar">aggregate.process_single_sidecar</a></td>
 <td>Process a single sidecar file (aggregation workflow).</td>
 </tr>
 </tbody>
@@ -261,39 +839,39 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../../docs_src/reference/accumulator.StreamingStats.html#healpyxel.accumulator.StreamingStats">accumulator.StreamingStats</a></td>
+<td><a href="accumulator.StreamingStats.qmd#healpyxel.accumulator.StreamingStats">accumulator.StreamingStats</a></td>
 <td>Container for streaming statistics using Welford’s algorithm.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/accumulator.CellAccumulator.html#healpyxel.accumulator.CellAccumulator">accumulator.CellAccumulator</a></td>
+<td><a href="accumulator.CellAccumulator.qmd#healpyxel.accumulator.CellAccumulator">accumulator.CellAccumulator</a></td>
 <td>Accumulator for a single HEALPix cell.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/accumulator.accumulate_batch.html#healpyxel.accumulator.accumulate_batch">accumulator.accumulate_batch</a></td>
+<td><a href="accumulator.accumulate_batch.qmd#healpyxel.accumulator.accumulate_batch">accumulator.accumulate_batch</a></td>
 <td>Process one batch of data and update accumulator state.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/accumulator.save_state.html#healpyxel.accumulator.save_state">accumulator.save_state</a></td>
+<td><a href="accumulator.save_state.qmd#healpyxel.accumulator.save_state">accumulator.save_state</a></td>
 <td>Serialize accumulated state to Parquet with metadata.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/accumulator.load_state.html#healpyxel.accumulator.load_state">accumulator.load_state</a></td>
+<td><a href="accumulator.load_state.qmd#healpyxel.accumulator.load_state">accumulator.load_state</a></td>
 <td>Load accumulator state, HEALPix metadata, AND processing history from parquet file.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/accumulator.state_to_dataframe.html#healpyxel.accumulator.state_to_dataframe">accumulator.state_to_dataframe</a></td>
+<td><a href="accumulator.state_to_dataframe.qmd#healpyxel.accumulator.state_to_dataframe">accumulator.state_to_dataframe</a></td>
 <td>Convert accumulated state dict → DataFrame with explicit healpix_id column.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility.html#healpyxel.accumulator.validate_accumulator_sidecar_compatibility">accumulator.validate_accumulator_sidecar_compatibility</a></td>
+<td><a href="accumulator.validate_accumulator_sidecar_compatibility.qmd#healpyxel.accumulator.validate_accumulator_sidecar_compatibility">accumulator.validate_accumulator_sidecar_compatibility</a></td>
 <td>Validate that accumulator state is compatible with sidecar file.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/accumulator.find_sidecar.html#healpyxel.accumulator.find_sidecar">accumulator.find_sidecar</a></td>
+<td><a href="accumulator.find_sidecar.qmd#healpyxel.accumulator.find_sidecar">accumulator.find_sidecar</a></td>
 <td>Attempt to find matching sidecar file for input data.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/accumulator.ensure_not_processed.html#healpyxel.accumulator.ensure_not_processed">accumulator.ensure_not_processed</a></td>
+<td><a href="accumulator.ensure_not_processed.qmd#healpyxel.accumulator.ensure_not_processed">accumulator.ensure_not_processed</a></td>
 <td>Check/add input fingerprint in state metadata.</td>
 </tr>
 </tbody>
@@ -305,19 +883,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../../docs_src/reference/finalize.finalize_statistics.html#healpyxel.finalize.finalize_statistics">finalize.finalize_statistics</a></td>
+<td><a href="finalize.finalize_statistics.qmd#healpyxel.finalize.finalize_statistics">finalize.finalize_statistics</a></td>
 <td>Convert accumulator state to final statistics DataFrame.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/finalize.densify_healpix_map.html#healpyxel.finalize.densify_healpix_map">finalize.densify_healpix_map</a></td>
+<td><a href="finalize.densify_healpix_map.qmd#healpyxel.finalize.densify_healpix_map">finalize.densify_healpix_map</a></td>
 <td>Create a complete HEALPix grid by filling empty cells with fill_value.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/finalize.export_to_geotiff.html#healpyxel.finalize.export_to_geotiff">finalize.export_to_geotiff</a></td>
+<td><a href="finalize.export_to_geotiff.qmd#healpyxel.finalize.export_to_geotiff">finalize.export_to_geotiff</a></td>
 <td>Export a column to GeoTIFF format (requires rasterio and healpy).</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/finalize.load_state.html#healpyxel.finalize.load_state">finalize.load_state</a></td>
+<td><a href="finalize.load_state.qmd#healpyxel.finalize.load_state">finalize.load_state</a></td>
 <td>Load accumulator state, HEALPix metadata, AND processing history from parquet file.</td>
 </tr>
 </tbody>
@@ -329,27 +907,27 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../../docs_src/reference/metadata.HEALPyxelxMetadata.html#healpyxel.metadata.HEALPyxelxMetadata">metadata.HEALPyxelxMetadata</a></td>
+<td><a href="metadata.HEALPyxelxMetadata.qmd#healpyxel.metadata.HEALPyxelxMetadata">metadata.HEALPyxelxMetadata</a></td>
 <td>Validated HEALPix grid metadata with embedded parquet I/O.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/metadata.FileType.html#healpyxel.metadata.FileType">metadata.FileType</a></td>
+<td><a href="metadata.FileType.qmd#healpyxel.metadata.FileType">metadata.FileType</a></td>
 <td>Pipeline file type discriminator.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/metadata.read_metadata_from_file.html#healpyxel.metadata.read_metadata_from_file">metadata.read_metadata_from_file</a></td>
+<td><a href="metadata.read_metadata_from_file.qmd#healpyxel.metadata.read_metadata_from_file">metadata.read_metadata_from_file</a></td>
 <td>Unified metadata reader with intelligent fallback strategy.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/metadata.save_with_metadata.html#healpyxel.metadata.save_with_metadata">metadata.save_with_metadata</a></td>
+<td><a href="metadata.save_with_metadata.qmd#healpyxel.metadata.save_with_metadata">metadata.save_with_metadata</a></td>
 <td>Save DataFrame with embedded HEALPix metadata.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/metadata.validate_sidecar.html#healpyxel.metadata.validate_sidecar">metadata.validate_sidecar</a></td>
+<td><a href="metadata.validate_sidecar.qmd#healpyxel.metadata.validate_sidecar">metadata.validate_sidecar</a></td>
 <td>Validate sidecar structure and return diagnostic metrics.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/metadata.validate_aggregate.html#healpyxel.metadata.validate_aggregate">metadata.validate_aggregate</a></td>
+<td><a href="metadata.validate_aggregate.qmd#healpyxel.metadata.validate_aggregate">metadata.validate_aggregate</a></td>
 <td>Validate aggregate DataFrame structure.</td>
 </tr>
 </tbody>
@@ -361,31 +939,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <table class="caption-top table">
 <tbody>
 <tr class="odd">
-<td><a href="../../docs_src/reference/cli.sidecar_cli.html#healpyxel.cli.sidecar_cli">cli.sidecar_cli</a></td>
+<td><a href="cli.sidecar_cli.qmd#healpyxel.cli.sidecar_cli">cli.sidecar_cli</a></td>
 <td>CLI entry point for healpyxel_sidecar.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/cli.aggregate_cli.html#healpyxel.cli.aggregate_cli">cli.aggregate_cli</a></td>
-<td>CLI entry point for healpix_aggregate command.</td>
+<td><a href="cli.aggregate_cli.qmd#healpyxel.cli.aggregate_cli">cli.aggregate_cli</a></td>
+<td>CLI entry point for healpyxel_aggregate.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/cli.accumulator_cli.html#healpyxel.cli.accumulator_cli">cli.accumulator_cli</a></td>
-<td>CLI entry point for healpix_accumulator command.</td>
+<td><a href="cli.accumulator_cli.qmd#healpyxel.cli.accumulator_cli">cli.accumulator_cli</a></td>
+<td>CLI entry point for healpyxel_accumulator.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/cli.finalize_cli.html#healpyxel.cli.finalize_cli">cli.finalize_cli</a></td>
-<td>CLI entry point for healpix_finalize command.</td>
+<td><a href="cli.finalize_cli.qmd#healpyxel.cli.finalize_cli">cli.finalize_cli</a></td>
+<td>CLI entry point for healpyxel_finalize.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/cli.to_geoparquet_cli.html#healpyxel.cli.to_geoparquet_cli">cli.to_geoparquet_cli</a></td>
-<td>CLI entry point for healpyxel_to_geoparquet command.</td>
+<td><a href="cli.to_geoparquet_cli.qmd#healpyxel.cli.to_geoparquet_cli">cli.to_geoparquet_cli</a></td>
+<td>CLI entry point for healpyxel_to_geoparquet.</td>
 </tr>
 <tr class="even">
-<td><a href="../../docs_src/reference/cli.cache_cli.html#healpyxel.cli.cache_cli">cli.cache_cli</a></td>
+<td><a href="cli.cache_cli.qmd#healpyxel.cli.cache_cli">cli.cache_cli</a></td>
 <td>CLI entry point for healpyxel-cache command.</td>
 </tr>
 <tr class="odd">
-<td><a href="../../docs_src/reference/cli.validate_lon_lat_columns.html#healpyxel.cli.validate_lon_lat_columns">cli.validate_lon_lat_columns</a></td>
+<td><a href="cli.validate_lon_lat_columns.qmd#healpyxel.cli.validate_lon_lat_columns">cli.validate_lon_lat_columns</a></td>
 <td>Validate or auto-detect lon/lat columns. Fail fast with context.</td>
 </tr>
 </tbody>
@@ -397,9 +975,37 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 </section>
 
-</main> <!-- /main -->
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var sidebar = document.getElementById('quarto-margin-sidebar');
+  if (!sidebar) return;
+  var text = sidebar.textContent || '';
+  if (text.indexOf('API Reference') === -1) return;
+  var el = document.getElementById('quarto-content');
+  if (!el) return;
+  // Remove sidebar and widen container so <main> fills the page
+  sidebar.remove();
+  el.classList.remove('page-columns');
+  el.style.maxWidth = '90vw';
+  el.style.gridTemplateColumns = '1fr';
+});
+</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
     const icon = "";
     const anchorJS = new window.AnchorJS();
     anchorJS.options = {
@@ -848,7 +1454,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       }
     }
   });
-  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../../notebooks/90_example_streaming.html" class="pagination-link" aria-label="Streaming WIP!">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Streaming WIP!</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Function reference {.doc .doc-index}</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">## Core</span></span>
@@ -941,10 +1556,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> <span class="pp">|</span></span>
 <span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="pp">| ---</span> <span class="pp">| ---</span> <span class="pp">|</span></span>
 <span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.sidecar_cli</span><span class="co">](cli.sidecar_cli.qmd#healpyxel.cli.sidecar_cli)</span> <span class="pp">|</span> CLI entry point for healpyxel_sidecar. <span class="pp">|</span></span>
-<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.aggregate_cli</span><span class="co">](cli.aggregate_cli.qmd#healpyxel.cli.aggregate_cli)</span> <span class="pp">|</span> CLI entry point for healpix_aggregate command. <span class="pp">|</span></span>
-<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.accumulator_cli</span><span class="co">](cli.accumulator_cli.qmd#healpyxel.cli.accumulator_cli)</span> <span class="pp">|</span> CLI entry point for healpix_accumulator command. <span class="pp">|</span></span>
-<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.finalize_cli</span><span class="co">](cli.finalize_cli.qmd#healpyxel.cli.finalize_cli)</span> <span class="pp">|</span> CLI entry point for healpix_finalize command. <span class="pp">|</span></span>
-<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.to_geoparquet_cli</span><span class="co">](cli.to_geoparquet_cli.qmd#healpyxel.cli.to_geoparquet_cli)</span> <span class="pp">|</span> CLI entry point for healpyxel_to_geoparquet command. <span class="pp">|</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.aggregate_cli</span><span class="co">](cli.aggregate_cli.qmd#healpyxel.cli.aggregate_cli)</span> <span class="pp">|</span> CLI entry point for healpyxel_aggregate. <span class="pp">|</span></span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.accumulator_cli</span><span class="co">](cli.accumulator_cli.qmd#healpyxel.cli.accumulator_cli)</span> <span class="pp">|</span> CLI entry point for healpyxel_accumulator. <span class="pp">|</span></span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.finalize_cli</span><span class="co">](cli.finalize_cli.qmd#healpyxel.cli.finalize_cli)</span> <span class="pp">|</span> CLI entry point for healpyxel_finalize. <span class="pp">|</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.to_geoparquet_cli</span><span class="co">](cli.to_geoparquet_cli.qmd#healpyxel.cli.to_geoparquet_cli)</span> <span class="pp">|</span> CLI entry point for healpyxel_to_geoparquet. <span class="pp">|</span></span>
 <span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.cache_cli</span><span class="co">](cli.cache_cli.qmd#healpyxel.cli.cache_cli)</span> <span class="pp">|</span> CLI entry point for healpyxel-cache command. <span class="pp">|</span></span>
 <span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">cli.validate_lon_lat_columns</span><span class="co">](cli.validate_lon_lat_columns.qmd#healpyxel.cli.validate_lon_lat_columns)</span> <span class="pp">|</span> Validate or auto-detect lon/lat columns. Fail fast with context. <span class="pp">|</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>

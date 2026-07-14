@@ -1,7 +1,12 @@
 # sidecar.get_healpix_cell_geometry { #healpyxel.sidecar.get_healpix_cell_geometry }
 
 ```python
-sidecar.get_healpix_cell_geometry(healpix_id, nside, nest=True)
+sidecar.get_healpix_cell_geometry(
+    healpix_id,
+    nside,
+    nest=True,
+    lon_convention='0_360',
+)
 ```
 
 Return a shapely Polygon for the given HEALPix cell.

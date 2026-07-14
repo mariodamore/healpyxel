@@ -1,0 +1,566 @@
+[
+  {
+    "objectID": "notebooks/90_example_streaming.html",
+    "href": "notebooks/90_example_streaming.html",
+    "title": "Streaming WIP!",
+    "section": "",
+    "text": "STILL WORK IN PROGRESS\nCode\nfrom pathlib import Path\nimport pandas as pd\nimport numpy as np\n\n# Get test data directory (notebooks sit one level below project root)\ntest_data_dir = Path('../test_data')\nbatches_dir = test_data_dir / 'batches'\nvalidation_dir = test_data_dir / 'validation'",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Streaming",
+      "Streaming WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/90_example_streaming.html#step-1-load-first-batch",
+    "href": "notebooks/90_example_streaming.html#step-1-load-first-batch",
+    "title": "Streaming WIP!",
+    "section": "Step 1: Load First Batch",
+    "text": "Step 1: Load First Batch\nLet’s inspect the first batch to understand the data structure:\n\n\nCode\nbatch_001 = pd.read_parquet(batches_dir / 'batch_001.parquet')\n\nprint(f\"Batch 001 Info:\")\nprint(f\"  Observations: {len(batch_001):,}\")\nprint(f\"  Columns: {len(batch_001.columns)}\")\nprint(f\"  Memory: {batch_001.memory_usage(deep=True).sum() / 1024 / 1024:.1f} MB\")\nprint(f\"\\n  Lon range: {batch_001['lon_center'].min():.2f}° to {batch_001['lon_center'].max():.2f}°\")\nprint(f\"  Lat range: {batch_001['lat_center'].min():.2f}° to {batch_001['lat_center'].max():.2f}°\")\n\n# Show spectral columns\nspectral_cols = [col for col in batch_001.columns if col.startswith('r') and col[1:4].isdigit()]\nprint(f\"\\n  Spectral columns: {spectral_cols}\")\n\nbatch_001.head(3)\n\n\nBatch 001 Info:\n  Observations: 1,468\n  Columns: 61\n  Memory: 0.9 MB\n\n  Lon range: 10.00° to 11.00°\n  Lat range: -19.98° to 19.89°\n\n  Spectral columns: ['r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2']\n\n\n\n\n\n\n\n\n\nref_id\na\nb\nc\nd\ne\nf\ng\nh\ni\n...\nlat_center\nlon_center\nsurface\nwidth\nlength\nang_incidence\nang_emission\nang_phase\nazimuth\ngeometry\n\n\n\n\n0\n1121007250900093\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n-18.660860\n10.366696\n215028350.0\n3099.5337\n88330.2600\n70.62914\n25.383625\n95.974850\n100.571640\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n1\n1121107541500261\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n-5.029988\n10.999325\n6055773.0\n2627.1873\n2934.8687\n65.56774\n36.283978\n101.835815\n110.489525\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n2\n1121107541500262\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n-5.010632\n10.991251\n6071996.5\n2630.5942\n2938.9200\n65.57476\n36.276817\n101.835700\n110.482254\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n\n\n3 rows × 61 columns",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Streaming",
+      "Streaming WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/90_example_streaming.html#step-2-generate-healpix-sidecar",
+    "href": "notebooks/90_example_streaming.html#step-2-generate-healpix-sidecar",
+    "title": "Streaming WIP!",
+    "section": "Step 2: Generate HEALPix Sidecar",
+    "text": "Step 2: Generate HEALPix Sidecar\nFor this example, we’ll use the existing healpix_sidecar.py script (will be converted to module later):\n\n\nCode\n# Once healpix_sidecar is converted to a module, this will be:\n# from healpyxel import sidecar\n# sidecar_df = sidecar.generate(batch_001, nside=64, mode='fuzzy')\n\n# For now, run the CLI:\nprint(\"Generate sidecar using CLI:\")\nprint(f\"  python healpix_sidecar.py --input {batches_dir / 'batch_001.parquet'} --nside 64 --mode fuzzy\")\nprint(\"\\nThis will create: batch_001.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet\")\n\n\nGenerate sidecar using CLI:\n  python healpix_sidecar.py --input ../test_data/batches/batch_001.parquet --nside 64 --mode fuzzy\n\nThis will create: batch_001.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Streaming",
+      "Streaming WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/90_example_streaming.html#step-3-streaming-accumulation-workflow",
+    "href": "notebooks/90_example_streaming.html#step-3-streaming-accumulation-workflow",
+    "title": "Streaming WIP!",
+    "section": "Step 3: Streaming Accumulation Workflow",
+    "text": "Step 3: Streaming Accumulation Workflow\nProcess multiple batches incrementally:\n\nConceptual Workflow\n# Day 1: Initialize\nfrom healpyxel import accumulator\n\nstate = accumulator.accumulate_batch(\n    new_data=batch_001,\n    sidecar=sidecar_001,\n    value_columns=['r750', 'r950'],\n    existing_state=None,  # First batch\n    use_tdigest=True\n)\n\n# Day 2: Incremental update\nstate = accumulator.accumulate_batch(\n    new_data=batch_002,\n    sidecar=sidecar_002,\n    value_columns=['r750', 'r950'],\n    existing_state=state,  # Reuse previous state\n    use_tdigest=True\n)\n\n# Finalize: Convert to statistics\nfrom healpyxel import finalize\n\nresults = finalize.finalize_statistics(\n    state=state,\n    percentiles=[25, 50, 75],\n    min_count=2\n)",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Streaming",
+      "Streaming WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/90_example_streaming.html#step-4-validation",
+    "href": "notebooks/90_example_streaming.html#step-4-validation",
+    "title": "Streaming WIP!",
+    "section": "Step 4: Validation",
+    "text": "Step 4: Validation\nCompare streaming results with batch processing:\n\n\nCode\n# Load combined validation file\ncombined_file = validation_dir / 'combined_batch_001_003.parquet'\n\nif combined_file.exists():\n    combined = pd.read_parquet(combined_file)\n    \n    print(\"Validation Dataset:\")\n    print(f\"  Combined (batches 1-3): {len(combined):,} obs\")\n    print(f\"  Lon range: {combined['lon_center'].min():.2f}° to {combined['lon_center'].max():.2f}°\")\n    \n    # Load individual batches\n    batch_001_len = len(pd.read_parquet(batches_dir / 'batch_001.parquet'))\n    batch_002_len = len(pd.read_parquet(batches_dir / 'batch_002.parquet'))\n    batch_003_len = len(pd.read_parquet(batches_dir / 'batch_003.parquet'))\n    \n    total_individual = batch_001_len + batch_002_len + batch_003_len\n    \n    print(f\"\\n  Individual batches sum: {total_individual:,} obs\")\n    print(f\"  Difference: {abs(len(combined) - total_individual)} obs\")\n    \n    if len(combined) == total_individual:\n        print(\"  ✓ Counts match perfectly!\")\n    else:\n        print(\"  ⚠️  Count mismatch (may be due to filtering)\")\nelse:\n    print(f\"⚠️  Validation file not found: {combined_file}\")\n\n\nValidation Dataset:\n  Combined (batches 1-3): 10,890 obs\n  Lon range: 175.00° to 178.00°\n\n  Individual batches sum: 5,017 obs\n  Difference: 5873 obs\n  ⚠️  Count mismatch (may be due to filtering)",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Streaming",
+      "Streaming WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/90_example_streaming.html#step-5-performance-metrics",
+    "href": "notebooks/90_example_streaming.html#step-5-performance-metrics",
+    "title": "Streaming WIP!",
+    "section": "Step 5: Performance Metrics",
+    "text": "Step 5: Performance Metrics\nCompare memory usage between approaches:\n\n\nCode\nimport sys\n\n# Memory for batch processing (loading all data at once)\nif combined_file.exists():\n    combined = pd.read_parquet(combined_file)\n    batch_memory = combined.memory_usage(deep=True).sum() / 1024 / 1024\n    \n    print(\"Memory Comparison:\")\n    print(f\"  Batch processing: {batch_memory:.1f} MB (load all data)\")\n    print(f\"  Streaming: ~5-10 MB per batch + state file (~10-20 MB)\")\n    print(f\"\\n  Memory savings: ~{batch_memory - 20:.1f} MB\")\n    print(f\"  Efficiency: {20 / batch_memory * 100:.1f}% of batch memory\")\n\n\nMemory Comparison:\n  Batch processing: 6.9 MB (load all data)\n  Streaming: ~5-10 MB per batch + state file (~10-20 MB)\n\n  Memory savings: ~-13.1 MB\n  Efficiency: 290.9% of batch memory",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Streaming",
+      "Streaming WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/90_example_streaming.html#summary",
+    "href": "notebooks/90_example_streaming.html#summary",
+    "title": "Streaming WIP!",
+    "section": "Summary",
+    "text": "Summary\nThis notebook demonstrates:\n\n✅ Loading test batch data\n✅ Understanding data structure\n⏳ Sidecar generation (to be implemented)\n⏳ Streaming accumulation (to be implemented)\n⏳ Finalization to statistics (to be implemented)\n✅ Validation approach\n✅ Performance benefits\n\nNext steps: - Convert healpix_*.py scripts to nbdev modules - Implement Python API for all functions - Add comprehensive tests - Create more example notebooks",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Streaming",
+      "Streaming WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/82_example_visualization_psf.html",
+    "href": "notebooks/82_example_visualization_psf.html",
+    "title": "Gaussian PSF - WIP!",
+    "section": "",
+    "text": "Use of Gaussian spread function both for measurement or healpix cell assignment and weigthing.\nSTILL WORK IN PROGRESS\n\n\nCode\n# Import the GaussianPSF class from healpyxel.sidecar\nfrom healpyxel.sidecar import GaussianPSF\n\nimport numpy as np\nimport matplotlib.pyplot as plt\n\n\n\n\nCode\n# Create a Gaussian PSF with a chosen sigma\nsigma = 1.0\npsf = GaussianPSF(sigma=sigma)\n\n# Create a grid of (dx, dy) values\ngrid_size = 100\nextent = 3 * sigma\nx = np.linspace(-extent, extent, grid_size)\ny = np.linspace(-extent, extent, grid_size)\ndx, dy = np.meshgrid(x, y)\n\n# Evaluate the PSF on the grid\nz = psf(dx, dy)\n\n\n\n\nCode\nplt.figure(figsize=(6, 5))\nplt.imshow(z, extent=[-extent, extent, -extent, extent], origin='lower', cmap='viridis')\nplt.colorbar(label='PSF Value')\nplt.title(f'2D Gaussian PSF (sigma={sigma})')\nplt.xlabel('dx')\nplt.ylabel('dy')\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\nCode\nplt.figure()\nplt.plot(x, psf(x, 0), label='PSF along dy=0')\nplt.title('Gaussian PSF 1D cross-section')\nplt.xlabel('dx')\nplt.ylabel('PSF Value')\nplt.legend()\nplt.show()\n\n\n\n\n\n\n\n\n\n\n\nCode\nfrom pathlib import Path\n\n# Look for test data\ntest_data_dir = Path('../test_data')\nif test_data_dir.exists():\n    print(\"Test data directory found!\")\n    print(f\"\\nContents:\")\n    for item in sorted(test_data_dir.iterdir()):\n        if item.is_file():\n            size_mb = item.stat().st_size / 1024 / 1024\n            print(f\"  {item.name}: {size_mb:.2f} MB\")\n        elif item.is_dir():\n            n_files = len(list(item.glob('*')))\n            print(f\"  {item.name}/: {n_files} files\")\nelse:\n    print(\"Test data directory not found. Run create_test_data.sh to generate test data.\")\n\n\nTest data directory found!\n\nContents:\n  README.md: 0.00 MB\n  batches/: 9 files\n  derived/: 1 files\n  regions/: 0 files\n  samples/: 5 files\n  validation/: 2 files\n\n\n\n\nCode\nfrom healpyxel.sidecar import process_partition, write_coalesced_output, get_psf\nimport pandas as pd\nfrom pathlib import Path\nimport geopandas as gpd\nfrom shapely import wkb\n\n# Load your test data\ninput_path = test_data_dir / 'batches' / 'batch_001.parquet'\n# Read as regular pandas DataFrame first (geometry is stored as WKB binary)\ndf = pd.read_parquet(input_path)\n\nprint(f\"Loaded {len(df)} rows\")\nprint(f\"Columns: {list(df.columns)}\")\n\n# Convert WKB geometry column to shapely geometries\nif 'geometry' in df.columns:\n    print(\"\\nConverting WKB geometry to GeoDataFrame...\")\n    df['geometry'] = df['geometry'].apply(lambda x: wkb.loads(bytes(x)) if x is not None else None)\n    gdf = gpd.GeoDataFrame(df, geometry='geometry', crs='EPSG:4326')\n    print(f\"CRS: {gdf.crs}\")\nelse:\n    print(\"\\nNo geometry column found!\")\n    gdf = df\n\n# Show first few rows\ngdf.head(3)\n\n\nLoaded 1468 rows\nColumns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'geometry']\n\nConverting WKB geometry to GeoDataFrame...\nCRS: EPSG:4326\n\n\n\n\n\n\n\n\n\nref_id\na\nb\nc\nd\ne\nf\ng\nh\ni\n...\nlat_center\nlon_center\nsurface\nwidth\nlength\nang_incidence\nang_emission\nang_phase\nazimuth\ngeometry\n\n\n\n\n0\n1121007250900093\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n-18.660860\n10.366696\n215028350.0\n3099.5337\n88330.2600\n70.62914\n25.383625\n95.974850\n100.571640\nPOLYGON ((9.27929 -18.77973, 10.37122 -18.6970...\n\n\n1\n1121107541500261\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n-5.029988\n10.999325\n6055773.0\n2627.1873\n2934.8687\n65.56774\n36.283978\n101.835815\n110.489525\nPOLYGON ((10.98603 -4.99815, 10.97064 -5.04187...\n\n\n2\n1121107541500262\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n-5.010632\n10.991251\n6071996.5\n2630.5942\n2938.9200\n65.57476\n36.276817\n101.835700\n110.482254\nPOLYGON ((10.97798 -4.97872, 10.9625 -5.0225, ...\n\n\n\n\n3 rows × 61 columns\n\n\n\n\n\nCode\ngdf['lon_center'].describe()\n\n\ncount    1468.000000\nmean       10.529462\nstd         0.305749\nmin        10.000008\n25%        10.255890\n50%        10.542513\n75%        10.823499\nmax        10.999325\nName: lon_center, dtype: float64\n\n\n\n\nCode\nimport numpy as np\n\ndef healpix_cell_diameter_deg(nside):\n    # Area of a HEALPix cell (steradians)\n    area_sr = 4 * np.pi / (12 * nside * nside)\n    # Convert to square degrees\n    area_deg2 = area_sr * (180/np.pi)**2\n    # Equivalent diameter (degrees) for a circle of this area\n    diameter_deg = 2 * np.sqrt(area_deg2 / np.pi)\n    return diameter_deg\n\n\n\n\nCode\n# Set parameters\nnside = 32\nmode = \"fuzzy\"\nlon_convention = \"0_360\"\nsigma_level = 0.01  # Number of sigma to cover the cell\ncell_radius = healpix_cell_diameter_deg(nside) / 2\nsigma = cell_radius / sigma_level\ncell_psf = get_psf(\"gaussian\", sigma=sigma)  # You can adjust sigma as needed\nprint(f\"{cell_radius=}\")\nprint(f\"{sigma_level=}\")\nprint(f\"{sigma=:}\")\n\n\ncell_radius=np.float64(1.03374167891586)\nsigma_level=0.01\nsigma=103.374167891586\n\n\n\n\nCode\nplt.figure()\nx = np.linspace(-3* cell_radius, 3*cell_radius, 200)\nplt.figure(figsize=(15,4))\nplt.plot(x, cell_psf(x, 0), label='PSF along dy=0')\n# put vertical lines at +/- cell_diameter\nplt.axvline(cell_radius, color='r', linestyle='--', label='Cell Diameter ')\nplt.axvline(-cell_radius, color='r', linestyle='--')\nplt.title('Gaussian PSF 1D cross-section')\nplt.xlabel('dx')\nplt.ylabel('PSF Value')\nplt.legend()\nplt.show()\n\n\n&lt;Figure size 672x480 with 0 Axes&gt;\n\n\n\n\n\n\n\n\n\n\n\nCode\nprocessed_partition = process_partition(\n    gdf, \n    nside, \n    mode, \n    base_index=None,\n    lon_convention=lon_convention,\n    data_psf=None,\n    cell_psf=cell_psf\n    )\n\nprint(processed_partition.describe())\n\n\n         source_id   healpix_id       weight\ncount  1739.000000       1739.0  1739.000000\nmean    727.195515  4429.384129     0.921372\nstd     418.950427   223.607119     0.035745\nmin       0.000000       4175.0     0.856722\n25%     366.500000       4217.0     0.892225\n50%     743.000000       4483.0     0.929850\n75%    1079.000000       4495.0     0.944746\nmax    1467.000000       4976.0     0.986331\n\n\n\n\nCode\nprocessed_partition['weight'].plot( cmap='viridis', figsize=(8,6), legend=True)\n\n\n\n\n\n\n\n\n\n\n\nCode\nprocessed_partition.groupby('healpix_id').agg(len)[['weight']].sort_values(by='weight', ascending=False).head(10)\n\n\n\n\n\n\n\n\n\nweight\n\n\nhealpix_id\n\n\n\n\n\n4492\n141\n\n\n4208\n121\n\n\n4489\n115\n\n\n4197\n115\n\n\n4494\n101\n\n\n4220\n97\n\n\n4223\n96\n\n\n4217\n96\n\n\n4482\n76\n\n\n4483\n71\n\n\n\n\n\n\n\n\n\nCode\nprocessed_partition.groupby('healpix_id').agg(sum)[['weight']].sort_values(by='weight', ascending=False).head(10)\n\n\n\n\n\n\n\n\n\nweight\n\n\nhealpix_id\n\n\n\n\n\n4492\n131.989471\n\n\n4489\n107.275394\n\n\n4208\n105.071214\n\n\n4197\n99.205540\n\n\n4494\n94.980121\n\n\n4223\n87.018214\n\n\n4220\n86.826338\n\n\n4217\n85.490074\n\n\n4482\n70.281569\n\n\n4483\n65.849359\n\n\n\n\n\n\n\n\n\nCode\nhealpix_id = 6374\ncell = processed_partition.query(f'healpix_id == {healpix_id}')\n\ncell\n\n\n\n\n\n\n\n\n\nsource_id\nhealpix_id\nweight\n\n\n\n\n\n\n\n\n\n\n\nCode\nimport healpy as hp\nlon, lat = 175, 43  # Example from your data\ntheta = np.radians(90 - lat)\nphi = np.radians(lon)\nhid = hp.ang2pix(nside, theta, phi, nest=True)\nprint(hid)\n\nfrom healpyxel.sidecar import get_healpix_cell_geometry\n\n# Return a shapely Polygon for the given HEALPix cell.\n# Uses healpy boundaries (in degrees, lon/lat).\n\nprint(get_healpix_cell_geometry(hid, nside=nside,nest=False).exterior.xy)\n\n\n1372\n(array('d', [-32.94412311703627, -33.52804087419743, -34.82172104878954, -34.23461408949813, -32.94412311703627]), array('d', [100.70419447584689, 102.7155086769465, 102.67406996768031, 100.66793719134546, 100.70419447584689]))\n\n\n\n\nCode\ngdf_cell = gdf.iloc[cell['source_id'].values].copy()\n\n\n\n\nCode\ngdf_cell['weight'] = cell.set_index('source_id')['weight']\nfig, ax = plt.subplots(figsize=(20,8))\ngdf_cell.plot(aspect=0.2, ax=ax, column='weight', legend=True)\n\n\n\n\n\n\n\n\n\n\n\nCode\ngdf_cell['weight'].plot( cmap='viridis', figsize=(8,6), legend=True)\n\n\n\n\n\n\n\n\n\n\n\nCode\nfrom sqlalchemy import column\n\n\nfig, axs = plt.subplots(ncols=2, figsize=(10,8))\ngdf_cell.plot(ax=axs[0], aspect='equal', column='weight')\npoly = get_healpix_cell_geometry(healpix_id, nside=nside)\nx_poly, y_poly = poly.exterior.xy\n\naxs[1].plot(x_poly, y_poly, color='red', linewidth=2)\naxs[1].fill(x_poly, y_poly, facecolor='red', alpha=0.15)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n Back to top",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Visualization",
+      "Gaussian PSF - WIP!"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html",
+    "href": "notebooks/01_core_concepts.html",
+    "title": "Core Concepts",
+    "section": "",
+    "text": "Code\nimport healpyxel\nfrom healpyxel import core\nimport pandas as pd\nimport numpy as np\n\nprint(f\"healpyxel version: {healpyxel.__version__}\")\n\n\nhealpyxel version: 0.2.0",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html#core-utilities",
+    "href": "notebooks/01_core_concepts.html#core-utilities",
+    "title": "Core Concepts",
+    "section": "Core Utilities",
+    "text": "Core Utilities\nTest the core utility functions:\n\n\nCode\n# Validate nside parameter\ntry:\n    core.validate_nside(64)  # Valid power of 2\n    print(\"✓ nside=64 is valid\")\nexcept ValueError as e:\n    print(f\"✗ {e}\")\n\ntry:\n    core.validate_nside(100)  # Invalid\nexcept ValueError as e:\n    print(f\"✓ Caught invalid nside: {e}\")\n\n\n✓ nside=64 is valid\n✓ Caught invalid nside: nside must be a power of 2, got 100\n\n\n\n\nCode\n# Test MAD (Median Absolute Deviation)\ndata = np.array([1, 2, 3, 4, 5, 100])  # Outlier at 100\nmad_value = core.mad(data)\nprint(f\"MAD of {data}: {mad_value:.2f}\")\n\n\nMAD of [  1   2   3   4   5 100]: 1.50\n\n\n\n\nCode\n# Test robust standard deviation\nrobust_std = core.robust_std(data)\nnormal_std = np.std(data)\nprint(f\"Robust std: {robust_std:.2f}\")\nprint(f\"Normal std: {normal_std:.2f}\")\nprint(f\"Robust std is less affected by the outlier (100)\")\n\n\nRobust std: 2.22\nNormal std: 36.17\nRobust std is less affected by the outlier (100)",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html#test-data",
+    "href": "notebooks/01_core_concepts.html#test-data",
+    "title": "Core Concepts",
+    "section": "Test Data",
+    "text": "Test Data\nCheck available test data in the package:\n\n\nCode\nfrom pathlib import Path\n\n# Look for test data\ntest_data_dir = Path('../test_data')\nif test_data_dir.exists():\n    print(\"Test data directory found!\")\n    print(f\"\\nContents:\")\n    for item in sorted(test_data_dir.iterdir()):\n        if item.is_file():\n            size_mb = item.stat().st_size / 1024 / 1024\n            print(f\"  {item.name}: {size_mb:.2f} MB\")\n        elif item.is_dir():\n            n_files = len(list(item.glob('*')))\n            print(f\"  {item.name}/: {n_files} files\")\nelse:\n    print(\"Test data directory not found. Run create_test_data.sh to generate test data.\")\n\n\nTest data directory found!\n\nContents:\n  README.md: 0.00 MB\n  batches/: 9 files\n  derived/: 1 files\n  regions/: 0 files\n  samples/: 5 files\n  validation/: 2 files",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html#cli-commands",
+    "href": "notebooks/01_core_concepts.html#cli-commands",
+    "title": "Core Concepts",
+    "section": "CLI Commands",
+    "text": "CLI Commands\nThe package provides four CLI commands:\n\nhealpix_sidecar - Create sidecar files with HEALPix assignments\nhealpix_aggregate - Aggregate data into HEALPix cells\nhealpix_accumulator - Stream large datasets with online statistics\nhealpix_finalize - Finalize accumulated state to statistical maps\n\nCheck if commands are available:\n\n\nCode\nimport subprocess\n\ncommands = ['healpix_sidecar', 'healpix_aggregate', 'healpix_accumulator', 'healpix_finalize']\n\nfor cmd in commands:\n    result = subprocess.run(['which', cmd], capture_output=True, text=True)\n    if result.returncode == 0:\n        print(f\"✓ {cmd}: {result.stdout.strip()}\")\n    else:\n        print(f\"✗ {cmd}: not found\")\n\n\n✗ healpix_sidecar: not found\n✗ healpix_aggregate: not found\n✗ healpix_accumulator: not found\n✗ healpix_finalize: not found",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html#quick-test-with-sample-data",
+    "href": "notebooks/01_core_concepts.html#quick-test-with-sample-data",
+    "title": "Core Concepts",
+    "section": "Quick Test with Sample Data",
+    "text": "Quick Test with Sample Data\nIf test data is available, let’s try a quick aggregation:\n\n\nCode\n# Check for sample data\nsample_file = test_data_dir / 'sample_001.parquet'\n\nif sample_file.exists():\n    print(f\"Loading sample: {sample_file.name}\")\n    df = pd.read_parquet(sample_file)\n    \n    print(f\"\\nShape: {df.shape}\")\n    print(f\"\\nColumns: {list(df.columns)}\")\n    print(f\"\\nFirst few rows:\")\n    display(df.head())\n    \n    # Check for lat/lon columns\n    if 'latitude' in df.columns and 'longitude' in df.columns:\n        print(f\"\\n✓ Found latitude/longitude columns for HEALPix conversion\")\n        print(f\"  Lat range: [{df['latitude'].min():.2f}, {df['latitude'].max():.2f}]\")\n        print(f\"  Lon range: [{df['longitude'].min():.2f}, {df['longitude'].max():.2f}]\")\nelse:\n    print(\"Sample data not found. Generate test data first:\")\n    print(\"  cd .. && bash create_test_data.sh\")\n\n\nSample data not found. Generate test data first:\n  cd .. && bash create_test_data.sh",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html#create-sidecar-for-sample-data-cli",
+    "href": "notebooks/01_core_concepts.html#create-sidecar-for-sample-data-cli",
+    "title": "Core Concepts",
+    "section": "Create Sidecar for Sample Data (CLI)",
+    "text": "Create Sidecar for Sample Data (CLI)\nBelow is a complete CLI regridding example that mirrors the notebook workflow using sample_50k.parquet, with nside=32. It writes outputs into a dedicated folder to keep the sidecar index stable.\nSave the script as examples/cli_regrid_sample_50k.sh and run it from the repo root:\n!/usr/bin/env bash\nset -euo pipefail\n\nROOT_DIR=\"$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/..\" && pwd)\"\nINPUT=\"$ROOT_DIR/test_data/samples/sample_50k.parquet\"\nOUT_DIR=\"$ROOT_DIR/test_data/derived/cli_quickstart\"\nNSIDE=32\nMODE=fuzzy\nLON_CONVENTION=0_360\n\nmkdir -p \"$OUT_DIR\"\n\n# 1) Create HEALPix sidecar\nhealpix_sidecar \\\n  --input \"$INPUT\" \\\n  --nside \"$NSIDE\" \\\n  --mode \"$MODE\" \\\n  --lon-convention \"$LON_CONVENTION\" \\\n  --output_dir \"$OUT_DIR\"\n\n# 2) Aggregate (densified) regridded map\nhealpix_aggregate \\\n  --input \"$INPUT\" \\\n  --sidecar-dir \"$OUT_DIR\" \\\n  --sidecar-index 0 \\\n  --aggregate \\\n  --columns r1050 \\\n  --aggs mean median std mad robust_std \\\n  --min-count 1 \\\n  --densify \\\n  --output \"$OUT_DIR/sample_50k_nside${NSIDE}_r1050_aggregate.parquet\"\n\nIf you want to aggregate a different column, replace r1050 in the script.\n\nOr use --all-columns to automatically aggregate every float/double column in the input (no need to list them manually):\nhealpix_aggregate \\\n  --input \"$INPUT\" \\\n  --sidecar-dir \"$OUT_DIR\" \\\n  --sidecar-index 0 \\\n  --aggregate \\\n  --all-columns \\\n  --aggs mean median std \\\n  --output \"$OUT_DIR/sample_50k_nside${NSIDE}_all_cols_aggregate.parquet\"\n\n\nCode\nfrom pathlib import Path\nfrom healpyxel.sidecar import build_output_path\n\nassert build_output_path(\n    Path(\"sample_50k.parquet\"),\n    mode=\"fuzzy\",\n    nside=32,\n).name == \"sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet\"",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html#next-steps",
+    "href": "notebooks/01_core_concepts.html#next-steps",
+    "title": "Core Concepts",
+    "section": "Next Steps",
+    "text": "Next Steps\nFor more detailed examples, see:\n\nSidecar workflow: 01_sidecar.ipynb - HEALPix assignment\nAggregation: 02_aggregate.ipynb - Statistical aggregation\nStreaming: 03_accumulator.ipynb - Large dataset processing\nFinalization: 04_finalize.ipynb - Final map products\n\nOr run the CLI commands directly:\n# Create sidecar with HEALPix IDs\nhealpix_sidecar --help\n\n# Aggregate into HEALPix cells\nhealpix_aggregate --help\n\n# Stream large datasets\nhealpix_accumulator --help\n\n# Finalize statistical maps\nhealpix_finalize --help",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "notebooks/01_core_concepts.html#package-information",
+    "href": "notebooks/01_core_concepts.html#package-information",
+    "title": "Core Concepts",
+    "section": "Package Information",
+    "text": "Package Information\n\n\nCode\n# Show available modules\nprint(\"Available modules:\")\nfor attr in dir(healpyxel):\n    if not attr.startswith('_'):\n        obj = getattr(healpyxel, attr)\n        if hasattr(obj, '__file__'):\n            print(f\"  - {attr}\")\n\n\nAvailable modules:\n  - accumulator\n  - aggregate\n  - cli\n  - core\n  - finalize\n  - geometry\n  - geospatial\n  - metadata\n  - sidecar",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Core Concepts"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html",
+    "href": "docs_src/index.html",
+    "title": "Healpyxel",
+    "section": "",
+    "text": "HEALPyxel — HEALPix-based spatial aggregation for planetary science data.",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#overview",
+    "href": "docs_src/index.html#overview",
+    "title": "Healpyxel",
+    "section": "Overview",
+    "text": "Overview\nThis project provides HEALPix-based spatial aggregation for planetary science data, with streaming accumulation, sidecar generation, and batch aggregation capabilities.",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#what-youll-learn",
+    "href": "docs_src/index.html#what-youll-learn",
+    "title": "Healpyxel",
+    "section": "What You’ll Learn",
+    "text": "What You’ll Learn\nStart with the linear path below if you are new to healpyxel:\n\nCore concepts tutorial — HEALPix basics, sidecar generation, aggregation\nFull workflow tutorial — end-to-end pipeline with visualizations\nSphere-native sidecar tutorial — great-circle SLERP, antimeridian-safe cells\n\nThe API reference is best used after the tutorial path above.",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#start-here",
+    "href": "docs_src/index.html#start-here",
+    "title": "Healpyxel",
+    "section": "Start Here",
+    "text": "Start Here\n\nCore concepts tutorial — the fastest way to get started.\nFull workflow tutorial — complete pipeline with plots.",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#install",
+    "href": "docs_src/index.html#install",
+    "title": "Healpyxel",
+    "section": "Install",
+    "text": "Install\nThe repository root README.md has the installation and local setup instructions, including optional dependencies.",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/index.html#workflow",
+    "href": "docs_src/index.html#workflow",
+    "title": "Healpyxel",
+    "section": "Workflow",
+    "text": "Workflow\n\nSidecar — assign MESSENGER/MASCS observations to HEALPix cells with PSF-weighted geometry\nAggregate — batch sidecar outputs into per-cell statistics\nAccumulate — stream incremental updates with TDigest percentiles and fuzzy mode\nFinalize — densify maps, export to GeoTIFF, and embed metadata",
+    "crumbs": [
+      "Home",
+      "Healpyxel"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html",
+    "href": "docs_src/reference/index.html",
+    "title": "",
+    "section": "",
+    "text": "Code",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html#core",
+    "href": "docs_src/reference/index.html#core",
+    "title": "",
+    "section": "Core",
+    "text": "Core\nValidation, robust statistics, and logging utilities.\n\n\n\ncore.validate_nside\nValidate that nside is a power of 2.\n\n\ncore.mad\nCompute Median Absolute Deviation.\n\n\ncore.robust_std\nCompute robust standard deviation using MAD * 1.4826.\n\n\ncore.setup_logger\nSetup a logger with standard formatting.",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html#sidecar",
+    "href": "docs_src/reference/index.html#sidecar",
+    "title": "",
+    "section": "Sidecar",
+    "text": "Sidecar\nHEALPix sidecar generation and PSF-weighted assignment.\n\n\n\nsidecar.compute_healpix_ids_from_lonlat\nCompute HEALPix indices for arrays of lon,lat in degrees.\n\n\nsidecar.detect_lonlat_columns\nAuto-detect longitude and latitude columns from a GeoDataFrame sample.\n\n\nsidecar.process_partition\nProcess a single dask partition and return DataFrame of assignments.\n\n\nsidecar.add_psf_weights_to_sidecar\nAdd a ‘weight’ column to the sidecar DataFrame using PSF functions.\n\n\nsidecar.normalize_weights_per_cell\nNormalize weights so that sum of weights per cell is 1.0.\n\n\nsidecar.build_output_path\nBuild output path for sidecar file based on input and parameters.\n\n\nsidecar.write_sidecar_metadata\nWrite sidecar processing metadata to JSON file.\n\n\nsidecar.validate_nside\nValidate that nside is a positive power of two.\n\n\nsidecar.get_healpix_cell_geometry\nReturn a shapely Polygon for the given HEALPix cell.\n\n\nsidecar.get_psf\n\n\n\nsidecar.GaussianPSF\n2D Gaussian PSF centered at (0,0).",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html#aggregate",
+    "href": "docs_src/reference/index.html#aggregate",
+    "title": "",
+    "section": "Aggregate",
+    "text": "Aggregate\nSidecar aggregation and output generation.\n\n\n\naggregate.aggregate_by_sidecar\nAggregate original DataFrame by HEALPix cells using a sidecar mapping.\n\n\naggregate.collect_sidecar_outputs\nScan output_dir for sidecar parquet files that match the input file stem.\n\n\naggregate.densify_healpix_aggregates\nDensify aggregated DataFrame to include all HEALPix cells.\n\n\naggregate.generate_output_filename\nGenerate output filename that matches the parseable structure of the sidecar.\n\n\naggregate.extract_nside_from_filename\nExtract nside value from sidecar filename using regex.\n\n\naggregate.validate_sidecar_metadata\nValidate sidecar metadata file and check source_file match.\n\n\naggregate.process_single_sidecar\nProcess a single sidecar file (aggregation workflow).",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html#accumulator",
+    "href": "docs_src/reference/index.html#accumulator",
+    "title": "",
+    "section": "Accumulator",
+    "text": "Accumulator\nStreaming accumulation with TDigest percentiles.\n\n\n\naccumulator.StreamingStats\nContainer for streaming statistics using Welford’s algorithm.\n\n\naccumulator.CellAccumulator\nAccumulator for a single HEALPix cell.\n\n\naccumulator.accumulate_batch\nProcess one batch of data and update accumulator state.\n\n\naccumulator.save_state\nSerialize accumulated state to Parquet with metadata.\n\n\naccumulator.load_state\nLoad accumulator state, HEALPix metadata, AND processing history from parquet file.\n\n\naccumulator.state_to_dataframe\nConvert accumulated state dict → DataFrame with explicit healpix_id column.\n\n\naccumulator.validate_accumulator_sidecar_compatibility\nValidate that accumulator state is compatible with sidecar file.\n\n\naccumulator.find_sidecar\nAttempt to find matching sidecar file for input data.\n\n\naccumulator.ensure_not_processed\nCheck/add input fingerprint in state metadata.",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html#finalize",
+    "href": "docs_src/reference/index.html#finalize",
+    "title": "",
+    "section": "Finalize",
+    "text": "Finalize\nStatistics finalization and export.\n\n\n\nfinalize.finalize_statistics\nConvert accumulator state to final statistics DataFrame.\n\n\nfinalize.densify_healpix_map\nCreate a complete HEALPix grid by filling empty cells with fill_value.\n\n\nfinalize.export_to_geotiff\nExport a column to GeoTIFF format (requires rasterio and healpy).\n\n\nfinalize.load_state\nLoad accumulator state, HEALPix metadata, AND processing history from parquet file.",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html#metadata",
+    "href": "docs_src/reference/index.html#metadata",
+    "title": "",
+    "section": "Metadata",
+    "text": "Metadata\nHEALPyxelxMetadata embedding and validation.\n\n\n\nmetadata.HEALPyxelxMetadata\nValidated HEALPix grid metadata with embedded parquet I/O.\n\n\nmetadata.FileType\nPipeline file type discriminator.\n\n\nmetadata.read_metadata_from_file\nUnified metadata reader with intelligent fallback strategy.\n\n\nmetadata.save_with_metadata\nSave DataFrame with embedded HEALPix metadata.\n\n\nmetadata.validate_sidecar\nValidate sidecar structure and return diagnostic metrics.\n\n\nmetadata.validate_aggregate\nValidate aggregate DataFrame structure.",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "docs_src/reference/index.html#cli",
+    "href": "docs_src/reference/index.html#cli",
+    "title": "",
+    "section": "CLI",
+    "text": "CLI\nCommand-line interface entry points.\n\n\n\ncli.sidecar_cli\nCLI entry point for healpyxel_sidecar.\n\n\ncli.aggregate_cli\nCLI entry point for healpyxel_aggregate.\n\n\ncli.accumulator_cli\nCLI entry point for healpyxel_accumulator.\n\n\ncli.finalize_cli\nCLI entry point for healpyxel_finalize.\n\n\ncli.to_geoparquet_cli\nCLI entry point for healpyxel_to_geoparquet.\n\n\ncli.cache_cli\nCLI entry point for healpyxel-cache command.\n\n\ncli.validate_lon_lat_columns\nValidate or auto-detect lon/lat columns. Fail fast with context.",
+    "crumbs": [
+      "Home",
+      "API Reference",
+      "Function reference"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_full_workflow.html",
+    "href": "notebooks/02_full_workflow.html",
+    "title": "Full Workflow",
+    "section": "",
+    "text": "Check available test data in the package\n\n\nCode\nfrom pathlib import Path\n\n# Look for test data\ntest_data_dir = Path('../test_data')\nif test_data_dir.exists():\n    print(\"Test data directory found!\")\n    print(f\"\\nContents:\")\n    for item in sorted(test_data_dir.iterdir()):\n        if item.is_file():\n            size_mb = item.stat().st_size / 1024 / 1024\n            print(f\"  {item.name}: {size_mb:.2f} MB\")\n        elif item.is_dir():\n            n_files = len(list(item.glob('*')))\n            print(f\"  {item.name}/: {n_files} files\")\nelse:\n    print(\"Test data directory not found. Run create_test_data.sh to generate test data.\")\n\n\nTest data directory found!\n\nContents:\n  README.md: 0.00 MB\n  batches/: 9 files\n  derived/: 1 files\n  regions/: 0 files\n  samples/: 5 files\n  validation/: 2 files",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Full Workflow"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_full_workflow.html#test-data",
+    "href": "notebooks/02_full_workflow.html#test-data",
+    "title": "Full Workflow",
+    "section": "",
+    "text": "Check available test data in the package\n\n\nCode\nfrom pathlib import Path\n\n# Look for test data\ntest_data_dir = Path('../test_data')\nif test_data_dir.exists():\n    print(\"Test data directory found!\")\n    print(f\"\\nContents:\")\n    for item in sorted(test_data_dir.iterdir()):\n        if item.is_file():\n            size_mb = item.stat().st_size / 1024 / 1024\n            print(f\"  {item.name}: {size_mb:.2f} MB\")\n        elif item.is_dir():\n            n_files = len(list(item.glob('*')))\n            print(f\"  {item.name}/: {n_files} files\")\nelse:\n    print(\"Test data directory not found. Run create_test_data.sh to generate test data.\")\n\n\nTest data directory found!\n\nContents:\n  README.md: 0.00 MB\n  batches/: 9 files\n  derived/: 1 files\n  regions/: 0 files\n  samples/: 5 files\n  validation/: 2 files",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Full Workflow"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_full_workflow.html#quick-test-with-sample-data",
+    "href": "notebooks/02_full_workflow.html#quick-test-with-sample-data",
+    "title": "Full Workflow",
+    "section": "Quick Test with Sample Data",
+    "text": "Quick Test with Sample Data\nIf test data is available, let’s try a quick aggregation\n\n\nLoading sample: sample_50k.parquet\n\nShape: (50000, 61)\n\nColumns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'geometry']\n\nFirst few rows:\n\n\n\n\n\n\n\n\n\nref_id\na\nb\nc\nd\ne\nf\ng\nh\ni\n...\nlat_center\nlon_center\nsurface\nwidth\nlength\nang_incidence\nang_emission\nang_phase\nazimuth\ngeometry\n\n\n\n\n0\n1310408274001158\n0\n1\n1\n1\n9\n1\n1\n0\n0\n...\n5.186568\n272.40450\n1567133.40\n1006.63727\n1982.1799\n43.049232\n34.814793\n77.85916\n109.019295\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n1\n1335313413800913\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n-60.939438\n71.77686\n13564574.00\n4064.49850\n4249.2210\n64.178116\n37.690910\n101.84035\n111.930336\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n2\n1224306405800836\n0\n2\n2\n2\n9\n1\n1\n0\n0\n...\n5.613894\n54.23045\n1755143.50\n1013.51886\n2204.9104\n53.815990\n24.053764\n77.86254\n99.559425\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n3\n1421301274400732\n0\n1\n1\n1\n9\n1\n1\n0\n0\n...\n-41.672714\n324.49740\n23309360.00\n6511.20950\n4558.0470\n52.841824\n46.625698\n99.40995\n121.833626\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n4\n1310308273500668\n0\n0\n0\n0\n9\n1\n1\n0\n0\n...\n26.975400\n284.81708\n905292.56\n480.38028\n2399.4622\n56.780300\n21.083624\n77.85945\n97.433360\nb'\\x01\\x03\\x00\\x00\\x00\\x01\\x00\\x00\\x00\\x05\\x00...\n\n\n\n\n5 rows × 61 columns\n\n\n\n\n\n\n\n\n\n\n\n\nfile\nsize_mb\nn_rows\nlat_min\nlat_max\nlon_min\nlon_max\nfilename\n\n\n\n\n0\nsamples/sample_50k.parquet\n18.891136\n50000\n-74.986440\n74.946884\n0.020273\n359.965550\nsample_50k\n\n\n1\nsamples/sample_5k.parquet\n1.941895\n5000\n-74.954390\n74.846540\n0.274960\n359.808900\nsample_5k\n\n\n2\nsamples/sample_25k.parquet\n9.614980\n25000\n-74.934560\n74.767715\n0.057941\n359.973240\nsample_25k\n\n\n3\nsamples/sample_50k.cell-healpix_assignment-fuz...\n0.481555\n50000\nNaN\nNaN\nNaN\nNaN\npart-000000\n\n\n4\nderived/cli_quickstart/sample_50k-aggregated-d...\n2.431089\n49152\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated-densified.cell-healpix_a...\n\n\n5\nderived/cli_quickstart/sample_50k-aggregated.c...\n0.806005\n10860\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated.cell-healpix_assignment-...\n\n\n6\nderived/cli_quickstart/sample_50k.cell-healpix...\n0.430335\n54931\nNaN\nNaN\nNaN\nNaN\nsample_50k.cell-healpix_assignment-fuzzy_nside...\n\n\n7\nderived/cli_quickstart/sample_50k-aggregated.c...\n0.538363\n10860\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated.cell-healpix_assignment-...\n\n\n8\nderived/cli_quickstart/sample_50k-aggregated-d...\n0.552613\n12288\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated-densified.cell-healpix_a...\n\n\n9\nderived/cli_quickstart/sample_50k-aggregated-d...\n0.850032\n12288\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated-densified.cell-healpix_a...\n\n\n10\nderived/cli_quickstart/sample_50k-aggregated.c...\n1.134424\n27990\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated.cell-healpix_assignment-...\n\n\n11\nderived/cli_quickstart/sample_50k.cell-healpix...\n0.525922\n59592\nNaN\nNaN\nNaN\nNaN\nsample_50k.cell-healpix_assignment-fuzzy_nside...\n\n\n12\nderived/cli_quickstart/sample_50k-aggregated.c...\n1.828314\n27990\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated.cell-healpix_assignment-...\n\n\n13\nderived/cli_quickstart/sample_50k-aggregated-d...\n1.302203\n49152\nNaN\nNaN\nNaN\nNaN\nsample_50k-aggregated-densified.cell-healpix_a...\n\n\n14\nvalidation/high_quality_subset.parquet\n9.039517\n25121\n-74.992330\n74.683150\n175.000180\n184.999790\nhigh_quality_subset\n\n\n15\nvalidation/combined_batch_001_003.parquet\n3.963546\n10890\n-74.627014\n74.447170\n175.000180\n177.999910\ncombined_batch_001_003\n\n\n16\nbatches/batch_009.parquet\n0.672874\n1801\n-19.999859\n19.949500\n16.000248\n16.998953\nbatch_009\n\n\n17\nbatches/batch_003.parquet\n0.632443\n1690\n-19.986248\n19.996410\n11.500583\n12.499980\nbatch_003\n\n\n18\nbatches/batch_007.parquet\n0.588025\n1558\n-19.987959\n19.968506\n14.500000\n15.498986\nbatch_007\n\n\n19\nbatches/batch_004.parquet\n0.623034\n1661\n-19.986248\n19.996410\n12.250600\n13.249151\nbatch_004\n\n\n20\nbatches/batch_006.parquet\n0.513293\n1359\n-19.990198\n19.941296\n13.750135\n14.748237\nbatch_006\n\n\n21\nbatches/batch_008.parquet\n0.748820\n2009\n-19.982304\n19.995022\n15.250301\n16.249926\nbatch_008\n\n\n22\nbatches/batch_001.parquet\n0.552237\n1468\n-19.979643\n19.893850\n10.000008\n10.999325\nbatch_001\n\n\n23\nbatches/batch_005.parquet\n0.532961\n1410\n-19.983326\n19.898113\n13.000294\n13.999997\nbatch_005\n\n\n24\nbatches/batch_002.parquet\n0.695540\n1859\n-19.984415\n19.893850\n10.750691\n11.749859\nbatch_002\n\n\n\n\n\n\n\nThose are the boundaries used to sample the initial data\n\n\n\n\n\n\n\n\n\n\n\nCode\n# #| hide\n# # convert to geopandas creating a polygon box with lat_min    lat_max lon_min lon_max per file\n# ax = gdf_stats[~gdf_stats.filename.str.contains('sample')].plot(column='filename', legend=False, figsize=(20, 6), aspect=0.25)\n# ax.set_xlim([150, 200])\n# ax.set_xlabel('Longitude')\n# ax.set_ylabel('Latitude')\n# ax.set_title('Geospatial coverage of parquet files (excluding sample files)')",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Full Workflow"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_full_workflow.html#create-sidecar-for-sample-data",
+    "href": "notebooks/02_full_workflow.html#create-sidecar-for-sample-data",
+    "title": "Full Workflow",
+    "section": "Create Sidecar for Sample Data",
+    "text": "Create Sidecar for Sample Data\nNow let’s create a HEALPix sidecar for the sample data. We can do this in memory without writing to a file.\n\n\nCode\n# Load the 50k sample\nimport geopandas as gpd\nfrom shapely import wkb\n\nsample_file = test_data_dir / 'samples' / 'sample_50k.parquet'\nprint(f\"Loading: {sample_file}\")\n\n# Read as regular pandas DataFrame first (geometry is stored as WKB binary)\ndf = pd.read_parquet(sample_file)\nprint(f\"Loaded {len(df)} rows\")\nprint(f\"Columns: {list(df.columns)}\")\n\n# Convert WKB geometry column to shapely geometries\nif 'geometry' in df.columns:\n    print(\"\\nConverting WKB geometry to GeoDataFrame...\")\n    df['geometry'] = df['geometry'].apply(lambda x: wkb.loads(bytes(x)) if x is not None else None)\n    gdf = gpd.GeoDataFrame(df, geometry='geometry', crs='EPSG:4326')\n    print(f\"CRS: {gdf.crs}\")\nelse:\n    print(\"\\nNo geometry column found!\")\n    gdf = df\n\n# Show first few rows\ngdf.head(3).iloc[:,-10:]\n\n\nLoading: ../test_data/samples/sample_50k.parquet\nLoaded 50000 rows\nColumns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'geometry']\n\nConverting WKB geometry to GeoDataFrame...\nCRS: EPSG:4326\n\n\n\n\n\n\n\n\n\nlat_center\nlon_center\nsurface\nwidth\nlength\nang_incidence\nang_emission\nang_phase\nazimuth\ngeometry\n\n\n\n\n0\n5.186568\n272.40450\n1567133.4\n1006.63727\n1982.1799\n43.049232\n34.814793\n77.85916\n109.019295\nPOLYGON ((272.39758 5.16433, 272.41583 5.18307...\n\n\n1\n-60.939438\n71.77686\n13564574.0\n4064.49850\n4249.2210\n64.178116\n37.690910\n101.84035\n111.930336\nPOLYGON ((71.72596 -60.89612, 71.69186 -60.963...\n\n\n2\n5.613894\n54.23045\n1755143.5\n1013.51886\n2204.9104\n53.815990\n24.053764\n77.86254\n99.559425\nPOLYGON ((54.24406 5.63592, 54.22025 5.62014, ...\n\n\n\n\n\n\n\nCreate sidecar in memory using the process_partition function\n\n\nCode\n# Create sidecar in memory using the process_partition function\nfrom healpyxel.sidecar import process_partition\n\n# Parameters\nnside = 32  # HEALPix resolution\nmode = 'fuzzy'  # 'fuzzy' allows multiple cells per geometry, 'strict' only single-cell geometries\n\n# Process the GeoDataFrame\nsidecar_df = process_partition(\n    gdf=gdf,\n    nside=nside,\n    mode=mode,\n    base_index=0,  # Start source_id from 0\n    lon_convention='0_360',  # Use '0_360' or '-180_180' (underscores, not hyphens!)\n)\n\nprint(f\"Created sidecar with {len(sidecar_df)} assignments\")\nprint(f\"Unique geometries: {sidecar_df['source_id'].nunique()}\")\nprint(f\"Unique HEALPix cells: {sidecar_df['healpix_id'].nunique()}\")\nprint(f\"\\nSidecar columns: {list(sidecar_df.columns)}\")\nprint(f\"Sidecar dtypes:\\n{sidecar_df.dtypes}\")\n\n# Show first few assignments\nsidecar_df.head(10)\n\n\nCreated sidecar with 57653 assignments\nUnique geometries: 49988\nUnique HEALPix cells: 10954\n\nSidecar columns: ['source_id', 'healpix_id', 'weight']\nSidecar dtypes:\nsource_id       int64\nhealpix_id     UInt64\nweight        float64\ndtype: object\n\n\n\n\n\n\n\n\n\nsource_id\nhealpix_id\nweight\n\n\n\n\n0\n0\n7943\n1.0\n\n\n1\n1\n8287\n1.0\n\n\n2\n1\n8309\n1.0\n\n\n3\n2\n5819\n1.0\n\n\n4\n3\n11685\n1.0\n\n\n5\n4\n3618\n1.0\n\n\n6\n5\n3805\n1.0\n\n\n7\n6\n9522\n1.0\n\n\n8\n7\n10975\n1.0\n\n\n9\n8\n1820\n1.0\n\n\n\n\n\n\n\nCheck how many cells each geometry touches (for fuzzy mode)\n\n\nAssignment statistics:\n  Min cells per geometry: 1\n  Max cells per geometry: 115\n  Mean cells per geometry: 1.15\n  Median cells per geometry: 1\n\nDistribution of assignments per geometry:\n1      43782\n2       5667\n3        355\n4        110\n5         35\n6         18\n7         12\n9          2\n10         1\n102        1\nName: count, dtype: int64\n\n\nOptional: Save sidecar to file for later use\n\n\nCode\nsidecar_output = pathlib.Path(f'/tmp/sample_50k_sidecar_nside{nside}_{mode}.parquet')\nsidecar_df.to_parquet(sidecar_output, index=False)\nprint(f\"Saved sidecar to: {sidecar_output}\")\nprint(f\"File size: {sidecar_output.stat().st_size / 1024:.2f} KB\")\n\n\nSaved sidecar to: /tmp/sample_50k_sidecar_nside32_fuzzy.parquet\nFile size: 450.80 KB",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Full Workflow"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_full_workflow.html#aggregate-data-by-healpix-cells",
+    "href": "notebooks/02_full_workflow.html#aggregate-data-by-healpix-cells",
+    "title": "Full Workflow",
+    "section": "Aggregate Data by HEALPix Cells",
+    "text": "Aggregate Data by HEALPix Cells\nNow let’s use the sidecar to aggregate the r1050 column from the original data by HEALPix cells.\n\n\n✓ Column 'r1050' found in the data\n  Range: [-0.050, 0.325]\n  Missing values: 0 / 50000\n\n\nAggregate r1050 by HEALPix cells with explicit aggregation functions.\nConvert GeoDataFrame to regular DataFrame for aggregation (geometry not needed)/\n\n\n\n\n\nAggregated data shape: (10954, 6)\nNumber of HEALPix cells with data: 10954\n\nAggregated columns: ['r1050_mean', 'r1050_median', 'r1050_std', 'r1050_mad', 'r1050_robust_std', 'n_sources']\n\n\n\n\n\n\n\n\n\nr1050_mean\nr1050_median\nr1050_std\nr1050_mad\nr1050_robust_std\nn_sources\n\n\nhealpix_id\n\n\n\n\n\n\n\n\n\n\n0\n0.048616\n0.047857\n0.003759\n0.002672\n0.003962\n4\n\n\n1\n0.051467\n0.052283\n0.002976\n0.001888\n0.002799\n6\n\n\n2\n0.049697\n0.049118\n0.003637\n0.002289\n0.003394\n6\n\n\n3\n0.057482\n0.057986\n0.006771\n0.006110\n0.009059\n4\n\n\n4\n0.051262\n0.051523\n0.006552\n0.002510\n0.003721\n9\n\n\n5\n0.048281\n0.048611\n0.008269\n0.004404\n0.006529\n8\n\n\n6\n0.058219\n0.058195\n0.002682\n0.002040\n0.003024\n6\n\n\n7\n0.053656\n0.054208\n0.008577\n0.006288\n0.009323\n8\n\n\n8\n0.037711\n0.037711\n0.008823\n0.008823\n0.013080\n2\n\n\n9\n0.041094\n0.041094\n0.012205\n0.012205\n0.018096\n2\n\n\n\n\n\n\n\n\nInterpret the Results\nEach row represents one HEALPix cell with: - healpix_id: The HEALPix cell identifier - r1050_mean: Mean of r1050 values in this cell - r1050_median: Median value (less affected by outliers) - r1050_std: Standard deviation (spread of values) - r1050_mad: Median Absolute Deviation (robust measure of spread) - r1050_robust_std: MAD * 1.4826 (approximates standard deviation for normal distributions) - n_sources: Number of source measurements in this cell, for all columns\nLet’s examine the statistics of the aggregated data.\nfirst, Display summary statistics of the aggregated results on HEALPix cells:\n\n\n\n\n\n\n\n\n\ncount\nmean\nstd\nmin\n25%\n50%\n75%\nmax\n\n\n\n\nr1050_mean\n10954.0\n0.054834\n0.008016\n0.008949\n0.049467\n0.053936\n0.059161\n0.141338\n\n\nr1050_median\n10954.0\n0.054728\n0.007989\n0.008949\n0.049368\n0.053817\n0.059106\n0.141338\n\n\nr1050_std\n10954.0\n0.004962\n0.004279\n0.000000\n0.002073\n0.004382\n0.006932\n0.133480\n\n\nr1050_mad\n10954.0\n0.003148\n0.002982\n0.000000\n0.001069\n0.002590\n0.004398\n0.032018\n\n\nr1050_robust_std\n10954.0\n0.004666\n0.004421\n0.000000\n0.001585\n0.003840\n0.006520\n0.047470\n\n\nn_sources\n10954.0\n5.263192\n4.996303\n1.000000\n2.000000\n4.000000\n7.000000\n98.000000\n\n\n\n\n\n\n\nCheck the distribution of source counts per HEALPix cell:\n\n\n\nCells with only 1 source: 1543\nCells with 2-5 sources: 5649\nCells with 5+ sources: 3762\n\n\n\n\n\n\n\n\n\nn_sources\n\n\n\n\ncount\n10954.000000\n\n\nmean\n5.263192\n\n\nstd\n4.996303\n\n\nmin\n1.000000\n\n\n25%\n2.000000\n\n\n50%\n4.000000\n\n\n75%\n7.000000\n\n\nmax\n98.000000\n\n\n\n\n\n\n\n\n\nHEALPix Metadata\nThe aggregation results don’t automatically include HEALPix metadata. You need to track this separately or read it from a saved sidecar file. For in-memory workflows, store metadata explicitly:\n\n\nHEALPix Configuration:\n  nside: 32\n  order: nested\n  nested: True\n  mode: fuzzy\n\n\nReading metadata from saved sidecar files:\nIf you save the sidecar to a parquet file (like we did earlier), the metadata is embedded in the parquet schema and can be read back.\nRead metadata from saved sidecar file:\n\n\nMetadata from saved sidecar file:\n  nside: N/A\n  mode: N/A\n  order: N/A",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Full Workflow"
+    ]
+  },
+  {
+    "objectID": "notebooks/02_full_workflow.html#visualize-healpix-map",
+    "href": "notebooks/02_full_workflow.html#visualize-healpix-map",
+    "title": "Full Workflow",
+    "section": "Visualize HEALPix Map",
+    "text": "Visualize HEALPix Map\nBefore visualizing, we need to densify the sparse aggregated data to include all HEALPix cells (including empty ones).\nWe’ll use the visualization utilities from healpyxel.visualization module.\nThe aggregated DataFrame only contains cells with data (sparse).\nDensify to create a full HEALPix grid with all npix = 12 * nside^2 cells\n\n\nSparse aggregated cells: 10954\nDense HEALPix grid cells: 12288 (expected: 12288)\n\nEmpty cells (no data): 1334\nCells with data: 10954\n\n\n\n\n\n\n\n\n\nr1050_mean\nr1050_median\nr1050_std\nr1050_mad\nr1050_robust_std\nn_sources\n\n\nhealpix_id\n\n\n\n\n\n\n\n\n\n\n0\n0.048616\n0.047857\n0.003759\n0.002672\n0.003962\n4.0\n\n\n1\n0.051467\n0.052283\n0.002976\n0.001888\n0.002799\n6.0\n\n\n2\n0.049697\n0.049118\n0.003637\n0.002289\n0.003394\n6.0\n\n\n3\n0.057482\n0.057986\n0.006771\n0.006110\n0.009059\n4.0\n\n\n4\n0.051262\n0.051523\n0.006552\n0.002510\n0.003721\n9.0\n\n\n5\n0.048281\n0.048611\n0.008269\n0.004404\n0.006529\n8.0\n\n\n6\n0.058219\n0.058195\n0.002682\n0.002040\n0.003024\n6.0\n\n\n7\n0.053656\n0.054208\n0.008577\n0.006288\n0.009323\n8.0\n\n\n8\n0.037711\n0.037711\n0.008823\n0.008823\n0.013080\n2.0\n\n\n9\n0.041094\n0.041094\n0.012205\n0.012205\n0.018096\n2.0\n\n\n\n\n\n\n\nImport visualization utilities from healpyxel and prepare the HEALPix map for visualization\n\n\nCode\n# Import visualization utilities from healpyxel\nfrom healpyxel.visualization import prepare_healpix_map\nimport numpy as np\n\n# Prepare the HEALPix map for visualization\noutput_column = 'r1050_median'\n\nhealpix_map, valid_pixels, invalid_pixels, mappable = prepare_healpix_map(\n    aggregated_dense,\n    output_column=output_column,\n    equalize=True,  # Apply histogram equalization for better contrast\n    percentile_cutoff=None,  # Optional: clip outliers, e.g., 5 for [5%, 95%]\n    cmap='Spectral_r'\n)\n\nprint(f\"HEALPix map prepared:\")\nprint(f\"  Total pixels: {len(healpix_map)}\")\nprint(f\"  Valid pixels: {valid_pixels.sum()}\")\nprint(f\"  Invalid pixels: {invalid_pixels.sum()}\")\n\n\nHEALPix map prepared:\n  Total pixels: 12288\n  Valid pixels: 10954\n  Invalid pixels: 1334\n\n\n\n\nCode\nimport healpy\n\nax = healpy.orthview(healpix_map, nest=nest_flag,\n                         title=f'HEALPix Map of {output_column} (nside={nside}, order={order})',\n                         cmap='Spectral_r',flip='geo', norm='None', xsize=2500)\nhealpy.graticule()",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Full Workflow"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html",
+    "href": "notebooks/03_sphere_native_sidecar.html",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "",
+    "text": "How healpyxel assigns observation footprints to HEALPix cells using SLERP-great-circle sampling on unit vectors — sidestepping antimeridian crossings, pole singularities, and winding-order problems entirely.\nCode\nimport numpy as np\nimport matplotlib.pyplot as plt\nimport matplotlib.patches as mpatches\nfrom matplotlib.collections import PatchCollection\n\nfrom healpyxel.geometry import Sphere\nfrom healpyxel.sidecar import (\n    process_partition,\n    _sample_great_circle_arc,\n    _query_healpix_single_polygon,\n    compute_healpix_ids_from_lonlat,\n)\nimport geopandas as gpd\nfrom shapely.geometry import Polygon",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#the-problem-planar-lonlat-geometry",
+    "href": "notebooks/03_sphere_native_sidecar.html#the-problem-planar-lonlat-geometry",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "1. The Problem: Planar lon/lat Geometry",
+    "text": "1. The Problem: Planar lon/lat Geometry\nRepresenting planetary footprints as lon/lat polygons in a flat coordinate system creates well-known pathologies:\n\nAntimeridian crossing: A polygon spanning from 179° to -179° is drawn across 358° of the map, not the 2° it spans on the sphere.\nPole singularity: All longitudes converge at the pole; a “small” polygon near the pole may wrap incorrectly in lon/lat.\nWinding order: In planar GIS, CW vs CCW determines which side is “inside.” On the sphere, winding still matters topologically — but dense sampling sidesteps it.\n\nhealpyxel’s observation geometry lives on a spherical body, not on a projection. The computation engine should reflect that.",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#the-solution-unit-vectors-slerp-great-circle-arcs",
+    "href": "notebooks/03_sphere_native_sidecar.html#the-solution-unit-vectors-slerp-great-circle-arcs",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "2. The Solution: Unit Vectors + SLERP Great-Circle Arcs",
+    "text": "2. The Solution: Unit Vectors + SLERP Great-Circle Arcs\nThe key insight: convert every polygon vertex to a unit vector (x, y, z) on the unit sphere. Consecutive vertices are then connected by the shortest great-circle arc using SLERP (spherical linear interpolation):\n\\[\nv(t) = \\frac{\\sin((1-t)\\theta)}{\\sin\\theta} \\cdot v_0 + \\frac{\\sin(t\\theta)}{\\sin\\theta} \\cdot v_1\n\\]\nwhere \\(\\theta = \\arccos(v_0 \\cdot v_1)\\) is the angular distance between vertices.\nProperties: - Antimeridian crossing: (179°, 5°) to (-179°, 5°) is only 2° on the sphere — SLERP takes the short arc automatically. - Pole safe: The north pole is just the vector (0, 0, 1). - Convention independent: (181°, 5°) in [0,360] maps to the same unit vector as (-179°, 5°) in [-180,180]. - Winding agnostic: We sample all edges and add interior points; CW and CCW windings produce identical HEALPix cell sets.\nThe SLERP formula is implemented in _sample_great_circle_arc() in sidecar.py.",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#walkthrough-slerp-on-a-simple-polygon",
+    "href": "notebooks/03_sphere_native_sidecar.html#walkthrough-slerp-on-a-simple-polygon",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "3. Walkthrough: SLERP on a Simple Polygon",
+    "text": "3. Walkthrough: SLERP on a Simple Polygon\nLet’s trace what happens for a small rectangle at high latitude, first showing the great-circle arc sampling.\n\n\nCode\n# Create a simple polygon at high latitude\ncoords = [(95.0, 70.0), (105.0, 70.0), (105.0, 75.0), (95.0, 75.0), (95.0, 70.0)]\npoly = Polygon(coords)\n\nbody = Sphere()\n\n# Extract vertices\nc = np.array(poly.exterior.coords)\nlons_v = c[:, 0].astype(float)\nlats_v = c[:, 1].astype(float)\nxyz_v = body.lonlat_to_xyz(lons_v, lats_v)  # (3, N)\n\nprint(\"Polygon vertices (lon, lat):\")\nfor lon, lat in zip(lons_v, lats_v):\n    print(f\"  ({lon:.1f}°, {lat:.1f}°)\")\n\nprint(f\"\\nUnit vectors (x, y, z):\")\nfor i in range(xyz_v.shape[1]):\n    print(f\"  v{i}: [{xyz_v[0, i]:+.4f}, {xyz_v[1, i]:+.4f}, {xyz_v[2, i]:+.4f}]\")\n\n\nPolygon vertices (lon, lat):\n  (95.0°, 70.0°)\n  (105.0°, 70.0°)\n  (105.0°, 75.0°)\n  (95.0°, 75.0°)\n  (95.0°, 70.0°)\n\nUnit vectors (x, y, z):\n  v0: [-0.0298, +0.3407, +0.9397]\n  v1: [-0.0885, +0.3304, +0.9397]\n  v2: [-0.0670, +0.2500, +0.9659]\n  v3: [-0.0226, +0.2578, +0.9659]\n  v4: [-0.0298, +0.3407, +0.9397]\n\n\n\n\nCode\n# Sample the first edge (v0 -&gt; v1) via SLERP\nv0 = xyz_v[:, 0]\nv1 = xyz_v[:, 1]\narc_pts = _sample_great_circle_arc(v0, v1, 20)  # 20 points on the great-circle arc\narc_lon, arc_lat = body.xyz_to_lonlat(arc_pts)\n\nprint(f\"Edge v0-&gt;v1: ({lons_v[0]}°, {lats_v[0]}°) → ({lons_v[1]}°, {lats_v[1]}°)\")\nprint(f\"  Angular distance: {np.degrees(np.arccos(np.clip(np.dot(v0, v1), -1, 1))):.2f}°\")\nprint(f\"  SLERP samples (first 5):\")\nfor i in range(5):\n    print(f\"    t={i/19:.2f}: ({arc_lon[i]:.3f}°, {arc_lat[i]:.3f}°)\")\n\n\nEdge v0-&gt;v1: (95.0°, 70.0°) → (105.0°, 70.0°)\n  Angular distance: 3.42°\n  SLERP samples (first 5):\n    t=0.00: (95.000°, 70.000°)\n    t=0.05: (95.524°, 70.014°)\n    t=0.11: (96.049°, 70.026°)\n    t=0.16: (96.575°, 70.037°)\n    t=0.21: (97.101°, 70.047°)\n\n\nThe SLERP samples follow the shortest great-circle arc on the sphere. For a 10° edge at 70°N latitude, the arc curves slightly toward the pole — this is physically correct for a sensor footprint on a spherical body.",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#antimeridian-crossing-no-fix-needed",
+    "href": "notebooks/03_sphere_native_sidecar.html#antimeridian-crossing-no-fix-needed",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "4. Antimeridian Crossing: No Fix Needed",
+    "text": "4. Antimeridian Crossing: No Fix Needed\nA polygon crossing the antimeridian at low latitude: vertices from 179° → -179° span only 2° on the sphere.\n\n\nCode\ndef plot_polygon_and_slrp(ax, coords_list, body, color, label, n_edge=40, ls=\"-\"):\n    \"\"\"Plot polygon vertices and SLERP edge samples on a lon/lat map.\"\"\"\n    xyz_all = []\n    for i in range(len(coords_list) - 1):\n        lon0, lat0 = coords_list[i]\n        lon1, lat1 = coords_list[i + 1]\n        v0 = body.lonlat_to_xyz(np.array([lon0]), np.array([lat0])).flatten()\n        v1 = body.lonlat_to_xyz(np.array([lon1]), np.array([lat1])).flatten()\n        arc = _sample_great_circle_arc(v0, v1, n_edge)\n        a_lon, a_lat = body.xyz_to_lonlat(arc)\n        ax.plot(a_lon, a_lat, color=color, lw=1.5, ls=ls, alpha=0.7)\n\n    # Vertices\n    lons = [c[0] for c in coords_list]\n    lats = [c[1] for c in coords_list]\n    ax.scatter(lons, lats, color=color, zorder=5, s=40, label=label)\n    return lons, lats\n\n\nfig, axes = plt.subplots(2, 1, figsize=(10, 8))\n\n# Panel A: Antimeridian crossing ([-180, 180] convention)\nax = axes[0]\nam_coords = [(175, 5), (179, 5), (-179, 5), (-175, 5), (-175, -5), (-179, -6), (179, -6), (175, -5), (175, 5)]\nplot_polygon_and_slrp(ax, am_coords, body, \"tab:blue\", \"antimeridian FOV\", n_edge=60)\nax.axvline(180, color=\"k\", lw=0.8, ls=\"--\", alpha=0.4)\nax.axvline(-180, color=\"k\", lw=0.8, ls=\"--\", alpha=0.4)\nax.axvline(0, color=\"gray\", lw=0.5, ls=\":\", alpha=0.3)\nax.set_xlim(-200, 200)\nax.set_ylim(-15, 15)\nax.set_xlabel(\"Longitude (°)\")\nax.set_ylabel(\"Latitude (°)\")\nax.set_title(\"Antimeridian Crossing ([-180, 180])\")\nax.legend(loc=\"upper left\")\nax.grid(True, alpha=0.3)\n\n# Panel B: Same polygon in [0, 360] convention\nax = axes[1]\nam_coords_360 = [(175, 5), (179, 5), (181, 5), (185, 5), (185, -5), (181, -6), (179, -6), (175, -5), (175, 5)]\nplot_polygon_and_slrp(ax, am_coords_360, body, \"tab:orange\", \"antimeridian FOV [0,360]\", n_edge=60)\nax.axvline(180, color=\"k\", lw=0.8, ls=\"--\", alpha=0.4)\nax.axvline(360, color=\"k\", lw=0.8, ls=\"--\", alpha=0.4)\nax.set_xlim(150, 390)\nax.set_ylim(-15, 15)\nax.set_xlabel(\"Longitude (°)\")\nax.set_title(\"Same FOV in [0, 360] Convention\")\nax.legend(loc=\"upper left\")\nax.grid(True, alpha=0.3)\n\nplt.tight_layout()\nplt.show()\n\n\n\n\n\n\n\n\n\nKey observation: In both panels, the edges follow the short great-circle arc. The edge from (179°, 5°) to (-179°, 5°) — which would be drawn across 358° in a planar lon/lat plot — is correctly represented as the 2° arc on the sphere.\nBoth conventions ([-180,180] and [0,360]) produce identical unit vectors, hence identical SLERP sampling and identical HEALPix cell assignments.",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#winding-order-sidestepped-by-dense-sampling",
+    "href": "notebooks/03_sphere_native_sidecar.html#winding-order-sidestepped-by-dense-sampling",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "5. Winding Order: Sidestepped by Dense Sampling",
+    "text": "5. Winding Order: Sidestepped by Dense Sampling\nOur SLERP-based approach does not depend on winding order. We sample every edge (CW or CCW) and add interior points. The result is the same set of HEALPix cells regardless of vertex ordering.\n\n\nCode\n# Create the same polygon with CCW and CW winding\ncoords_ccw = [(95.0, 70.0), (105.0, 70.0), (105.0, 75.0), (95.0, 75.0), (95.0, 70.0)]\ncoords_cw = list(reversed(coords_ccw))\n\npoly_ccw = Polygon(coords_ccw)\npoly_cw = Polygon(coords_cw)\n\ngdf_ccw = gpd.GeoDataFrame({\"geometry\": [poly_ccw]})\ngdf_cw = gpd.GeoDataFrame({\"geometry\": [poly_cw]})\n\nresult_ccw = process_partition(gdf_ccw, nside=32, mode=\"fuzzy\", lon_convention=\"minus_plus180\", body=Sphere())\nresult_cw = process_partition(gdf_cw, nside=32, mode=\"fuzzy\", lon_convention=\"minus_plus180\", body=Sphere())\n\nccw_cells = set(result_ccw[\"healpix_id\"])\ncw_cells = set(result_cw[\"healpix_id\"])\n\nprint(f\"CCW winding → {len(ccw_cells)} HEALPix cells\")\nprint(f\"CW winding  → {len(cw_cells)} HEALPix cells\")\nprint(f\"Sets are identical: {ccw_cells == cw_cells}\")\n\n\nCCW winding → 10 HEALPix cells\nCW winding  → 10 HEALPix cells\nSets are identical: True\n\n\nBoth windings produce the exact same cell set. This is because:\n\n_sample_great_circle_arc samples edges regardless of direction\nThe centroid (mean of unit vectors) is added as interior coverage\nOriginal vertices are added for exact corner coverage\ncompute_healpix_ids_from_lonlat collects all points → HEALPix IDs\n\nSigned spherical area determines which side of the loop is “inside” — but we never need to know that, because our dense sampling covers both the edges and the interior.",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#convention-independence--180180-vs-0360",
+    "href": "notebooks/03_sphere_native_sidecar.html#convention-independence--180180-vs-0360",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "6. Convention Independence: [-180,180] vs [0,360]",
+    "text": "6. Convention Independence: [-180,180] vs [0,360]\nThe same physical polygon expressed in different longitude conventions must produce identical sidecars. Unit vectors make this trivially true.\n\n\nCode\nam_coords = [(175, 5), (179, 5), (-179, 5), (-175, 5),\n             (-175, -5), (-179, -6), (179, -6), (175, -5), (175, 5)]\n\npoly_m180 = Polygon(am_coords)\npoly_360 = Polygon([(lon if lon &gt;= 0 else lon + 360, lat) for lon, lat in am_coords])\n\ngdf_m180 = gpd.GeoDataFrame({\"geometry\": [poly_m180]})\ngdf_360 = gpd.GeoDataFrame({\"geometry\": [poly_360]})\n\nr_m180 = process_partition(gdf_m180, nside=32, mode=\"fuzzy\", lon_convention=\"minus_plus180\", body=Sphere())\nr_360 = process_partition(gdf_360, nside=32, mode=\"fuzzy\", lon_convention=\"0_360\", body=Sphere())\n\ncells_m180 = set(r_m180[\"healpix_id\"])\ncells_360 = set(r_360[\"healpix_id\"])\n\nprint(f\"[-180,180] convention → {len(cells_m180)} cells\")\nprint(f\"[0,360]   convention → {len(cells_360)} cells\")\nprint(f\"Identical sets: {cells_m180 == cells_360}\")\n\n\n[-180,180] convention → 29 cells\n[0,360]   convention → 29 cells\nIdentical sets: True",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#polar-polygon-no-singularity",
+    "href": "notebooks/03_sphere_native_sidecar.html#polar-polygon-no-singularity",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "7. Polar Polygon: No Singularity",
+    "text": "7. Polar Polygon: No Singularity\nA triangle wrapping around the north pole works correctly because unit vectors have no coordinate singularity.\n\n\nCode\n# Triangle covering area near the north pole\npolar_coords = [(0.0, 85.0), (120.0, 85.0), (240.0, 85.0), (0.0, 85.0)]\npoly_polar = Polygon(polar_coords)\ngdf_polar = gpd.GeoDataFrame({\"geometry\": [poly_polar]})\n\nr_polar = process_partition(gdf_polar, nside=32, mode=\"fuzzy\", lon_convention=\"0_360\", body=Sphere())\npolar_cells = set(r_polar[\"healpix_id\"])\n\nprint(f\"Polar polygon → {len(polar_cells)} HEALPix cells\")\n\n# Verify cells are near the pole (high healpy indices in nested ordering)\nimport healpy as hp\nfor hid in sorted(polar_cells)[:5]:\n    theta, phi = hp.pix2ang(32, int(hid), nest=True)\n    lat_d = 90.0 - np.degrees(theta)\n    lon_d = np.degrees(phi)\n    print(f\"  cell {hid}: (lon={lon_d:.1f}°, lat={lat_d:.1f}°)\")\n\n\nPolar polygon → 20 HEALPix cells\n  cell 1018: (lon=11.2°, lat=84.1°)\n  cell 1019: (lon=15.0°, lat=85.6°)\n  cell 1021: (lon=67.5°, lat=87.1°)\n  cell 1022: (lon=22.5°, lat=87.1°)\n  cell 1023: (lon=45.0°, lat=88.5°)",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#full-pipeline-from-footprint-to-sidecar",
+    "href": "notebooks/03_sphere_native_sidecar.html#full-pipeline-from-footprint-to-sidecar",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "8. Full Pipeline: From Footprint to Sidecar",
+    "text": "8. Full Pipeline: From Footprint to Sidecar\nThe complete fuzzy-mode pipeline for a single polygon:\n\n\nCode\nfig, ax = plt.subplots(figsize=(10, 6))\n\n# Simple rectangle\nsimple_coords = [(100.0, 70.0), (105.0, 70.0), (105.0, 75.0), (100.0, 75.0), (100.0, 70.0)]\nsimple_poly = Polygon(simple_coords)\ngdf_simple = gpd.GeoDataFrame({\"geometry\": [simple_poly]})\nr_simple = process_partition(gdf_simple, nside=32, mode=\"fuzzy\", lon_convention=\"minus_plus180\", body=Sphere())\nsimple_cells = set(r_simple[\"healpix_id\"])\n\n# Plot polygon and SLERP edges\nplot_polygon_and_slrp(ax, simple_coords, body, \"tab:blue\", \"FOV polygon\", n_edge=80)\n\n# Plot HEALPix cell boundaries for the assigned cells\nimport healpy as hp\n\nfor hid in simple_cells:\n    cell_boundary = hp.boundaries(32, int(hid), step=1, nest=True)  # (3, 4) corners\n    cell_lon = np.degrees(hp.vec2ang(cell_boundary)[1])\n    cell_lat = 90.0 - np.degrees(hp.vec2ang(cell_boundary)[0])\n    # Close the ring\n    cell_lon = np.append(cell_lon, cell_lon[0])\n    cell_lat = np.append(cell_lat, cell_lat[0])\n    ax.plot(cell_lon, cell_lat, color=\"tab:red\", lw=0.8, alpha=0.5)\n\n# Vertex cells (subset check)\nimport healpy as hp\nvertex_hids = compute_healpix_ids_from_lonlat(32,\n    np.array([c[0] for c in simple_coords]),\n    np.array([c[1] for c in simple_coords]),\n    body=body)\n\nprint(f\"FOV polygon: {len(simple_coords)-1} edges at (70-75°N, 100-105°E)\")\nprint(f\"Fuzzy mode assigned {len(simple_cells)} HEALPix cells at nside=32\")\nprint(f\"Vertex cells ({len(vertex_hids)}): {sorted(vertex_hids)}\")\nprint(f\"All HEALPix cells ({len(simple_cells)}): {sorted(simple_cells)}\")\nprint(f\"Vertices ⊆ Fuzzy: {set(vertex_hids).issubset(simple_cells)}\")\n\n# Draw vertex cells more prominently\nfor hid in vertex_hids:\n    cell_boundary = hp.boundaries(32, int(hid), step=1, nest=True)\n    cell_lon = np.degrees(hp.vec2ang(cell_boundary)[1])\n    cell_lat = 90.0 - np.degrees(hp.vec2ang(cell_boundary)[0])\n    cell_lon = np.append(cell_lon, cell_lon[0])\n    cell_lat = np.append(cell_lat, cell_lat[0])\n    ax.plot(cell_lon, cell_lat, color=\"tab:green\", lw=2)\n\nax.set_xlim(95, 110)\nax.set_ylim(68, 77)\nax.set_xlabel(\"Longitude (°)\")\nax.set_ylabel(\"Latitude (°)\")\nax.set_title(\"Sphere-Native Fuzzy Assignment: Polygon → HEALPix Cells\")\nax.legend(handles=[\n    mpatches.Patch(color=\"tab:blue\", label=\"Polygon edges (SLERP)\"),\n    mpatches.Patch(color=\"tab:red\", label=\"Fuzzy-mode cells\"),\n    mpatches.Patch(color=\"tab:green\", label=\"Vertex cells (subset)\"),\n], loc=\"upper left\")\nax.grid(True, alpha=0.3)\nplt.tight_layout()\nplt.show()\n\n\nFOV polygon: 4 edges at (70-75°N, 100-105°E)\nFuzzy mode assigned 7 HEALPix cells at nside=32\nVertex cells (5): [np.int64(1965), np.int64(1965), np.int64(1970), np.int64(1980), np.int64(1981)]\nAll HEALPix cells (7): [np.uint64(1965), np.uint64(1970), np.uint64(1971), np.uint64(1976), np.uint64(1977), np.uint64(1980), np.uint64(1981)]\nVertices ⊆ Fuzzy: True\n\n\n\n\n\n\n\n\n\nGreen = cells touched by polygon vertices (strict mode). Red = all cells assigned by fuzzy-mode SLERP. The vertex cells are always a subset of the fuzzy cells.",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  },
+  {
+    "objectID": "notebooks/03_sphere_native_sidecar.html#summary",
+    "href": "notebooks/03_sphere_native_sidecar.html#summary",
+    "title": "Sphere-Native Sidecar Generation",
+    "section": "9. Summary",
+    "text": "9. Summary\n\n\n\n\n\n\n\n\nProblem\nPlanar lon/lat\nSphere-native (SLERP)\n\n\n\n\nAntimeridian split\nNeeds antimeridian.fix_polygon\nNo fix needed\n\n\nLongitude wrapping (±180°)\nCoordinate discontinuity\nNever appears\n\n\nPole singularity\nAll longitudes = same point\nNo singularity\n\n\nWinding order\nMatters (CW ≠ CCW)\nSidestepped by dense sampling\n\n\nBounding boxes\nPlanar distortion\nNot needed\n\n\nshapely.STRtree\nRequired for fuzzy mode\nEliminated\n\n\nshapely.interpolate()\nPlanar, walks long way around\nReplaced by SLERP\n\n\n\nThe fuzzy-mode hot path is now fully sphere-native. The only remaining use of antimeridian is in healpyxel_to_geoparquet (Phase 3 of the pipeline) for generating valid GeoParquet polygons for GIS visualization — that is an I/O concern, not a geometric one.",
+    "crumbs": [
+      "Home",
+      "Tutorials",
+      "Geometry Engine",
+      "Sphere-Native Sidecar Generation"
+    ]
+  }
+]

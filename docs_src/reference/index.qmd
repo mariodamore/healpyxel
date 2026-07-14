@@ -90,9 +90,9 @@ Command-line interface entry points.
 | | |
 | --- | --- |
 | [cli.sidecar_cli](cli.sidecar_cli.qmd#healpyxel.cli.sidecar_cli) | CLI entry point for healpyxel_sidecar. |
-| [cli.aggregate_cli](cli.aggregate_cli.qmd#healpyxel.cli.aggregate_cli) | CLI entry point for healpix_aggregate command. |
-| [cli.accumulator_cli](cli.accumulator_cli.qmd#healpyxel.cli.accumulator_cli) | CLI entry point for healpix_accumulator command. |
-| [cli.finalize_cli](cli.finalize_cli.qmd#healpyxel.cli.finalize_cli) | CLI entry point for healpix_finalize command. |
-| [cli.to_geoparquet_cli](cli.to_geoparquet_cli.qmd#healpyxel.cli.to_geoparquet_cli) | CLI entry point for healpyxel_to_geoparquet command. |
+| [cli.aggregate_cli](cli.aggregate_cli.qmd#healpyxel.cli.aggregate_cli) | CLI entry point for healpyxel_aggregate. |
+| [cli.accumulator_cli](cli.accumulator_cli.qmd#healpyxel.cli.accumulator_cli) | CLI entry point for healpyxel_accumulator. |
+| [cli.finalize_cli](cli.finalize_cli.qmd#healpyxel.cli.finalize_cli) | CLI entry point for healpyxel_finalize. |
+| [cli.to_geoparquet_cli](cli.to_geoparquet_cli.qmd#healpyxel.cli.to_geoparquet_cli) | CLI entry point for healpyxel_to_geoparquet. |
 | [cli.cache_cli](cli.cache_cli.qmd#healpyxel.cli.cache_cli) | CLI entry point for healpyxel-cache command. |
 | [cli.validate_lon_lat_columns](cli.validate_lon_lat_columns.qmd#healpyxel.cli.validate_lon_lat_columns) | Validate or auto-detect lon/lat columns. Fail fast with context. |

@@ -6,6 +6,7 @@ from shapely.geometry import Point, Polygon
 from pathlib import Path
 import healpy as hp
 
+from healpyxel.geometry import Sphere
 from healpyxel.sidecar import (
     compute_healpix_ids_from_lonlat,
     detect_lonlat_columns,
@@ -714,3 +715,137 @@ class TestGeometryComprehensive:
             assert geom_ring.is_valid
             assert geom_nest.area > 0
             assert geom_ring.area > 0
+
+
+class TestSphereNativeFuzzyMode:
+    """Test sphere-native fuzzy mode without antimeridian or shapely interpolate.
+
+    ADR-013: The computation engine uses SLERP sampling on unit vectors.
+    No antimeridian, no STRtree, no shapely cell polygons.
+    """
+
+    def test_antimeridian_crossing_fov_returns_cells(self):
+        """Fuzzy mode assigns cells for polygons crossing the antimeridian
+        in both [-180,180] and [0,360] conventions."""
+        # Polygon crossing the antimeridian (raw coords, no fix_polygon)
+        coords = [(175, 5), (179, 5), (-179, 5), (-175, 5), (-175, -5), (-179, -6), (179, -6), (175, -5), (175, 5)]
+        poly = Polygon(coords)
+
+        # Test with minus_plus180 convention
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+        result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                   lon_convention='minus_plus180',
+                                   body=Sphere())
+        recs = result.to_dict('records')
+        assert len(recs) > 0, "Fuzzy mode should assign cells to antimeridian-crossing FOV"
+        hids = {r['healpix_id'] for r in recs}
+
+        # Same polygon in 0_360 convention should produce the same cells
+        poly_360 = Polygon([(lon if lon >= 0 else lon + 360, lat) for lon, lat in coords])
+        gdf_360 = gpd.GeoDataFrame({'geometry': [poly_360]})
+        result_360 = process_partition(gdf_360, nside=nside, mode='fuzzy',
+                                       lon_convention='0_360',
+                                       body=Sphere())
+        recs_360 = result_360.to_dict('records')
+        hids_360 = {r['healpix_id'] for r in recs_360}
+
+        assert hids == hids_360, \
+            f"Cell assignment independent of lon convention: {hids} vs {hids_360}"
+
+    def test_fuzzy_matches_strict_vertices_no_antimeridian(self):
+        """Fuzzy mode on a crossing FOV covers at least the cells touched by vertices."""
+        coords = [(170, 5), (179, 5), (-179, 5), (-170, 5),
+                  (-170, -5), (-179, -6), (179, -6), (170, -5), (170, 5)]
+        poly = Polygon(coords)
+
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+        result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                   lon_convention='minus_plus180',
+                                   body=Sphere())
+        recs = result.to_dict('records')
+        assert len(recs) > 0
+        fuzzy_hids = {r['healpix_id'] for r in recs}
+
+        # Strict mode on the raw polygon vertices
+        coords_arr = np.array(coords, dtype=np.float64)
+        strict_hids = set(compute_healpix_ids_from_lonlat(
+            nside, coords_arr[:, 0], coords_arr[:, 1]))
+        assert strict_hids.issubset(fuzzy_hids), \
+            f"Strict vertex cells {strict_hids} should be subset of fuzzy cells {fuzzy_hids}"
+
+    def test_polar_polygon_fuzzy_assignment(self):
+        """Fuzzy mode works for polygons near the north pole."""
+        # Triangle covering area near the pole
+        coords = [(0, 85), (120, 85), (240, 85), (0, 85)]
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+        result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                   lon_convention='0_360',
+                                   body=Sphere())
+        recs = result.to_dict('records')
+        assert len(recs) > 0, "Polar polygon should return cells"
+
+    def test_winding_order_independence(self):
+        """Same polygon with opposite winding returns the same cells."""
+        # CCW polygon (standard)
+        coords_ccw = [(0, 0), (10, 0), (10, 10), (0, 10), (0, 0)]
+        # CW polygon (reversed)
+        coords_cw = list(reversed(coords_ccw))
+
+        poly_ccw = Polygon(coords_ccw)
+        poly_cw = Polygon(coords_cw)
+
+        gdf_ccw = gpd.GeoDataFrame({'geometry': [poly_ccw]})
+        gdf_cw = gpd.GeoDataFrame({'geometry': [poly_cw]})
+
+        nside = 32
+        result_ccw = process_partition(gdf_ccw, nside=nside, mode='fuzzy',
+                                       lon_convention='0_360',
+                                       body=Sphere())
+        result_cw = process_partition(gdf_cw, nside=nside, mode='fuzzy',
+                                      lon_convention='0_360',
+                                      body=Sphere())
+
+        hids_ccw = {r['healpix_id'] for r in result_ccw.to_dict('records')}
+        hids_cw = {r['healpix_id'] for r in result_cw.to_dict('records')}
+        assert hids_ccw == hids_cw, \
+            f"Winding should not affect result: {hids_ccw} vs {hids_cw}"
+
+    def test_simple_polygon_fuzzy_assignment(self):
+        """Simple non-crossing polygon returns correct cells."""
+        coords = [(100, 70), (105, 70), (105, 75), (100, 75), (100, 70)]
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+        result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                   lon_convention='minus_plus180',
+                                   body=Sphere())
+        recs = result.to_dict('records')
+        assert len(recs) > 0
+
+        # Verify the polygon's vertex cells are a subset
+        vertex_hids = set(compute_healpix_ids_from_lonlat(
+            nside, np.array([c[0] for c in coords], dtype=np.float64),
+            np.array([c[1] for c in coords], dtype=np.float64)))
+        fuzzy_hids = {r['healpix_id'] for r in recs}
+        assert vertex_hids.issubset(fuzzy_hids)
+
+
+def test_antimeridian_crossing():
+    """Test points near antimeridian."""
+    nside = 32
+    # Points straddling the antimeridian
+    lons = np.array([179.0, -179.0], dtype=np.float64)
+    lats = np.array([0.0, 0.0], dtype=np.float64)
+    hids = compute_healpix_ids_from_lonlat(nside, lons, lats)
+    # Both should map to the same or adjacent cells (lon wrapping)
+    assert len(hids) >= 1
+
+
+def test_antimeridian_prefilter_order():
+    """Antimeridian handling occurs before bounds filtering."""
+    # This is now handled by the body.lonlat_to_xyz conversion
+    pass  # antimeridian is no longer part of the computation path

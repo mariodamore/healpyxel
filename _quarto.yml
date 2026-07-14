@@ -2,91 +2,135 @@ project:
   type: website
   title: "Healpyxel"
   output-dir: docs
+  render:
+    - docs_src/index.qmd
+    - docs_src/reference/index.qmd
+    - notebooks/01_core_concepts.py
+    - notebooks/02_full_workflow.py
+    - notebooks/82_example_visualization_psf.py
+    - notebooks/03_sphere_native_sidecar.py
+    - notebooks/90_example_streaming.py
 
 website:
+  navbar:
+    title: "Healpyxel"
+    logo: docs_src/logo_cutout_128.png
+    search: true
+    pinned: true
+    left:
+      - text: "Home"
+        href: docs_src/index.qmd
+      - text: "Tutorials"
+        href: notebooks/01_core_concepts.py.html
+      - text: "Sphere-Native Sidecar"
+        href: notebooks/03_sphere_native_sidecar.py.html
+      - text: "Reference"
+        href: docs_src/reference/index.qmd
+  favicon: docs_src/favicon.ico
   sidebar:
-    - title: Tutorials
-      contents:
-        - 80_example_quickstart
-        - 81_example_visualization_workflow
-        - 82_example_visualization_psf
-        - 83_example_accumulation
-        - 83_example_accumulation-back
-        - 90_example_streaming
-    - title: API Reference
-      contents:
-        - reference/index
-        - section: Core
-          contents:
-            - reference/core.validate_nside
-            - reference/core.mad
-            - reference/core.robust_std
-            - reference/core.setup_logger
-        - section: Sidecar
-          contents:
-            - reference/sidecar.compute_healpix_ids_from_lonlat
-            - reference/sidecar.detect_lonlat_columns
-            - reference/sidecar.process_partition
-            - reference/sidecar.add_psf_weights_to_sidecar
-            - reference/sidecar.normalize_weights_per_cell
-            - reference/sidecar.build_output_path
-            - reference/sidecar.write_sidecar_metadata
-            - reference/sidecar.validate_nside
-            - reference/sidecar.get_healpix_cell_geometry
-            - reference/sidecar.get_psf
-            - reference/sidecar.GaussianPSF
-        - section: Aggregate
-          contents:
-            - reference/aggregate.aggregate_by_sidecar
-            - reference/aggregate.collect_sidecar_outputs
-            - reference/aggregate.densify_healpix_aggregates
-            - reference/aggregate.generate_output_filename
-            - reference/aggregate.extract_nside_from_filename
-            - reference/aggregate.validate_sidecar_metadata
-            - reference/aggregate.process_single_sidecar
-        - section: Accumulator
-          contents:
-            - reference/accumulator.StreamingStats
-            - reference/accumulator.CellAccumulator
-            - reference/accumulator.accumulate_batch
-            - reference/accumulator.save_state
-            - reference/accumulator.load_state
-            - reference/accumulator.state_to_dataframe
-            - reference/accumulator.validate_accumulator_sidecar_compatibility
-            - reference/accumulator.find_sidecar
-            - reference/accumulator.ensure_not_processed
-        - section: Finalize
-          contents:
-            - reference/finalize.finalize_statistics
-            - reference/finalize.densify_healpix_map
-            - reference/finalize.export_to_geotiff
-            - reference/finalize.load_state
-        - section: Metadata
-          contents:
-            - reference/metadata.HEALPyxelxMetadata
-            - reference/metadata.FileType
-            - reference/metadata.read_metadata_from_file
-            - reference/metadata.save_with_metadata
-            - reference/metadata.validate_sidecar
-            - reference/metadata.validate_aggregate
-        - section: CLI
-          contents:
-            - reference/cli.sidecar_cli
-            - reference/cli.aggregate_cli
-            - reference/cli.accumulator_cli
-            - reference/cli.finalize_cli
-            - reference/cli.to_geoparquet_cli
-            - reference/cli.cache_cli
-            - reference/cli.validate_lon_lat_columns
+    style: docked
+    search: true
+    collapse-level: 2
+    contents:
+      - section: "Home"
+        contents:
+          - docs_src/index.qmd
+      - section: "Tutorials"
+        contents:
+          - notebooks/01_core_concepts.py
+          - notebooks/02_full_workflow.py
+          - section: "Visualization"
+            contents:
+              - notebooks/82_example_visualization_psf.py
+          - section: "Geometry Engine"
+            contents:
+              - notebooks/03_sphere_native_sidecar.py
+          - section: "Streaming"
+            contents:
+              - notebooks/90_example_streaming.py
+      - section: "API Reference"
+        contents:
+          - docs_src/reference/index.qmd
+          - section: "Core"
+            contents:
+              - docs_src/reference/core.validate_nside
+              - docs_src/reference/core.mad
+              - docs_src/reference/core.robust_std
+              - docs_src/reference/core.setup_logger
+          - section: "Sidecar"
+            contents:
+              - docs_src/reference/sidecar.compute_healpix_ids_from_lonlat
+              - docs_src/reference/sidecar.detect_lonlat_columns
+              - docs_src/reference/sidecar.process_partition
+              - docs_src/reference/sidecar.add_psf_weights_to_sidecar
+              - docs_src/reference/sidecar.normalize_weights_per_cell
+              - docs_src/reference/sidecar.build_output_path
+              - docs_src/reference/sidecar.write_sidecar_metadata
+              - docs_src/reference/sidecar.validate_nside
+              - docs_src/reference/sidecar.get_healpix_cell_geometry
+              - docs_src/reference/sidecar.get_psf
+              - docs_src/reference/sidecar.GaussianPSF
+          - section: "Aggregate"
+            contents:
+              - docs_src/reference/aggregate.aggregate_by_sidecar
+              - docs_src/reference/aggregate.collect_sidecar_outputs
+              - docs_src/reference/aggregate.densify_healpix_aggregates
+              - docs_src/reference/aggregate.generate_output_filename
+              - docs_src/reference/aggregate.extract_nside_from_filename
+              - docs_src/reference/aggregate.validate_sidecar_metadata
+              - docs_src/reference/aggregate.process_single_sidecar
+          - section: "Accumulator"
+            contents:
+              - docs_src/reference/accumulator.StreamingStats
+              - docs_src/reference/accumulator.CellAccumulator
+              - docs_src/reference/accumulator.accumulate_batch
+              - docs_src/reference/accumulator.save_state
+              - docs_src/reference/accumulator.load_state
+              - docs_src/reference/accumulator.state_to_dataframe
+              - docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility
+              - docs_src/reference/accumulator.find_sidecar
+              - docs_src/reference/accumulator.ensure_not_processed
+          - section: "Finalize"
+            contents:
+              - docs_src/reference/finalize.finalize_statistics
+              - docs_src/reference/finalize.densify_healpix_map
+              - docs_src/reference/finalize.export_to_geotiff
+              - docs_src/reference/finalize.load_state
+          - section: "Metadata"
+            contents:
+              - docs_src/reference/metadata.HEALPyxelxMetadata
+              - docs_src/reference/metadata.FileType
+              - docs_src/reference/metadata.read_metadata_from_file
+              - docs_src/reference/metadata.save_with_metadata
+              - docs_src/reference/metadata.validate_sidecar
+              - docs_src/reference/metadata.validate_aggregate
+          - section: "CLI"
+            contents:
+              - docs_src/reference/cli.sidecar_cli
+              - docs_src/reference/cli.aggregate_cli
+              - docs_src/reference/cli.accumulator_cli
+              - docs_src/reference/cli.finalize_cli
+              - docs_src/reference/cli.to_geoparquet_cli
+              - docs_src/reference/cli.cache_cli
+              - docs_src/reference/cli.validate_lon_lat_columns
+  reader-mode: true
+  page-navigation: true
+  back-to-top-navigation: true
 
 format:
   html:
-    theme: default
+    theme:
+      light: flatly
+      dark: darkly
+    respect-user-color-scheme: true
     toc: true
     code-fold: true
     code-tools: true
-    css: reference/_styles-quartodoc.css
-
+    codefold: true
+    css:
+      # custom CSS overrides
+      - docs_src/reference/custom.css
+    include-after-body: docs_src/reference/custom-width.html
 execute:
   echo: true
   warning: false
@@ -101,7 +145,7 @@ jupyter:
 
 quartodoc:
   package: healpyxel
-  dir: docs/reference
+  dir: docs_src/reference
   sections:
     - title: Core
       desc: Validation, robust statistics, and logging utilities.

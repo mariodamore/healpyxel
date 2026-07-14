@@ -3,6 +3,7 @@
 import argparse
 import logging
 import os
+import warnings
 from pathlib import Path
 import sys
 import numpy as np
@@ -25,10 +26,11 @@ try:
 except Exception:
     _healpy = None
 
+from healpyxel.geometry import Sphere, Ellipsoid, SpiceDSK, BodyGeometry
+
 from shapely import get_coordinates  # shapely>=2.0
 from shapely.geometry import Polygon, MultiPolygon
 from tqdm.auto import tqdm
-import antimeridian
 
 try:
     from dask.diagnostics.progress import ProgressBar as DaskProgressBar
@@ -44,51 +46,13 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("healpix_sidecar")
 
-# Module-level cache for HEALPix grid + spatial index (keyed by (nside, lon_convention))
-_HEALPIX_GRID_CACHE: dict = {}
-
-def _get_healpix_grid(nside: int, lon_convention: str = 'minus_plus180'):
-    """Build (or retrieve cached) HEALPix cell grid with R-tree spatial index.
-
-    Uses healpyxel.geospatial.healpix_to_geodataframe() for efficient grid construction,
-    then wraps with shapely.STRtree for O(log N) spatial queries.
-
-    Args:
-        nside: HEALPix nside parameter
-        lon_convention: 'minus_plus180' (-180/180, default) or '0_360'
-
-    Returns:
-        (grid_gdf, tree) where grid_gdf has healpix_id as index and geometry column,
-        and tree is a shapely.STRtree (or None if shapely.STRtree unavailable).
-    """
-    # Normalize lon_convention for cache key
-    if lon_convention == 'auto':
-        lon_convention = '-180_180'
-    key = (nside, lon_convention)
-    if key in _HEALPIX_GRID_CACHE:
-        return _HEALPIX_GRID_CACHE[key]
-
-    lon_param = '0_360' if lon_convention == '0_360' else '-180_180'
-    from healpyxel.geospatial import healpix_to_geodataframe
-    grid = healpix_to_geodataframe(
-        nside=nside, order='nested', lon_convention=lon_param, chunk_size=65536
-    )
-    if grid.index.name != 'healpix_id':
-        grid = grid.set_index('healpix_id')
-
-    tree = None
-    try:
-        import shapely
-        if hasattr(shapely, 'STRtree'):
-            tree = shapely.STRtree(grid.geometry)
-    except (ImportError, Exception):
-        logger.debug("shapely.STRtree not available, falling back to dense sampling")
-
-    _HEALPIX_GRID_CACHE[key] = (grid, tree)
-    return _HEALPIX_GRID_CACHE[key]
-
-def compute_healpix_ids_from_lonlat(nside: int, lons: np.ndarray, lats: np.ndarray) -> np.ndarray:
+def compute_healpix_ids_from_lonlat(nside: int, lons: np.ndarray, lats: np.ndarray,
+                                     body: BodyGeometry | None = None) -> np.ndarray:
     """Compute HEALPix indices for arrays of lon,lat in degrees.
+
+    If a body geometry backend is provided, coordinates are first converted
+    through the body model (lon/lat -> xyz -> unit sphere) before HEALPix
+    indexing. This enables correct geodetic handling for ellipsoidal bodies.
 
     Tries to use cdshealpix if available, otherwise falls back to healpy.
     Returns a 1D integer numpy array of same length as inputs.
@@ -96,9 +60,21 @@ def compute_healpix_ids_from_lonlat(nside: int, lons: np.ndarray, lats: np.ndarr
     if lons.size == 0:
         return np.array([], dtype=np.int64)
 
-    # normalize lons to [0,360)
-    lons = np.mod(lons.astype(float), 360.0)
-    lats = lats.astype(float)
+    lons = np.asarray(lons, dtype=np.float64)
+    lats = np.asarray(lats, dtype=np.float64)
+
+    # ADR-013: apply body geometry conversion at the I/O boundary
+    if body is not None and not body.is_sphere():
+        xyz = body.lonlat_to_xyz(lons, lats)
+        norm = np.linalg.norm(xyz, axis=0)
+        norm_safe = np.where(norm > 1e-15, norm, 1.0)
+        xyz_unit = xyz / norm_safe
+        # Convert unit vectors back to healpy convention (theta, phi)
+        lons = np.degrees(np.arctan2(xyz_unit[1], xyz_unit[0]))
+        lons = np.mod(lons, 360.0)
+        lats = 90.0 - np.degrees(np.arccos(np.clip(xyz_unit[2], -1.0, 1.0)))
+    else:
+        lons = np.mod(lons, 360.0)
 
     # Prefer healpy (to match notebook usage). Fall back to cdshealpix if healpy not available.
     if _healpy is not None:
@@ -175,6 +151,94 @@ def compute_healpix_ids_from_polygon(nside: int, geom, n_samples: int = 200) -> 
 
     hids = compute_healpix_ids_from_lonlat(nside, lons_norm[mask], lats_f[mask])
     return np.unique(hids) if hids.size > 0 else np.array([], dtype=np.int64)
+
+def _sample_great_circle_arc(v0, v1, n_samples):
+    """Sample n_samples points along the great-circle arc from v0 to v1.
+
+    Uses SLERP on the unit sphere — always takes the short arc.
+    This is the sphere-native replacement for shapely's planar interpolate().
+    """
+    v0 = v0 / max(np.linalg.norm(v0), 1e-15)
+    v1 = v1 / max(np.linalg.norm(v1), 1e-15)
+    dot = float(np.dot(v0, v1))
+    if dot > 0.999999:
+        pts = np.tile(v0, (n_samples, 1))
+        return pts.T
+    theta = np.arccos(np.clip(dot, -1.0, 1.0))
+    t = np.linspace(0.0, 1.0, n_samples)
+    sin_t = np.sin(theta)
+    if sin_t < 1e-15:
+        pts = np.tile(v0, (n_samples, 1))
+        return pts.T
+    result = (np.outer(np.sin((1.0 - t) * theta), v0) + np.outer(np.sin(t * theta), v1)) / sin_t
+    norms = np.linalg.norm(result, axis=1, keepdims=True)
+    result = result / np.maximum(norms, 1e-15)
+    return result.T  # (3, n_samples)
+
+def _query_healpix_single_polygon(body, geom, nside, _healpy):
+    """Find HEALPix cells for a single polygon using sphere-native sampling.
+
+    Converts polygon vertices to unit vectors, samples great-circle arcs
+    between consecutive vertices via SLERP, then converts back to lon/lat
+    for HEALPix indexing. No antimeridian, no shapely interpolate.
+    """
+    coords = get_coordinates(geom)
+    lons = coords[:, 0].astype(np.float64)
+    lats = coords[:, 1].astype(np.float64)
+
+    if lons.size < 3:
+        return np.array([], dtype=np.int64)
+
+    xyz = body.lonlat_to_xyz(lons, lats)  # (3, N)
+    n_vertices = xyz.shape[1]
+    n_edge = 80
+
+    all_lons = []
+    all_lats = []
+
+    # Sample each edge via great-circle arc (including closing edge: last->first)
+    for i in range(n_vertices):
+        v0 = xyz[:, i]
+        v1 = xyz[:, (i + 1) % n_vertices]
+        arc = _sample_great_circle_arc(v0, v1, n_edge)  # (3, n_edge)
+        arc_lon, arc_lat = body.xyz_to_lonlat(arc)
+        all_lons.extend(arc_lon.tolist())
+        all_lats.extend(arc_lat.tolist())
+
+    # Interior point: centroid from unit vectors
+    centroid_xyz = xyz.mean(axis=1)
+    centroid_norm = np.linalg.norm(centroid_xyz)
+    if centroid_norm > 1e-15:
+        centroid_xyz = centroid_xyz / centroid_norm
+        centroid_lon, centroid_lat = body.xyz_to_lonlat(centroid_xyz.reshape(3, 1))
+        all_lons.extend([centroid_lon[0]] * 10)
+        all_lats.extend([centroid_lat[0]] * 10)
+    else:
+        # Full-sphere: use first vertex
+        lone, late = body.xyz_to_lonlat(xyz[:, 0].reshape(3, 1))
+        all_lons.extend([lone[0]] * 10)
+        all_lats.extend([late[0]] * 10)
+
+    # Also add the original vertex coordinates (exact polygon corners)
+    all_lons.extend(lons.tolist())
+    all_lats.extend(lats.tolist())
+
+    lons_samp = np.asarray(all_lons, dtype=np.float64)
+    lats_samp = np.asarray(all_lats, dtype=np.float64)
+
+    return compute_healpix_ids_from_lonlat(nside, lons_samp, lats_samp, body=body)
+
+def _query_healpix_spherical(body, geom, nside, _healpy):
+    """Find HEALPix cells intersecting a polygon via spherical query_disc.
+
+    Handles MultiPolygon by processing each part separately.
+    """
+    geoms = list(getattr(geom, 'geoms', [geom]))
+    all_hids = []
+    for part in geoms:
+        hids = _query_healpix_single_polygon(body, part, nside, _healpy)
+        all_hids.extend(hids)
+    return np.unique(np.asarray(all_hids, dtype=np.int64)) if all_hids else np.array([], dtype=np.int64)
 
 def detect_lonlat_columns(gdf_sample) -> tuple[str | None, str | None]:
     """Auto-detect longitude and latitude columns from a GeoDataFrame sample.
@@ -547,7 +611,8 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                      lon_convention: str = 'minus_plus180',
                      lon_col: str | None = None,
                      lat_col: str | None = None,
-                     data_psf=None, cell_psf=None, combine_method='multiply'
+                     data_psf=None, cell_psf=None, combine_method='multiply',
+                     body: BodyGeometry | None = None
                         ) -> pd.DataFrame:
     """Process a single dask partition and return DataFrame of assignments.
 
@@ -623,7 +688,9 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                     continue
 
                 # Compute HEALPix cell for this point
-                hid = compute_healpix_ids_from_lonlat(nside, np.array([lon]), np.array([lat]))[0]
+                hid = compute_healpix_ids_from_lonlat(
+                    nside, np.array([lon]), np.array([lat]), body=body
+                )[0]
                 weight = 1.0
 
                 # Apply PSF if present (point mode)
@@ -657,45 +724,36 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                     continue
 
                 def _is_valid_latitude(geometry):
+                    """Only reject NaN coords or lat outside [-90, 90].
+                    ADR-013: lon wrapping is handled by body.lonlat_to_xyz (np.mod)."""
                     if geometry is None or (hasattr(geometry, 'is_empty') and geometry.is_empty):
                         return False
                     geoms = [geometry] if getattr(geometry, "geom_type", "") == "Polygon" else list(getattr(geometry, "geoms", [geometry]))
                     for g in geoms:
                         if getattr(g, "exterior", None) is not None:
                             for coord in g.exterior.coords:
-                                lon = coord[0]
-                                lat = coord[1]
+                                lon, lat = coord[0], coord[1]
                                 if not (np.isfinite(lon) and np.isfinite(lat)):
                                     return False
-                                if lat < lat_min or lat > lat_max or lon < lon_min or lon > lon_max:
+                                if lat < -90.0 or lat > 90.0:
                                     return False
                         for interior in getattr(g, "interiors", []):
                             for coord in interior.coords:
-                                lon = coord[0]
-                                lat = coord[1]
+                                lon, lat = coord[0], coord[1]
                                 if not (np.isfinite(lon) and np.isfinite(lat)):
                                     return False
-                                if lat < lat_min or lat > lat_max or lon < lon_min or lon > lon_max:
+                                if lat < -90.0 or lat > 90.0:
                                     return False
                     return True
 
                 total_count += 1
+                geom2 = geom  # ADR-013: no antimeridian.fix_polygon; sphere handles wrapping
 
-                try:
-                    geom2 = antimeridian.fix_polygon(geom)
-                except Exception as e:
-                    logger.debug(f"Antimeridian fix failed for {src_id}: {e}")
-                    geom2 = geom
-
-                # Validate fixed geometry; fall back to original if fixed is invalid
                 if not _is_valid_latitude(geom2):
-                    if not _is_valid_latitude(geom):
-                        dropped_count += 1
-                        dropped_prefilter += 1
-                        logger.debug(f"Dropped geometry {src_id}: invalid after antimeridian fix and original")
-                        continue
-                    else:
-                        geom2 = geom
+                    dropped_count += 1
+                    dropped_prefilter += 1
+                    logger.debug(f"Dropped geometry {src_id}: invalid coordinates")
+                    continue
 
                 try:
                     coords = get_coordinates(geom2)
@@ -736,19 +794,14 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                 lats = lats[mask]
 
                 if mode == 'fuzzy' and geom2.geom_type in ('Polygon', 'MultiPolygon'):
-                    lon_param = '0_360' if lon_convention == '0_360' else '-180_180'
-                    grid, tree = _get_healpix_grid(nside, lon_param)
-                    if tree is not None:
-                        candidates = tree.query(geom2)
-                        hids = np.array([
-                            grid.index[idx]
-                            for idx in candidates
-                            if grid.geometry.iloc[idx].intersects(geom2)
-                        ], dtype=np.int64)
-                    else:
+                    # ADR-013: spherical query_disc replaces STRtree + dense sampling.
+                    # No antimeridian, no shapely cell polygons, no dense boundary fallback.
+                    if body is None:
                         hids = compute_healpix_ids_from_polygon(nside, geom2)
+                    else:
+                        hids = _query_healpix_spherical(body, geom2, nside, _healpy)
                 else:
-                    hids = compute_healpix_ids_from_lonlat(nside, lons, lats)
+                    hids = compute_healpix_ids_from_lonlat(nside, lons, lats, body=body)
                 if hids.size == 0:
                     continue
 
@@ -758,7 +811,7 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                         weight = 1.0
                         if data_psf or cell_psf:
                             src_centroid = geom.centroid
-                            cell_geom = get_healpix_cell_geometry(unique[0], nside, lon_convention=_normalize_lon_convention(lon_convention))
+                            cell_geom = get_healpix_cell_geometry(unique[0], nside, lon_convention=lon_convention)
                             dx = src_centroid.x - cell_geom.centroid.x
                             dy = src_centroid.y - cell_geom.centroid.y
                             w_data = data_psf(dx, dy) if data_psf else 1.0
@@ -779,7 +832,7 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                         weight = 1.0
                         if data_psf or cell_psf:
                             src_centroid = geom.centroid
-                            cell_geom = get_healpix_cell_geometry(hid, nside, lon_convention=_normalize_lon_convention(lon_convention))
+                            cell_geom = get_healpix_cell_geometry(hid, nside, lon_convention=lon_convention)
                             dx = src_centroid.x - cell_geom.centroid.x
                             dy = src_centroid.y - cell_geom.centroid.y
                             w_data = data_psf(dx, dy) if data_psf else 1.0
@@ -952,6 +1005,48 @@ def validate_nside(nside: int) -> bool:
     """Validate that nside is a positive power of two."""
     return nside > 0 and (nside & (nside - 1)) == 0
 
+_BODY_REGISTRY = {
+    'sphere': Sphere,
+    'ellipsoid': Ellipsoid,
+    'dsk': SpiceDSK,
+}
+
+def get_body(body_model: str, **kwargs) -> BodyGeometry:
+    """Create a BodyGeometry instance from a model name.
+
+    Parameters
+    ----------
+    body_model : str
+        One of 'sphere', 'ellipsoid', 'dsk'.
+    **kwargs : passed to the backend constructor (e.g. radius, polar_radius).
+
+    Returns
+    -------
+    BodyGeometry instance.
+    """
+    cls = _BODY_REGISTRY.get(body_model.lower())
+    if cls is None:
+        raise ValueError(
+            f"Unknown body model '{body_model}'. "
+            f"Choose from: {list(_BODY_REGISTRY.keys())}"
+        )
+    return cls(**kwargs)
+
+def _get_body(config) -> BodyGeometry:
+    """Extract body geometry from config (dict or argparse Namespace).
+
+    Defaults to Sphere(radius=1.0) if not specified.
+    """
+    model_name = _get_config(config, 'body_model', 'sphere')
+    radius = _get_config(config, 'body_radius', 1.0)
+    polar_radius = _get_config(config, 'body_polar_radius', None)
+    if model_name == 'ellipsoid':
+        return Ellipsoid(radius=radius, polar_radius=polar_radius)
+    elif model_name == 'dsk':
+        return SpiceDSK()
+    else:
+        return Sphere(radius=radius)
+
 def parse_arguments(argv=None):
     """Parse command line arguments."""
     parser = argparse.ArgumentParser(description="Create HEALPix sidecar mapping source geometries to cells.")
@@ -992,6 +1087,17 @@ def parse_arguments(argv=None):
                         help='How to combine data and cell PSF weights (default: multiply)')
     parser.add_argument('--no-psf-normalize', action='store_true',
                         help='Disable normalization of weights per cell (default: normalize)')
+
+    parser.add_argument('--body-model', type=str, default='sphere',
+                        choices=['sphere', 'ellipsoid', 'dsk'],
+                        help='Body geometry model for coordinate conversion (default: sphere). '
+                             'Use ellipsoid for Earth/Mars applications. dsk is not yet implemented.')
+    parser.add_argument('--body-radius', type=float, default=1.0,
+                        help='Body equatorial radius in arbitrary units (default: 1.0). '
+                             'Only used for sphere/ellipsoid models.')
+    parser.add_argument('--body-polar-radius', type=float, default=None,
+                        help='Body polar radius (for ellipsoid flattening). If None, '
+                             'body is spherical (default: None).')
 
     return parser.parse_args(argv)
 
@@ -1298,10 +1404,27 @@ def run(config):
     logger.info(f"Input file: {input_path.name}")
     logger.info(f"Mode: {_get_config(config, 'mode')}, lon-convention: {_get_config(config, 'lon_convention')}, nside: {nsides}")
 
-    if _get_config(config, 'lon_col') is None or _get_config(config, 'lat_col') is None:
+    has_geometry = False
+    try:
+        df_sample = pd.read_parquet(str(input_path), engine="pyarrow").head(1)
+        has_geometry = any(
+            str(df_sample[col].dtype) == 'object'
+            and any(kw in col.lower() for kw in ('polygon', 'geometry', 'wkt', 'wkb', 'geom'))
+            for col in df_sample.columns
+        )
+    except Exception:
+        pass
+
+    if _get_config(config, 'lon_col') is None and _get_config(config, 'lat_col') is None and has_geometry:
+        logger.info("Polygon geometry column detected — using geometry-based fuzzy mode (ignoring scalar lon/lat columns)")
+        lon_col = None
+        lat_col = None
+    elif _get_config(config, 'lon_col') is None or _get_config(config, 'lat_col') is None:
         logger.info(f"Auto-detecting lon/lat columns (user provided: lon_col={_get_config(config, 'lon_col')}, lat_col={_get_config(config, 'lat_col')})")
         try:
             df_sample = pd.read_parquet(str(input_path), engine="pyarrow").head(100)
+            if has_geometry:
+                logger.info(f"  Note: scalar columns found but geometry column exists — set --lon-col=0 --lat-col=0 to force geometry mode")
             detected_lon, detected_lat = detect_lonlat_columns(df_sample)
             lon_col = _get_config(config, 'lon_col') or detected_lon
             lat_col = _get_config(config, 'lat_col') or detected_lat
@@ -1360,6 +1483,9 @@ def run(config):
     logger.info(f"Reading input lazily from {input_path}; ncores={_get_config(config, 'ncores')}; mode={_get_config(config, 'mode')}; nsides={nsides}")
     logger.info(f"Longitude convention: {_get_config(config, 'lon_convention')}")
 
+    body = _get_body(config)
+    logger.info(f"Body geometry model: {body.name()}")
+
     ddf = _read_input_lazy(input_path, _get_config(config, 'ncores'))
 
     meta = pd.DataFrame({"source_id": pd.Series(dtype="int64"), "healpix_id": pd.Series(dtype="UInt64")})
@@ -1399,7 +1525,8 @@ def run(config):
                     lat_col=lat_col,
                     data_psf=data_psf,
                     cell_psf=cell_psf,
-                    combine_method=_get_config(config, 'psf_combine', 'multiply')
+                    combine_method=_get_config(config, 'psf_combine', 'multiply'),
+                    body=body,
                     )
                     for i, part in enumerate(delayed_partitions)
                 ]

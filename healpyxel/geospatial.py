@@ -1,10 +1,11 @@
 from typing import Iterable, Optional, Tuple, List, Union
 from pathlib import Path
+import logging
 import math
 import numpy as np
 import pandas as pd
 import healpy as hp
-from shapely.geometry import Polygon, mapping
+from shapely.geometry import Polygon, MultiPolygon, mapping
 from shapely import wkb
 import geopandas as gpd
 import pyarrow as pa
@@ -18,6 +19,8 @@ import os
 import configparser
 
 from shapely.geometry.base import BaseGeometry
+
+logger = logging.getLogger(__name__)
 
 def is_geometry_valid(geom: BaseGeometry) -> bool:
     """
@@ -297,7 +300,7 @@ def _spherical_to_lonlat(theta_arr: np.ndarray, phi_arr: np.ndarray,
 #| export
 def _lonlat_to_polygons(lons: np.ndarray, lats: np.ndarray,
                         lon_convention: str = '0_360',
-                        fix_antimeridian: bool = True) -> List[Polygon]:
+                        fix_antimeridian: bool = True) -> List[Union[Polygon, MultiPolygon]]:
     """Convert lon/lat corner arrays to Shapely Polygons.
 
     Args:
@@ -327,6 +330,9 @@ def _lonlat_to_polygons(lons: np.ndarray, lats: np.ndarray,
         if fix_antimeridian:
             try:
                 poly = antimeridian.fix_polygon(poly)
+                if poly.geom_type == 'MultiPolygon':
+                    logger.debug(f"Antimeridian split cached cell into {len(poly.geoms)} parts "
+                                 f"(bounds: {poly.bounds})")
             except Exception:
                 pass  # Silently fall back to raw polygon
 
@@ -974,7 +980,7 @@ def _normalize_lon(lons: np.ndarray, convention: str = '0_360') -> np.ndarray:
         lons = ((lons + 180.0) % 360.0) - 180.0
     return lons
 
-def _make_polygon_from_corners(lons: List[float], lats: List[float], lon_convention: str = '0_360', fix_antimeridian: bool = True) -> Polygon:
+def _make_polygon_from_corners(lons: List[float], lats: List[float], lon_convention: str = '0_360', fix_antimeridian: bool = True) -> Union[Polygon, MultiPolygon]:
     """Make a shapely Polygon from corner lon/lat lists.
     Automatically fixes antimeridian-wrapping using `antimeridian.fix_polygon` when requested.
     """
@@ -988,6 +994,9 @@ def _make_polygon_from_corners(lons: List[float], lats: List[float], lon_convent
     if fix_antimeridian:
         try:
             fixed = antimeridian.fix_polygon(poly)
+            if fixed.geom_type == 'MultiPolygon':
+                logger.debug(f"Antimeridian split cell into {len(fixed.geoms)} parts "
+                             f"(bounds: {poly.bounds} -> parts: {[p.bounds for p in fixed.geoms]})")
             return fixed
         except Exception:
             # Fallback: return original polygon but warn

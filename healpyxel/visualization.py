@@ -113,7 +113,7 @@ def prepare_healpix_map(
     percentile_clip = not (percentile_cutoff is None or percentile_cutoff is False)
 
     # Extract base arrays
-    healpix_map = aggregated_dense[output_column].astype(float).copy().values
+    healpix_map = np.array(aggregated_dense[output_column], dtype=float, copy=True)
     valid_pixels = ~np.isnan(healpix_map)
     invalid_pixels = ~valid_pixels
 
@@ -144,7 +144,7 @@ def prepare_healpix_map(
         healpix_map[valid_pixels] = np.clip(healpix_map[valid_pixels], vmin, vmax)
 
     # Create ScalarMappable using original (pre-equalized) values for colorbar
-    orig_map = aggregated_dense[output_column].astype(float).values
+    orig_map = np.array(aggregated_dense[output_column], dtype=float, copy=True)
     if np.any(valid_pixels):
         vmin = float(np.nanmin(orig_map[valid_pixels]))
         vmax = float(np.nanmax(orig_map[valid_pixels]))

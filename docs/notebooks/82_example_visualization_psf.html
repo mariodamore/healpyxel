@@ -1,0 +1,2058 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>example_visualization_psf – Healpyxel</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/03_sphere_native_sidecar.html" rel="next">
+<link href="../notebooks/02_full_workflow.html" rel="prev">
+<link href="../docs_src/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-4f7210a01128827e17b2825bab7455c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../docs_src/reference/custom.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../docs_src/logo_cutout_128.png" alt="" class="navbar-logo light-content">
+    <img src="../docs_src/logo_cutout_128.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Healpyxel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../docs_src/index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../notebooks/01_core_concepts.py.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../notebooks/03_sphere_native_sidecar.py.html"> 
+<span class="menu-text">Sphere-Native Sidecar</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../docs_src/reference/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/01_core_concepts.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../notebooks/82_example_visualization_psf.html">Visualization</a></li><li class="breadcrumb-item"><a href="../notebooks/82_example_visualization_psf.html">Gaussian PSF - WIP!</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Home</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs_src/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Healpyxel</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/01_core_concepts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core Concepts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/02_full_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Full Workflow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Visualization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/82_example_visualization_psf.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Geometry Engine</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/03_sphere_native_sidecar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sphere-Native Sidecar Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Streaming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/90_example_streaming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Streaming WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">API Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs_src/reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Function reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Core</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.mad</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.robust_std</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.setup_logger</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sidecar</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.compute_healpix_ids_from_lonlat</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.detect_lonlat_columns</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.process_partition</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.add_psf_weights_to_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.normalize_weights_per_cell</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.build_output_path</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.write_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_healpix_cell_geometry</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_psf</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.GaussianPSF</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Aggregate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.aggregate_by_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.collect_sidecar_outputs</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.densify_healpix_aggregates</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.generate_output_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.extract_nside_from_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.validate_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.process_single_sidecar</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Accumulator</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.StreamingStats</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.CellAccumulator</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.accumulate_batch</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.save_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.load_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.state_to_dataframe</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.find_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.ensure_not_processed</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Finalize</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.finalize_statistics</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.densify_healpix_map</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.export_to_geotiff</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.load_state</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Metadata</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.HEALPyxelxMetadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.FileType</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.read_metadata_from_file</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.save_with_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_aggregate</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">CLI</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.sidecar_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.aggregate_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.accumulator_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.finalize_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.to_geoparquet_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.cache_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.validate_lon_lat_columns</span>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar zindex-bottom">
+        
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/01_core_concepts.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../notebooks/82_example_visualization_psf.html">Visualization</a></li><li class="breadcrumb-item"><a href="../notebooks/82_example_visualization_psf.html">Gaussian PSF - WIP!</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Gaussian PSF - WIP!</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Use of Gaussian spread function both for measurement or healpix cell assignment and weigthing.</p>
+<p><span style="color: red;"><em>STILL WORK IN PROGRESS</em></span></p>
+<div id="a8c4ec5d" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the GaussianPSF class from healpyxel.sidecar</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.sidecar <span class="im">import</span> GaussianPSF</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="e5a08df7" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Gaussian PSF with a chosen sigma</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>sigma <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>psf <span class="op">=</span> GaussianPSF(sigma<span class="op">=</span>sigma)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a grid of (dx, dy) values</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>grid_size <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>extent <span class="op">=</span> <span class="dv">3</span> <span class="op">*</span> sigma</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span>extent, extent, grid_size)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>y <span class="op">=</span> np.linspace(<span class="op">-</span>extent, extent, grid_size)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>dx, dy <span class="op">=</span> np.meshgrid(x, y)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Evaluate the PSF on the grid</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> psf(dx, dy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="b9616749" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">5</span>))</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>plt.imshow(z, extent<span class="op">=</span>[<span class="op">-</span>extent, extent, <span class="op">-</span>extent, extent], origin<span class="op">=</span><span class="st">'lower'</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>plt.colorbar(label<span class="op">=</span><span class="st">'PSF Value'</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'2D Gaussian PSF (sigma=</span><span class="sc">{</span>sigma<span class="sc">}</span><span class="ss">)'</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'dx'</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'dy'</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="82_example_visualization_psf_files/figure-html/cell-4-output-1.png" width="513" height="437" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="045765be" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>plt.plot(x, psf(x, <span class="dv">0</span>), label<span class="op">=</span><span class="st">'PSF along dy=0'</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Gaussian PSF 1D cross-section'</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'dx'</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'PSF Value'</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="82_example_visualization_psf_files/figure-html/cell-5-output-1.png" width="589" height="449" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="7e17c156" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Look for test data</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>test_data_dir <span class="op">=</span> Path(<span class="st">'../test_data'</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> test_data_dir.exists():</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Test data directory found!"</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Contents:"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> item <span class="kw">in</span> <span class="bu">sorted</span>(test_data_dir.iterdir()):</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> item.is_file():</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            size_mb <span class="op">=</span> item.stat().st_size <span class="op">/</span> <span class="dv">1024</span> <span class="op">/</span> <span class="dv">1024</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>item<span class="sc">.</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>size_mb<span class="sc">:.2f}</span><span class="ss"> MB"</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> item.is_dir():</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>            n_files <span class="op">=</span> <span class="bu">len</span>(<span class="bu">list</span>(item.glob(<span class="st">'*'</span>)))</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>item<span class="sc">.</span>name<span class="sc">}</span><span class="ss">/: </span><span class="sc">{</span>n_files<span class="sc">}</span><span class="ss"> files"</span>)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Test data directory not found. Run create_test_data.sh to generate test data."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test data directory found!
+
+Contents:
+  README.md: 0.00 MB
+  batches/: 9 files
+  derived/: 1 files
+  regions/: 0 files
+  samples/: 5 files
+  validation/: 2 files</code></pre>
+</div>
+</div>
+<div id="a4d12792" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.sidecar <span class="im">import</span> process_partition, write_coalesced_output, get_psf</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely <span class="im">import</span> wkb</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Load your test data</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>input_path <span class="op">=</span> test_data_dir <span class="op">/</span> <span class="st">'batches'</span> <span class="op">/</span> <span class="st">'batch_001.parquet'</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Read as regular pandas DataFrame first (geometry is stored as WKB binary)</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>df <span class="op">=</span> pd.read_parquet(input_path)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Loaded </span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> rows"</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Columns: </span><span class="sc">{</span><span class="bu">list</span>(df.columns)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert WKB geometry column to shapely geometries</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="st">'geometry'</span> <span class="kw">in</span> df.columns:</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Converting WKB geometry to GeoDataFrame..."</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    df[<span class="st">'geometry'</span>] <span class="op">=</span> df[<span class="st">'geometry'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: wkb.loads(<span class="bu">bytes</span>(x)) <span class="cf">if</span> x <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="cf">else</span> <span class="va">None</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    gdf <span class="op">=</span> gpd.GeoDataFrame(df, geometry<span class="op">=</span><span class="st">'geometry'</span>, crs<span class="op">=</span><span class="st">'EPSG:4326'</span>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"CRS: </span><span class="sc">{</span>gdf<span class="sc">.</span>crs<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">No geometry column found!"</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    gdf <span class="op">=</span> df</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Show first few rows</span></span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>gdf.head(<span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Loaded 1468 rows
+Columns: ['ref_id', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q1', 'q2', 'q3', 'q4', 'obs_id', 'vis_slope', 'nir_slope', 'visnir_slope', 'norm_vis_slope', 'norm_nir_slope', 'norm_visnir_slope', 'curvature', 'norm_curvature', 'uv_downturn', 'color_index_310_390', 'color_index_415_750', 'color_index_750_415', 'color_index_750_950', 'r310', 'r390', 'r750', 'r950', 'r1050', 'r1400', 'r415', 'r433_2', 'r479_9', 'r556_9', 'r628_8', 'r748_7', 'r828_4', 'r898_8', 'r996_2', 'spot_number', 'lat_center', 'lon_center', 'surface', 'width', 'length', 'ang_incidence', 'ang_emission', 'ang_phase', 'azimuth', 'geometry']
+
+Converting WKB geometry to GeoDataFrame...
+CRS: EPSG:4326</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="6">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">ref_id</th>
+<th data-quarto-table-cell-role="th">a</th>
+<th data-quarto-table-cell-role="th">b</th>
+<th data-quarto-table-cell-role="th">c</th>
+<th data-quarto-table-cell-role="th">d</th>
+<th data-quarto-table-cell-role="th">e</th>
+<th data-quarto-table-cell-role="th">f</th>
+<th data-quarto-table-cell-role="th">g</th>
+<th data-quarto-table-cell-role="th">h</th>
+<th data-quarto-table-cell-role="th">i</th>
+<th data-quarto-table-cell-role="th">...</th>
+<th data-quarto-table-cell-role="th">lat_center</th>
+<th data-quarto-table-cell-role="th">lon_center</th>
+<th data-quarto-table-cell-role="th">surface</th>
+<th data-quarto-table-cell-role="th">width</th>
+<th data-quarto-table-cell-role="th">length</th>
+<th data-quarto-table-cell-role="th">ang_incidence</th>
+<th data-quarto-table-cell-role="th">ang_emission</th>
+<th data-quarto-table-cell-role="th">ang_phase</th>
+<th data-quarto-table-cell-role="th">azimuth</th>
+<th data-quarto-table-cell-role="th">geometry</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">0</th>
+<td>1121007250900093</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>-18.660860</td>
+<td>10.366696</td>
+<td>215028350.0</td>
+<td>3099.5337</td>
+<td>88330.2600</td>
+<td>70.62914</td>
+<td>25.383625</td>
+<td>95.974850</td>
+<td>100.571640</td>
+<td>POLYGON ((9.27929 -18.77973, 10.37122 -18.6970...</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">1</th>
+<td>1121107541500261</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>-5.029988</td>
+<td>10.999325</td>
+<td>6055773.0</td>
+<td>2627.1873</td>
+<td>2934.8687</td>
+<td>65.56774</td>
+<td>36.283978</td>
+<td>101.835815</td>
+<td>110.489525</td>
+<td>POLYGON ((10.98603 -4.99815, 10.97064 -5.04187...</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">2</th>
+<td>1121107541500262</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>9</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>...</td>
+<td>-5.010632</td>
+<td>10.991251</td>
+<td>6071996.5</td>
+<td>2630.5942</td>
+<td>2938.9200</td>
+<td>65.57476</td>
+<td>36.276817</td>
+<td>101.835700</td>
+<td>110.482254</td>
+<td>POLYGON ((10.97798 -4.97872, 10.9625 -5.0225, ...</td>
+</tr>
+</tbody>
+</table>
+
+<p>3 rows × 61 columns</p>
+</div>
+</div>
+</div>
+<div id="dd9facfd" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>gdf[<span class="st">'lon_center'</span>].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>count    1468.000000
+mean       10.529462
+std         0.305749
+min        10.000008
+25%        10.255890
+50%        10.542513
+75%        10.823499
+max        10.999325
+Name: lon_center, dtype: float64</code></pre>
+</div>
+</div>
+<div id="d292de71" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> healpix_cell_diameter_deg(nside):</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Area of a HEALPix cell (steradians)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    area_sr <span class="op">=</span> <span class="dv">4</span> <span class="op">*</span> np.pi <span class="op">/</span> (<span class="dv">12</span> <span class="op">*</span> nside <span class="op">*</span> nside)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Convert to square degrees</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    area_deg2 <span class="op">=</span> area_sr <span class="op">*</span> (<span class="dv">180</span><span class="op">/</span>np.pi)<span class="op">**</span><span class="dv">2</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Equivalent diameter (degrees) for a circle of this area</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    diameter_deg <span class="op">=</span> <span class="dv">2</span> <span class="op">*</span> np.sqrt(area_deg2 <span class="op">/</span> np.pi)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> diameter_deg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="558faf69" class="cell" data-execution_count="9">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set parameters</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>nside <span class="op">=</span> <span class="dv">32</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>mode <span class="op">=</span> <span class="st">"fuzzy"</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>lon_convention <span class="op">=</span> <span class="st">"0_360"</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>sigma_level <span class="op">=</span> <span class="fl">0.01</span>  <span class="co"># Number of sigma to cover the cell</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>cell_radius <span class="op">=</span> healpix_cell_diameter_deg(nside) <span class="op">/</span> <span class="dv">2</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>sigma <span class="op">=</span> cell_radius <span class="op">/</span> sigma_level</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>cell_psf <span class="op">=</span> get_psf(<span class="st">"gaussian"</span>, sigma<span class="op">=</span>sigma)  <span class="co"># You can adjust sigma as needed</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>cell_radius<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>sigma_level<span class="op">=</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>sigma<span class="op">=</span><span class="sc">:}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>cell_radius=np.float64(1.03374167891586)
+sigma_level=0.01
+sigma=103.374167891586</code></pre>
+</div>
+</div>
+<div id="8e4c65fb" class="cell" data-execution_count="10">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> np.linspace(<span class="op">-</span><span class="dv">3</span><span class="op">*</span> cell_radius, <span class="dv">3</span><span class="op">*</span>cell_radius, <span class="dv">200</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>,<span class="dv">4</span>))</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>plt.plot(x, cell_psf(x, <span class="dv">0</span>), label<span class="op">=</span><span class="st">'PSF along dy=0'</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co"># put vertical lines at +/- cell_diameter</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>plt.axvline(cell_radius, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, label<span class="op">=</span><span class="st">'Cell Diameter '</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="op">-</span>cell_radius, color<span class="op">=</span><span class="st">'r'</span>, linestyle<span class="op">=</span><span class="st">'--'</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Gaussian PSF 1D cross-section'</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'dx'</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'PSF Value'</span>)</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<pre><code>&lt;Figure size 672x480 with 0 Axes&gt;</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="82_example_visualization_psf_files/figure-html/cell-11-output-2.png" width="1210" height="376" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="0959d554" class="cell" data-execution_count="11">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>processed_partition <span class="op">=</span> process_partition(</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    gdf, </span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    nside, </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    mode, </span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    base_index<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    lon_convention<span class="op">=</span>lon_convention,</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    data_psf<span class="op">=</span><span class="va">None</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    cell_psf<span class="op">=</span>cell_psf</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(processed_partition.describe())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>         source_id   healpix_id       weight
+count  1739.000000       1739.0  1739.000000
+mean    727.195515  4429.384129     0.921372
+std     418.950427   223.607119     0.035745
+min       0.000000       4175.0     0.856722
+25%     366.500000       4217.0     0.892225
+50%     743.000000       4483.0     0.929850
+75%    1079.000000       4495.0     0.944746
+max    1467.000000       4976.0     0.986331</code></pre>
+</div>
+</div>
+<div id="647ca6ca" class="cell" data-execution_count="12">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>processed_partition[<span class="st">'weight'</span>].plot( cmap<span class="op">=</span><span class="st">'viridis'</span>, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>), legend<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="82_example_visualization_psf_files/figure-html/cell-13-output-1.png" width="653" height="485" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="18f11d87" class="cell" data-execution_count="13">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>processed_partition.groupby(<span class="st">'healpix_id'</span>).agg(<span class="bu">len</span>)[[<span class="st">'weight'</span>]].sort_values(by<span class="op">=</span><span class="st">'weight'</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="13">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4492</th>
+<td>141</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4208</th>
+<td>121</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4489</th>
+<td>115</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4197</th>
+<td>115</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4494</th>
+<td>101</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4220</th>
+<td>97</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4223</th>
+<td>96</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4217</th>
+<td>96</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4482</th>
+<td>76</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4483</th>
+<td>71</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="59270770" class="cell" data-execution_count="14">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>processed_partition.groupby(<span class="st">'healpix_id'</span>).agg(<span class="bu">sum</span>)[[<span class="st">'weight'</span>]].sort_values(by<span class="op">=</span><span class="st">'weight'</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="14">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th"></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4492</th>
+<td>131.989471</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4489</th>
+<td>107.275394</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4208</th>
+<td>105.071214</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4197</th>
+<td>99.205540</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4494</th>
+<td>94.980121</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4223</th>
+<td>87.018214</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4220</th>
+<td>86.826338</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4217</th>
+<td>85.490074</td>
+</tr>
+<tr class="odd">
+<th data-quarto-table-cell-role="th">4482</th>
+<td>70.281569</td>
+</tr>
+<tr class="even">
+<th data-quarto-table-cell-role="th">4483</th>
+<td>65.849359</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="fd7789d9" class="cell" data-execution_count="15">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>healpix_id <span class="op">=</span> <span class="dv">6374</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>cell <span class="op">=</span> processed_partition.query(<span class="ss">f'healpix_id == </span><span class="sc">{</span>healpix_id<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>cell</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="15">
+<div>
+
+
+<table class="dataframe caption-top table table-sm table-striped small" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">source_id</th>
+<th data-quarto-table-cell-role="th">healpix_id</th>
+<th data-quarto-table-cell-role="th">weight</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div id="4ac20ec7" class="cell" data-execution_count="16">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpy <span class="im">as</span> hp</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>lon, lat <span class="op">=</span> <span class="dv">175</span>, <span class="dv">43</span>  <span class="co"># Example from your data</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>theta <span class="op">=</span> np.radians(<span class="dv">90</span> <span class="op">-</span> lat)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>phi <span class="op">=</span> np.radians(lon)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>hid <span class="op">=</span> hp.ang2pix(nside, theta, phi, nest<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(hid)</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.sidecar <span class="im">import</span> get_healpix_cell_geometry</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Return a shapely Polygon for the given HEALPix cell.</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Uses healpy boundaries (in degrees, lon/lat).</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(get_healpix_cell_geometry(hid, nside<span class="op">=</span>nside,nest<span class="op">=</span><span class="va">False</span>).exterior.xy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>1372
+(array('d', [-32.94412311703627, -33.52804087419743, -34.82172104878954, -34.23461408949813, -32.94412311703627]), array('d', [100.70419447584689, 102.7155086769465, 102.67406996768031, 100.66793719134546, 100.70419447584689]))</code></pre>
+</div>
+</div>
+<div id="8bb390a1" class="cell" data-execution_count="17">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gdf_cell <span class="op">=</span> gdf.iloc[cell[<span class="st">'source_id'</span>].values].copy()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div id="358496b9" class="cell" data-execution_count="18">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>gdf_cell[<span class="st">'weight'</span>] <span class="op">=</span> cell.set_index(<span class="st">'source_id'</span>)[<span class="st">'weight'</span>]</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">20</span>,<span class="dv">8</span>))</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>gdf_cell.plot(aspect<span class="op">=</span><span class="fl">0.2</span>, ax<span class="op">=</span>ax, column<span class="op">=</span><span class="st">'weight'</span>, legend<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="82_example_visualization_psf_files/figure-html/cell-19-output-1.png" width="1548" height="344" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="4caf3baf" class="cell" data-execution_count="19">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>gdf_cell[<span class="st">'weight'</span>].plot( cmap<span class="op">=</span><span class="st">'viridis'</span>, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>), legend<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="82_example_visualization_psf_files/figure-html/cell-20-output-1.png" width="665" height="485" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div id="d38dbbbc" class="cell" data-execution_count="20">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sqlalchemy <span class="im">import</span> column</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>fig, axs <span class="op">=</span> plt.subplots(ncols<span class="op">=</span><span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">8</span>))</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>gdf_cell.plot(ax<span class="op">=</span>axs[<span class="dv">0</span>], aspect<span class="op">=</span><span class="st">'equal'</span>, column<span class="op">=</span><span class="st">'weight'</span>)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>poly <span class="op">=</span> get_healpix_cell_geometry(healpix_id, nside<span class="op">=</span>nside)</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>x_poly, y_poly <span class="op">=</span> poly.exterior.xy</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>].plot(x_poly, y_poly, color<span class="op">=</span><span class="st">'red'</span>, linewidth<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>axs[<span class="dv">1</span>].fill(x_poly, y_poly, facecolor<span class="op">=</span><span class="st">'red'</span>, alpha<span class="op">=</span><span class="fl">0.15</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="82_example_visualization_psf_files/figure-html/cell-21-output-1.png" width="794" height="633" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
+<!-- -->
+
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var sidebar = document.getElementById('quarto-margin-sidebar');
+  if (!sidebar) return;
+  var text = sidebar.textContent || '';
+  if (text.indexOf('API Reference') === -1) return;
+  var el = document.getElementById('quarto-content');
+  if (!el) return;
+  // Remove sidebar and widen container so <main> fills the page
+  sidebar.remove();
+  el.classList.remove('page-columns');
+  el.style.maxWidth = '90vw';
+  el.style.gridTemplateColumns = '1fr';
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../notebooks/02_full_workflow.html" class="pagination-link" aria-label="Full Workflow">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Full Workflow</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/03_sphere_native_sidecar.html" class="pagination-link" aria-label="Sphere-Native Sidecar Generation">
+        <span class="nav-page-text">Sphere-Native Sidecar Generation</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb28" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># ---</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu"># jupyter:</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">#   jupytext:</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="fu">#     text_representation:</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="fu">#       extension: .py</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="fu">#       format_name: percent</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="fu">#       format_version: '1.3'</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="fu">#       jupytext_version: 1.19.1</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="fu">#   kernelspec:</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="fu">#     display_name: python3</span></span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">#     language: python</span></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="fu">#     name: python3</span></span>
+<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a><span class="fu"># ---</span></span>
+<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a><span class="fu"># # Gaussian PSF - WIP!</span></span>
+<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb28-18"><a href="#cb28-18" aria-hidden="true" tabindex="-1"></a><span class="fu"># Use of Gaussian spread function both for measurement or healpix cell assignment and weigthing.</span></span>
+<span id="cb28-19"><a href="#cb28-19" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb28-20"><a href="#cb28-20" aria-hidden="true" tabindex="-1"></a><span class="fu"># &lt;span style="color: red;"&gt;*STILL WORK IN PROGRESS*&lt;/span&gt;</span></span>
+<span id="cb28-21"><a href="#cb28-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-22"><a href="#cb28-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-23"><a href="#cb28-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># Import the GaussianPSF class from healpyxel.sidecar</span></span>
+<span id="cb28-24"><a href="#cb28-24" aria-hidden="true" tabindex="-1"></a>from healpyxel.sidecar import GaussianPSF</span>
+<span id="cb28-25"><a href="#cb28-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-26"><a href="#cb28-26" aria-hidden="true" tabindex="-1"></a>import numpy as np</span>
+<span id="cb28-27"><a href="#cb28-27" aria-hidden="true" tabindex="-1"></a>import matplotlib.pyplot as plt</span>
+<span id="cb28-28"><a href="#cb28-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-29"><a href="#cb28-29" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-30"><a href="#cb28-30" aria-hidden="true" tabindex="-1"></a><span class="fu"># Create a Gaussian PSF with a chosen sigma</span></span>
+<span id="cb28-31"><a href="#cb28-31" aria-hidden="true" tabindex="-1"></a>sigma = 1.0</span>
+<span id="cb28-32"><a href="#cb28-32" aria-hidden="true" tabindex="-1"></a>psf = GaussianPSF(sigma=sigma)</span>
+<span id="cb28-33"><a href="#cb28-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-34"><a href="#cb28-34" aria-hidden="true" tabindex="-1"></a><span class="fu"># Create a grid of (dx, dy) values</span></span>
+<span id="cb28-35"><a href="#cb28-35" aria-hidden="true" tabindex="-1"></a>grid_size = 100</span>
+<span id="cb28-36"><a href="#cb28-36" aria-hidden="true" tabindex="-1"></a>extent = 3 * sigma</span>
+<span id="cb28-37"><a href="#cb28-37" aria-hidden="true" tabindex="-1"></a>x = np.linspace(-extent, extent, grid_size)</span>
+<span id="cb28-38"><a href="#cb28-38" aria-hidden="true" tabindex="-1"></a>y = np.linspace(-extent, extent, grid_size)</span>
+<span id="cb28-39"><a href="#cb28-39" aria-hidden="true" tabindex="-1"></a>dx, dy = np.meshgrid(x, y)</span>
+<span id="cb28-40"><a href="#cb28-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-41"><a href="#cb28-41" aria-hidden="true" tabindex="-1"></a><span class="fu"># Evaluate the PSF on the grid</span></span>
+<span id="cb28-42"><a href="#cb28-42" aria-hidden="true" tabindex="-1"></a>z = psf(dx, dy)</span>
+<span id="cb28-43"><a href="#cb28-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-44"><a href="#cb28-44" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-45"><a href="#cb28-45" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize=(6, 5))</span>
+<span id="cb28-46"><a href="#cb28-46" aria-hidden="true" tabindex="-1"></a>plt.imshow(z, extent=<span class="co">[</span><span class="ot">-extent, extent, -extent, extent</span><span class="co">]</span>, origin='lower', cmap='viridis')</span>
+<span id="cb28-47"><a href="#cb28-47" aria-hidden="true" tabindex="-1"></a>plt.colorbar(label='PSF Value')</span>
+<span id="cb28-48"><a href="#cb28-48" aria-hidden="true" tabindex="-1"></a>plt.title(f'2D Gaussian PSF (sigma={sigma})')</span>
+<span id="cb28-49"><a href="#cb28-49" aria-hidden="true" tabindex="-1"></a>plt.xlabel('dx')</span>
+<span id="cb28-50"><a href="#cb28-50" aria-hidden="true" tabindex="-1"></a>plt.ylabel('dy')</span>
+<span id="cb28-51"><a href="#cb28-51" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb28-52"><a href="#cb28-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-53"><a href="#cb28-53" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-54"><a href="#cb28-54" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb28-55"><a href="#cb28-55" aria-hidden="true" tabindex="-1"></a>plt.plot(x, psf(x, 0), label='PSF along dy=0')</span>
+<span id="cb28-56"><a href="#cb28-56" aria-hidden="true" tabindex="-1"></a>plt.title('Gaussian PSF 1D cross-section')</span>
+<span id="cb28-57"><a href="#cb28-57" aria-hidden="true" tabindex="-1"></a>plt.xlabel('dx')</span>
+<span id="cb28-58"><a href="#cb28-58" aria-hidden="true" tabindex="-1"></a>plt.ylabel('PSF Value')</span>
+<span id="cb28-59"><a href="#cb28-59" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb28-60"><a href="#cb28-60" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb28-61"><a href="#cb28-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-62"><a href="#cb28-62" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-63"><a href="#cb28-63" aria-hidden="true" tabindex="-1"></a>from pathlib import Path</span>
+<span id="cb28-64"><a href="#cb28-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-65"><a href="#cb28-65" aria-hidden="true" tabindex="-1"></a><span class="fu"># Look for test data</span></span>
+<span id="cb28-66"><a href="#cb28-66" aria-hidden="true" tabindex="-1"></a>test_data_dir = Path('../test_data')</span>
+<span id="cb28-67"><a href="#cb28-67" aria-hidden="true" tabindex="-1"></a>if test_data_dir.exists():</span>
+<span id="cb28-68"><a href="#cb28-68" aria-hidden="true" tabindex="-1"></a>    print("Test data directory found!")</span>
+<span id="cb28-69"><a href="#cb28-69" aria-hidden="true" tabindex="-1"></a>    print(f"\nContents:")</span>
+<span id="cb28-70"><a href="#cb28-70" aria-hidden="true" tabindex="-1"></a>    for item in sorted(test_data_dir.iterdir()):</span>
+<span id="cb28-71"><a href="#cb28-71" aria-hidden="true" tabindex="-1"></a>        if item.is_file():</span>
+<span id="cb28-72"><a href="#cb28-72" aria-hidden="true" tabindex="-1"></a>            size_mb = item.stat().st_size / 1024 / 1024</span>
+<span id="cb28-73"><a href="#cb28-73" aria-hidden="true" tabindex="-1"></a>            print(f"  {item.name}: {size_mb:.2f} MB")</span>
+<span id="cb28-74"><a href="#cb28-74" aria-hidden="true" tabindex="-1"></a>        elif item.is_dir():</span>
+<span id="cb28-75"><a href="#cb28-75" aria-hidden="true" tabindex="-1"></a>            n_files = len(list(item.glob('*')))</span>
+<span id="cb28-76"><a href="#cb28-76" aria-hidden="true" tabindex="-1"></a>            print(f"  {item.name}/: {n_files} files")</span>
+<span id="cb28-77"><a href="#cb28-77" aria-hidden="true" tabindex="-1"></a>else:</span>
+<span id="cb28-78"><a href="#cb28-78" aria-hidden="true" tabindex="-1"></a>    print("Test data directory not found. Run create_test_data.sh to generate test data.")</span>
+<span id="cb28-79"><a href="#cb28-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-80"><a href="#cb28-80" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-81"><a href="#cb28-81" aria-hidden="true" tabindex="-1"></a>from healpyxel.sidecar import process_partition, write_coalesced_output, get_psf</span>
+<span id="cb28-82"><a href="#cb28-82" aria-hidden="true" tabindex="-1"></a>import pandas as pd</span>
+<span id="cb28-83"><a href="#cb28-83" aria-hidden="true" tabindex="-1"></a>from pathlib import Path</span>
+<span id="cb28-84"><a href="#cb28-84" aria-hidden="true" tabindex="-1"></a>import geopandas as gpd</span>
+<span id="cb28-85"><a href="#cb28-85" aria-hidden="true" tabindex="-1"></a>from shapely import wkb</span>
+<span id="cb28-86"><a href="#cb28-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-87"><a href="#cb28-87" aria-hidden="true" tabindex="-1"></a><span class="fu"># Load your test data</span></span>
+<span id="cb28-88"><a href="#cb28-88" aria-hidden="true" tabindex="-1"></a>input_path = test_data_dir / 'batches' / 'batch_001.parquet'</span>
+<span id="cb28-89"><a href="#cb28-89" aria-hidden="true" tabindex="-1"></a><span class="fu"># Read as regular pandas DataFrame first (geometry is stored as WKB binary)</span></span>
+<span id="cb28-90"><a href="#cb28-90" aria-hidden="true" tabindex="-1"></a>df = pd.read_parquet(input_path)</span>
+<span id="cb28-91"><a href="#cb28-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-92"><a href="#cb28-92" aria-hidden="true" tabindex="-1"></a>print(f"Loaded {len(df)} rows")</span>
+<span id="cb28-93"><a href="#cb28-93" aria-hidden="true" tabindex="-1"></a>print(f"Columns: {list(df.columns)}")</span>
+<span id="cb28-94"><a href="#cb28-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-95"><a href="#cb28-95" aria-hidden="true" tabindex="-1"></a><span class="fu"># Convert WKB geometry column to shapely geometries</span></span>
+<span id="cb28-96"><a href="#cb28-96" aria-hidden="true" tabindex="-1"></a>if 'geometry' in df.columns:</span>
+<span id="cb28-97"><a href="#cb28-97" aria-hidden="true" tabindex="-1"></a>    print("\nConverting WKB geometry to GeoDataFrame...")</span>
+<span id="cb28-98"><a href="#cb28-98" aria-hidden="true" tabindex="-1"></a>    df<span class="co">[</span><span class="ot">'geometry'</span><span class="co">]</span> = df<span class="co">[</span><span class="ot">'geometry'</span><span class="co">]</span>.apply(lambda x: wkb.loads(bytes(x)) if x is not None else None)</span>
+<span id="cb28-99"><a href="#cb28-99" aria-hidden="true" tabindex="-1"></a>    gdf = gpd.GeoDataFrame(df, geometry='geometry', crs='EPSG:4326')</span>
+<span id="cb28-100"><a href="#cb28-100" aria-hidden="true" tabindex="-1"></a>    print(f"CRS: {gdf.crs}")</span>
+<span id="cb28-101"><a href="#cb28-101" aria-hidden="true" tabindex="-1"></a>else:</span>
+<span id="cb28-102"><a href="#cb28-102" aria-hidden="true" tabindex="-1"></a>    print("\nNo geometry column found!")</span>
+<span id="cb28-103"><a href="#cb28-103" aria-hidden="true" tabindex="-1"></a>    gdf = df</span>
+<span id="cb28-104"><a href="#cb28-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-105"><a href="#cb28-105" aria-hidden="true" tabindex="-1"></a><span class="fu"># Show first few rows</span></span>
+<span id="cb28-106"><a href="#cb28-106" aria-hidden="true" tabindex="-1"></a>gdf.head(3)</span>
+<span id="cb28-107"><a href="#cb28-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-108"><a href="#cb28-108" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-109"><a href="#cb28-109" aria-hidden="true" tabindex="-1"></a>gdf<span class="co">[</span><span class="ot">'lon_center'</span><span class="co">]</span>.describe()</span>
+<span id="cb28-110"><a href="#cb28-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-111"><a href="#cb28-111" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-112"><a href="#cb28-112" aria-hidden="true" tabindex="-1"></a>import numpy as np</span>
+<span id="cb28-113"><a href="#cb28-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-114"><a href="#cb28-114" aria-hidden="true" tabindex="-1"></a>def healpix_cell_diameter_deg(nside):</span>
+<span id="cb28-115"><a href="#cb28-115" aria-hidden="true" tabindex="-1"></a>    # Area of a HEALPix cell (steradians)</span>
+<span id="cb28-116"><a href="#cb28-116" aria-hidden="true" tabindex="-1"></a>    area_sr = 4 * np.pi / (12 * nside * nside)</span>
+<span id="cb28-117"><a href="#cb28-117" aria-hidden="true" tabindex="-1"></a>    # Convert to square degrees</span>
+<span id="cb28-118"><a href="#cb28-118" aria-hidden="true" tabindex="-1"></a>    area_deg2 = area_sr * (180/np.pi)**2</span>
+<span id="cb28-119"><a href="#cb28-119" aria-hidden="true" tabindex="-1"></a>    # Equivalent diameter (degrees) for a circle of this area</span>
+<span id="cb28-120"><a href="#cb28-120" aria-hidden="true" tabindex="-1"></a>    diameter_deg = 2 * np.sqrt(area_deg2 / np.pi)</span>
+<span id="cb28-121"><a href="#cb28-121" aria-hidden="true" tabindex="-1"></a>    return diameter_deg</span>
+<span id="cb28-122"><a href="#cb28-122" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb28-123"><a href="#cb28-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-124"><a href="#cb28-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-125"><a href="#cb28-125" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-126"><a href="#cb28-126" aria-hidden="true" tabindex="-1"></a><span class="fu"># Set parameters</span></span>
+<span id="cb28-127"><a href="#cb28-127" aria-hidden="true" tabindex="-1"></a>nside = 32</span>
+<span id="cb28-128"><a href="#cb28-128" aria-hidden="true" tabindex="-1"></a>mode = "fuzzy"</span>
+<span id="cb28-129"><a href="#cb28-129" aria-hidden="true" tabindex="-1"></a>lon_convention = "0_360"</span>
+<span id="cb28-130"><a href="#cb28-130" aria-hidden="true" tabindex="-1"></a>sigma_level = 0.01  # Number of sigma to cover the cell</span>
+<span id="cb28-131"><a href="#cb28-131" aria-hidden="true" tabindex="-1"></a>cell_radius = healpix_cell_diameter_deg(nside) / 2</span>
+<span id="cb28-132"><a href="#cb28-132" aria-hidden="true" tabindex="-1"></a>sigma = cell_radius / sigma_level</span>
+<span id="cb28-133"><a href="#cb28-133" aria-hidden="true" tabindex="-1"></a>cell_psf = get_psf("gaussian", sigma=sigma)  # You can adjust sigma as needed</span>
+<span id="cb28-134"><a href="#cb28-134" aria-hidden="true" tabindex="-1"></a>print(f"{cell_radius=}")</span>
+<span id="cb28-135"><a href="#cb28-135" aria-hidden="true" tabindex="-1"></a>print(f"{sigma_level=}")</span>
+<span id="cb28-136"><a href="#cb28-136" aria-hidden="true" tabindex="-1"></a>print(f"{sigma=:}")</span>
+<span id="cb28-137"><a href="#cb28-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-138"><a href="#cb28-138" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-139"><a href="#cb28-139" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
+<span id="cb28-140"><a href="#cb28-140" aria-hidden="true" tabindex="-1"></a>x = np.linspace(-3* cell_radius, 3*cell_radius, 200)</span>
+<span id="cb28-141"><a href="#cb28-141" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize=(15,4))</span>
+<span id="cb28-142"><a href="#cb28-142" aria-hidden="true" tabindex="-1"></a>plt.plot(x, cell_psf(x, 0), label='PSF along dy=0')</span>
+<span id="cb28-143"><a href="#cb28-143" aria-hidden="true" tabindex="-1"></a><span class="fu"># put vertical lines at +/- cell_diameter</span></span>
+<span id="cb28-144"><a href="#cb28-144" aria-hidden="true" tabindex="-1"></a>plt.axvline(cell_radius, color='r', linestyle='--', label='Cell Diameter ')</span>
+<span id="cb28-145"><a href="#cb28-145" aria-hidden="true" tabindex="-1"></a>plt.axvline(-cell_radius, color='r', linestyle='--')</span>
+<span id="cb28-146"><a href="#cb28-146" aria-hidden="true" tabindex="-1"></a>plt.title('Gaussian PSF 1D cross-section')</span>
+<span id="cb28-147"><a href="#cb28-147" aria-hidden="true" tabindex="-1"></a>plt.xlabel('dx')</span>
+<span id="cb28-148"><a href="#cb28-148" aria-hidden="true" tabindex="-1"></a>plt.ylabel('PSF Value')</span>
+<span id="cb28-149"><a href="#cb28-149" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb28-150"><a href="#cb28-150" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb28-151"><a href="#cb28-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-152"><a href="#cb28-152" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-153"><a href="#cb28-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-154"><a href="#cb28-154" aria-hidden="true" tabindex="-1"></a>processed_partition = process_partition(</span>
+<span id="cb28-155"><a href="#cb28-155" aria-hidden="true" tabindex="-1"></a>    gdf, </span>
+<span id="cb28-156"><a href="#cb28-156" aria-hidden="true" tabindex="-1"></a>    nside, </span>
+<span id="cb28-157"><a href="#cb28-157" aria-hidden="true" tabindex="-1"></a>    mode, </span>
+<span id="cb28-158"><a href="#cb28-158" aria-hidden="true" tabindex="-1"></a>    base_index=None,</span>
+<span id="cb28-159"><a href="#cb28-159" aria-hidden="true" tabindex="-1"></a>    lon_convention=lon_convention,</span>
+<span id="cb28-160"><a href="#cb28-160" aria-hidden="true" tabindex="-1"></a>    data_psf=None,</span>
+<span id="cb28-161"><a href="#cb28-161" aria-hidden="true" tabindex="-1"></a>    cell_psf=cell_psf</span>
+<span id="cb28-162"><a href="#cb28-162" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb28-163"><a href="#cb28-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-164"><a href="#cb28-164" aria-hidden="true" tabindex="-1"></a>print(processed_partition.describe())</span>
+<span id="cb28-165"><a href="#cb28-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-166"><a href="#cb28-166" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-167"><a href="#cb28-167" aria-hidden="true" tabindex="-1"></a>processed_partition<span class="co">[</span><span class="ot">'weight'</span><span class="co">]</span>.plot( cmap='viridis', figsize=(8,6), legend=True)</span>
+<span id="cb28-168"><a href="#cb28-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-169"><a href="#cb28-169" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-170"><a href="#cb28-170" aria-hidden="true" tabindex="-1"></a>processed_partition.groupby('healpix_id').agg(len)[<span class="co">[</span><span class="ot">'weight'</span><span class="co">]</span>].sort_values(by='weight', ascending=False).head(10)</span>
+<span id="cb28-171"><a href="#cb28-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-172"><a href="#cb28-172" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-173"><a href="#cb28-173" aria-hidden="true" tabindex="-1"></a>processed_partition.groupby('healpix_id').agg(sum)[<span class="co">[</span><span class="ot">'weight'</span><span class="co">]</span>].sort_values(by='weight', ascending=False).head(10)</span>
+<span id="cb28-174"><a href="#cb28-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-175"><a href="#cb28-175" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-176"><a href="#cb28-176" aria-hidden="true" tabindex="-1"></a>healpix_id = 6374</span>
+<span id="cb28-177"><a href="#cb28-177" aria-hidden="true" tabindex="-1"></a>cell = processed_partition.query(f'healpix_id == {healpix_id}')</span>
+<span id="cb28-178"><a href="#cb28-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-179"><a href="#cb28-179" aria-hidden="true" tabindex="-1"></a>cell</span>
+<span id="cb28-180"><a href="#cb28-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-181"><a href="#cb28-181" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-182"><a href="#cb28-182" aria-hidden="true" tabindex="-1"></a>import healpy as hp</span>
+<span id="cb28-183"><a href="#cb28-183" aria-hidden="true" tabindex="-1"></a>lon, lat = 175, 43  # Example from your data</span>
+<span id="cb28-184"><a href="#cb28-184" aria-hidden="true" tabindex="-1"></a>theta = np.radians(90 - lat)</span>
+<span id="cb28-185"><a href="#cb28-185" aria-hidden="true" tabindex="-1"></a>phi = np.radians(lon)</span>
+<span id="cb28-186"><a href="#cb28-186" aria-hidden="true" tabindex="-1"></a>hid = hp.ang2pix(nside, theta, phi, nest=True)</span>
+<span id="cb28-187"><a href="#cb28-187" aria-hidden="true" tabindex="-1"></a>print(hid)</span>
+<span id="cb28-188"><a href="#cb28-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-189"><a href="#cb28-189" aria-hidden="true" tabindex="-1"></a>from healpyxel.sidecar import get_healpix_cell_geometry</span>
+<span id="cb28-190"><a href="#cb28-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-191"><a href="#cb28-191" aria-hidden="true" tabindex="-1"></a><span class="fu"># Return a shapely Polygon for the given HEALPix cell.</span></span>
+<span id="cb28-192"><a href="#cb28-192" aria-hidden="true" tabindex="-1"></a><span class="fu"># Uses healpy boundaries (in degrees, lon/lat).</span></span>
+<span id="cb28-193"><a href="#cb28-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-194"><a href="#cb28-194" aria-hidden="true" tabindex="-1"></a>print(get_healpix_cell_geometry(hid, nside=nside,nest=False).exterior.xy)</span>
+<span id="cb28-195"><a href="#cb28-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-196"><a href="#cb28-196" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-197"><a href="#cb28-197" aria-hidden="true" tabindex="-1"></a>gdf_cell = gdf.iloc<span class="co">[</span><span class="ot">cell['source_id'].values</span><span class="co">]</span>.copy()</span>
+<span id="cb28-198"><a href="#cb28-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-199"><a href="#cb28-199" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-200"><a href="#cb28-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-201"><a href="#cb28-201" aria-hidden="true" tabindex="-1"></a>gdf_cell<span class="co">[</span><span class="ot">'weight'</span><span class="co">]</span> = cell.set_index('source_id')<span class="co">[</span><span class="ot">'weight'</span><span class="co">]</span></span>
+<span id="cb28-202"><a href="#cb28-202" aria-hidden="true" tabindex="-1"></a>fig, ax = plt.subplots(figsize=(20,8))</span>
+<span id="cb28-203"><a href="#cb28-203" aria-hidden="true" tabindex="-1"></a>gdf_cell.plot(aspect=0.2, ax=ax, column='weight', legend=True)</span>
+<span id="cb28-204"><a href="#cb28-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-205"><a href="#cb28-205" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-206"><a href="#cb28-206" aria-hidden="true" tabindex="-1"></a>gdf_cell<span class="co">[</span><span class="ot">'weight'</span><span class="co">]</span>.plot( cmap='viridis', figsize=(8,6), legend=True)</span>
+<span id="cb28-207"><a href="#cb28-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-208"><a href="#cb28-208" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb28-209"><a href="#cb28-209" aria-hidden="true" tabindex="-1"></a>from sqlalchemy import column</span>
+<span id="cb28-210"><a href="#cb28-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-211"><a href="#cb28-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-212"><a href="#cb28-212" aria-hidden="true" tabindex="-1"></a>fig, axs = plt.subplots(ncols=2, figsize=(10,8))</span>
+<span id="cb28-213"><a href="#cb28-213" aria-hidden="true" tabindex="-1"></a>gdf_cell.plot(ax=axs<span class="co">[</span><span class="ot">0</span><span class="co">]</span>, aspect='equal', column='weight')</span>
+<span id="cb28-214"><a href="#cb28-214" aria-hidden="true" tabindex="-1"></a>poly = get_healpix_cell_geometry(healpix_id, nside=nside)</span>
+<span id="cb28-215"><a href="#cb28-215" aria-hidden="true" tabindex="-1"></a>x_poly, y_poly = poly.exterior.xy</span>
+<span id="cb28-216"><a href="#cb28-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-217"><a href="#cb28-217" aria-hidden="true" tabindex="-1"></a>axs<span class="co">[</span><span class="ot">1</span><span class="co">]</span>.plot(x_poly, y_poly, color='red', linewidth=2)</span>
+<span id="cb28-218"><a href="#cb28-218" aria-hidden="true" tabindex="-1"></a>axs<span class="co">[</span><span class="ot">1</span><span class="co">]</span>.fill(x_poly, y_poly, facecolor='red', alpha=0.15)</span>
+<span id="cb28-219"><a href="#cb28-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-220"><a href="#cb28-220" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

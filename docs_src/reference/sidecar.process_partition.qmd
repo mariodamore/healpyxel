@@ -12,6 +12,7 @@ sidecar.process_partition(
     data_psf=None,
     cell_psf=None,
     combine_method='multiply',
+    body=None,
 )
 ```
 
@@ -21,12 +22,16 @@ Supports two workflows:
 1. Scalar lon/lat columns (efficient for strict mode): pass lon_col, lat_col
 2. Geometry-based (for fuzzy mode): pass geometries via gdf.geometry
 
+In fuzzy mode, FOV polygons are assigned to all HEALPix cells they touch using
+spatial indexing (shapely.STRtree R-tree). This is O(log N) per polygon and
+correctly handles polygons that cross cell boundaries, unlike vertex-only sampling.
+
 Args:
     gdf: GeoDataFrame or DataFrame partition
     nside: HEALPix nside parameter
     mode: 'strict' or 'fuzzy' assignment mode
     base_index: Base index for global source_id generation
-    lon_convention: 'minus_plus180' (alias for '-180_180') or '0_360'. Both accepted; stored as '-180_180' in metadata.
+    lon_convention: 'minus_plus180' or '0_360'
     lon_col: Longitude column name (if None, use geometry)
     lat_col: Latitude column name (if None, use geometry)
     data_psf, cell_psf: Optional PSF functions

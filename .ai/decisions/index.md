@@ -11,6 +11,10 @@
 | ADR-007 | Migrate from nbdev to pure Python + Quarto | Active | 2026-07-10 |
 | ADR-008 | antimeridian.fix_polygon must run before bounds pre-filter | Active | 2026-07-10 |
 | ADR-009 | CLI segregation — pure submodules, single gateway in cli.py | Active | 2026-07-10 |
+| ADR-010 | Abandon hierarchical HEALPix traversal, retain STRtree + shapely.prepare() | Superseded by ADR-013 | 2026-07-12 |
+| ADR-011 | Exclude WIP notebooks from published docs | Active | 2026-07-13 |
+| ADR-012 | Global sidebar/navbar for Quarto docs | Active | 2026-07-13 |
+| ADR-013 | Pluggable body geometry backend (Sphere/Ellipsoid/DSK) | Active | 2026-07-13 |
 
 ## Notes
 

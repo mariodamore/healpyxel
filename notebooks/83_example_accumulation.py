@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.1
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: mertis
 #     language: python
@@ -325,8 +325,9 @@ print(f"  Columns: {list(combined_raw_df.columns)}")
 numeric_cols = combined_raw_df.select_dtypes(include=[np.number]).columns.tolist()
 exclude_cols = {'source_id', 'batch_id', 'lat', 'lon', 'latitude', 'longitude', 'lat_center', 'lon_center'}
 # use a predefined list of value columns for clarity and consistency
-value_columns = ['vis_slope', 'nir_slope', 'r1050'] 
-# value_columns = [c for c in numeric_cols if c not in exclude_cols]
+value_columns = ['vis_slope', 'nir_slope', 'r1050']
+# CLI equivalent: healpyxel_aggregate --all-columns (auto-discovers all float/double columns)
+# Python equivalent: value_columns = [c for c in numeric_cols if c not in exclude_cols]
 
 if not value_columns:
     print("⚠️  No value columns found, using first numeric column")

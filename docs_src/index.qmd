@@ -2,13 +2,36 @@
 title: "Healpyxel"
 ---
 
-# Healpyxel
+<div style="display: flex; align-items: center; gap: 1rem;">
+<img src="../docs_src/logo_cutout.png" style="width: 150px;" alt="Healpyxel logo"/>
+<div>
+<strong>HEALPyxel</strong> — HEALPix-based spatial aggregation for planetary science data.
+</div>
+</div>
 
-HEALPix-based spatial aggregation for planetary science data.
 
 ## Overview
 
 This project provides HEALPix-based spatial aggregation for planetary science data, with streaming accumulation, sidecar generation, and batch aggregation capabilities.
+
+## What You'll Learn
+
+Start with the linear path below if you are new to healpyxel:
+
+1. [Core concepts tutorial](../notebooks/01_core_concepts.py.html) — HEALPix basics, sidecar generation, aggregation
+2. [Full workflow tutorial](../notebooks/02_full_workflow.py.html) — end-to-end pipeline with visualizations
+3. [Sphere-native sidecar tutorial](../notebooks/03_sphere_native_sidecar.py.html) — great-circle SLERP, antimeridian-safe cells
+
+The [API reference](reference/index.qmd) is best used after the tutorial path above.
+
+## Start Here
+
+- [Core concepts tutorial](../notebooks/01_core_concepts.py.html) — the fastest way to get started.
+- [Full workflow tutorial](../notebooks/02_full_workflow.py.html) — complete pipeline with plots.
+
+## Install
+
+The repository root [README.md](../README.md) has the installation and local setup instructions, including optional dependencies.
 
 ## Workflow
 

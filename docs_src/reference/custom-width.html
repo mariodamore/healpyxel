@@ -1,0 +1,15 @@
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var sidebar = document.getElementById('quarto-margin-sidebar');
+  if (!sidebar) return;
+  var text = sidebar.textContent || '';
+  if (text.indexOf('API Reference') === -1) return;
+  var el = document.getElementById('quarto-content');
+  if (!el) return;
+  // Remove sidebar and widen container so <main> fills the page
+  sidebar.remove();
+  el.classList.remove('page-columns');
+  el.style.maxWidth = '90vw';
+  el.style.gridTemplateColumns = '1fr';
+});
+</script>

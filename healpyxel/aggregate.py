@@ -408,6 +408,24 @@ def collect_sidecar_outputs(
     logger.info(f"Found {len(df_out)} sidecar file(s)")
     return df_out
 
+def get_numeric_columns(file_path: Path) -> List[str]:
+    """Return all float/double column names from a parquet file.
+
+    Used by --all-columns to auto-discover aggregation targets.
+    Excludes int, string, bool, and other non-float types.
+    """
+    try:
+        pf = pq.ParquetFile(file_path)
+        schema = pf.schema_arrow
+        numeric = []
+        for field in schema:
+            if pa.types.is_floating(field.type):
+                numeric.append(field.name)
+        return numeric
+    except Exception as e:
+        logger.error(f"Failed to read schema from {file_path}: {e}")
+        return []
+
 def print_parquet_schema(file_path: Path, show_metadata: bool = True) -> None:
     """
     Print the schema of a parquet file.
@@ -859,18 +877,28 @@ EXAMPLES:
         '--aggregate',
         action='store_true',
         help='Perform aggregation (required flag to enable processing). '
-             'Must be paired with --sidecar-index and --columns. '
+             'Must be paired with --sidecar-index and either --columns or --all-columns. '
              'Without this flag, only schema inspection operations run.'
     )
 
-    parser.add_argument(
+    col_group = parser.add_mutually_exclusive_group()
+    col_group.add_argument(
         '--columns',
         nargs='+',
         metavar='COL',
         help='Value columns to aggregate (space-separated; required for --aggregate). '
              'Example: --columns reflectance radiance emission. '
              'Each column will have aggregation functions applied (mean, median, std, etc.). '
-             'Columns must exist in input parquet file (verify with --schema first).'
+             'Columns must exist in input parquet file (verify with --schema first). '
+             'Mutually exclusive with --all-columns.'
+    )
+    col_group.add_argument(
+        '--all-columns',
+        action='store_true',
+        help='Aggregate all float/double columns in the input parquet file. '
+             'Automatically discovers numeric columns from the schema. '
+             'Useful when the column list is long or changes frequently. '
+             'Mutually exclusive with --columns.'
     )
 
     # =========================================================================
@@ -1328,6 +1356,15 @@ def run(config):
             else:
                 args.sidecar_index = [int(idx) for idx in args.sidecar_index]
 
+    # Resolve --all-columns into args.columns so downstream code sees a single list
+    if getattr(args, 'all_columns', False):
+        if not hasattr(args, 'columns') or args.columns is None:
+            args.columns = get_numeric_columns(args.input)
+            if not args.columns:
+                raise RuntimeError(f"No float/double columns found in {args.input}. Cannot use --all-columns.")
+            logger.info(f"--all-columns: discovered {len(args.columns)} numeric columns")
+        args.all_columns = False  # resolve to avoid confusion downstream
+
     if _is_interactive_session():
         logger.info("Interactive session detected; skipping CLI argument parsing.")
         return 0
@@ -1374,10 +1411,16 @@ def run(config):
     # Aggregation (single or batch mode)
     sidecar_index = _get_config(config, 'sidecar_index')
     columns = _get_config(config, 'columns')
+    all_columns = _get_config(config, 'all_columns', False)
     if sidecar_index or _get_config(config, 'aggregate'):
         if sidecar_index is None:
             raise RuntimeError("--sidecar-index is required when using --aggregate")
-        if not columns:
+        if all_columns:
+            columns = get_numeric_columns(input_file)
+            if not columns:
+                raise RuntimeError(f"No float/double columns found in {input_file}. Cannot use --all-columns.")
+            logger.info(f"--all-columns: discovered {len(columns)} numeric columns: {columns}")
+        elif not columns:
             raise RuntimeError("--columns is required when using --aggregate")
 
         if not sidecar_dir.exists():

@@ -1,7 +1,7 @@
 # cli.finalize_cli { #healpyxel.cli.finalize_cli }
 
 ```python
-cli.finalize_cli()
+cli.finalize_cli(argv=None)
 ```
 
-CLI entry point for healpix_finalize command.
+CLI entry point for healpyxel_finalize.

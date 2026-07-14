@@ -21,7 +21,7 @@ Attributes:
     order: Pixel ordering scheme ('nested' or 'ring')
     npix: Total number of pixels (auto-computed from nside if None)
     mode: Cell assignment mode ('strict' or 'fuzzy')
-    lon_convention: Longitude convention ('0_360' or '-180_180')
+    lon_convention: Longitude convention ('0_360' or '-180_180'). Value 'minus_plus180' is accepted and normalized to '-180_180'.
     file_type: Pipeline stage that produced this file (optional)
 
 Examples:

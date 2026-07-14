@@ -210,7 +210,7 @@ from sqlalchemy import column
 
 
 fig, axs = plt.subplots(ncols=2, figsize=(10,8))
-gdf_cell.plot(ax=axs[0], aspect='auto', column='weight')
+gdf_cell.plot(ax=axs[0], aspect='equal', column='weight')
 poly = get_healpix_cell_geometry(healpix_id, nside=nside)
 x_poly, y_poly = poly.exterior.xy
 

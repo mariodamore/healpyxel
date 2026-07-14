@@ -1,10 +1,14 @@
 # sidecar.compute_healpix_ids_from_lonlat { #healpyxel.sidecar.compute_healpix_ids_from_lonlat }
 
 ```python
-sidecar.compute_healpix_ids_from_lonlat(nside, lons, lats)
+sidecar.compute_healpix_ids_from_lonlat(nside, lons, lats, body=None)
 ```
 
 Compute HEALPix indices for arrays of lon,lat in degrees.
+
+If a body geometry backend is provided, coordinates are first converted
+through the body model (lon/lat -> xyz -> unit sphere) before HEALPix
+indexing. This enables correct geodetic handling for ellipsoidal bodies.
 
 Tries to use cdshealpix if available, otherwise falls back to healpy.
 Returns a 1D integer numpy array of same length as inputs.

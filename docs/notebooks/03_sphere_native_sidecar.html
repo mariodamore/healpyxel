@@ -1,0 +1,2062 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>sphere_native_sidecar – Healpyxel</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../notebooks/90_example_streaming.html" rel="next">
+<link href="../notebooks/82_example_visualization_psf.html" rel="prev">
+<link href="../docs_src/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-4f7210a01128827e17b2825bab7455c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../docs_src/reference/custom.css">
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../docs_src/logo_cutout_128.png" alt="" class="navbar-logo light-content">
+    <img src="../docs_src/logo_cutout_128.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Healpyxel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../docs_src/index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../notebooks/01_core_concepts.py.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../notebooks/03_sphere_native_sidecar.py.html"> 
+<span class="menu-text">Sphere-Native Sidecar</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../docs_src/reference/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/01_core_concepts.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../notebooks/03_sphere_native_sidecar.html">Geometry Engine</a></li><li class="breadcrumb-item"><a href="../notebooks/03_sphere_native_sidecar.html">Sphere-Native Sidecar Generation</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Home</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs_src/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Healpyxel</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/01_core_concepts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core Concepts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/02_full_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Full Workflow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Visualization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/82_example_visualization_psf.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Geometry Engine</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/03_sphere_native_sidecar.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Sphere-Native Sidecar Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Streaming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/90_example_streaming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Streaming WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">API Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs_src/reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Function reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Core</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.mad</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.robust_std</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.setup_logger</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sidecar</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.compute_healpix_ids_from_lonlat</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.detect_lonlat_columns</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.process_partition</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.add_psf_weights_to_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.normalize_weights_per_cell</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.build_output_path</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.write_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_healpix_cell_geometry</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_psf</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.GaussianPSF</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Aggregate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.aggregate_by_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.collect_sidecar_outputs</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.densify_healpix_aggregates</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.generate_output_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.extract_nside_from_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.validate_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.process_single_sidecar</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Accumulator</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.StreamingStats</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.CellAccumulator</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.accumulate_batch</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.save_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.load_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.state_to_dataframe</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.find_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.ensure_not_processed</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Finalize</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.finalize_statistics</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.densify_healpix_map</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.export_to_geotiff</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.load_state</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Metadata</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.HEALPyxelxMetadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.FileType</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.read_metadata_from_file</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.save_with_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_aggregate</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">CLI</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.sidecar_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.aggregate_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.accumulator_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.finalize_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.to_geoparquet_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.cache_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.validate_lon_lat_columns</span>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-problem-planar-lonlat-geometry" id="toc-the-problem-planar-lonlat-geometry" class="nav-link active" data-scroll-target="#the-problem-planar-lonlat-geometry">1. The Problem: Planar lon/lat Geometry</a></li>
+  <li><a href="#the-solution-unit-vectors-slerp-great-circle-arcs" id="toc-the-solution-unit-vectors-slerp-great-circle-arcs" class="nav-link" data-scroll-target="#the-solution-unit-vectors-slerp-great-circle-arcs">2. The Solution: Unit Vectors + SLERP Great-Circle Arcs</a></li>
+  <li><a href="#walkthrough-slerp-on-a-simple-polygon" id="toc-walkthrough-slerp-on-a-simple-polygon" class="nav-link" data-scroll-target="#walkthrough-slerp-on-a-simple-polygon">3. Walkthrough: SLERP on a Simple Polygon</a></li>
+  <li><a href="#antimeridian-crossing-no-fix-needed" id="toc-antimeridian-crossing-no-fix-needed" class="nav-link" data-scroll-target="#antimeridian-crossing-no-fix-needed">4. Antimeridian Crossing: No Fix Needed</a></li>
+  <li><a href="#winding-order-sidestepped-by-dense-sampling" id="toc-winding-order-sidestepped-by-dense-sampling" class="nav-link" data-scroll-target="#winding-order-sidestepped-by-dense-sampling">5. Winding Order: Sidestepped by Dense Sampling</a></li>
+  <li><a href="#convention-independence--180180-vs-0360" id="toc-convention-independence--180180-vs-0360" class="nav-link" data-scroll-target="#convention-independence--180180-vs-0360">6. Convention Independence: [-180,180] vs [0,360]</a></li>
+  <li><a href="#polar-polygon-no-singularity" id="toc-polar-polygon-no-singularity" class="nav-link" data-scroll-target="#polar-polygon-no-singularity">7. Polar Polygon: No Singularity</a></li>
+  <li><a href="#full-pipeline-from-footprint-to-sidecar" id="toc-full-pipeline-from-footprint-to-sidecar" class="nav-link" data-scroll-target="#full-pipeline-from-footprint-to-sidecar">8. Full Pipeline: From Footprint to Sidecar</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">9. Summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/01_core_concepts.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../notebooks/03_sphere_native_sidecar.html">Geometry Engine</a></li><li class="breadcrumb-item"><a href="../notebooks/03_sphere_native_sidecar.html">Sphere-Native Sidecar Generation</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Sphere-Native Sidecar Generation</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>How healpyxel assigns observation footprints to HEALPix cells using SLERP-great-circle sampling on unit vectors — sidestepping antimeridian crossings, pole singularities, and winding-order problems entirely.</p>
+<div id="fd52efa1" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.patches <span class="im">as</span> mpatches</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.collections <span class="im">import</span> PatchCollection</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.geometry <span class="im">import</span> Sphere</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.sidecar <span class="im">import</span> (</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    process_partition,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    _sample_great_circle_arc,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    _query_healpix_single_polygon,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>    compute_healpix_ids_from_lonlat,</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> geopandas <span class="im">as</span> gpd</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> shapely.geometry <span class="im">import</span> Polygon</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="the-problem-planar-lonlat-geometry" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem-planar-lonlat-geometry">1. The Problem: Planar lon/lat Geometry</h2>
+<p>Representing planetary footprints as lon/lat polygons in a flat coordinate system creates well-known pathologies:</p>
+<ul>
+<li><strong>Antimeridian crossing</strong>: A polygon spanning from 179° to -179° is drawn across 358° of the map, not the 2° it spans on the sphere.</li>
+<li><strong>Pole singularity</strong>: All longitudes converge at the pole; a “small” polygon near the pole may wrap incorrectly in lon/lat.</li>
+<li><strong>Winding order</strong>: In planar GIS, CW vs CCW determines which side is “inside.” On the sphere, winding still matters topologically — but dense sampling sidesteps it.</li>
+</ul>
+<p>healpyxel’s observation geometry lives on a <strong>spherical body</strong>, not on a projection. The computation engine should reflect that.</p>
+</section>
+<section id="the-solution-unit-vectors-slerp-great-circle-arcs" class="level2">
+<h2 class="anchored" data-anchor-id="the-solution-unit-vectors-slerp-great-circle-arcs">2. The Solution: Unit Vectors + SLERP Great-Circle Arcs</h2>
+<p>The key insight: convert every polygon vertex to a <strong>unit vector</strong> (x, y, z) on the unit sphere. Consecutive vertices are then connected by the <strong>shortest great-circle arc</strong> using SLERP (spherical linear interpolation):</p>
+<p><span class="math display">\[
+v(t) = \frac{\sin((1-t)\theta)}{\sin\theta} \cdot v_0 + \frac{\sin(t\theta)}{\sin\theta} \cdot v_1
+\]</span></p>
+<p>where <span class="math inline">\(\theta = \arccos(v_0 \cdot v_1)\)</span> is the angular distance between vertices.</p>
+<p>Properties: - <strong>Antimeridian crossing</strong>: (179°, 5°) to (-179°, 5°) is only 2° on the sphere — SLERP takes the short arc automatically. - <strong>Pole safe</strong>: The north pole is just the vector (0, 0, 1). - <strong>Convention independent</strong>: (181°, 5°) in [0,360] maps to the same unit vector as (-179°, 5°) in [-180,180]. - <strong>Winding agnostic</strong>: We sample all edges and add interior points; CW and CCW windings produce identical HEALPix cell sets.</p>
+<p>The SLERP formula is implemented in <code>_sample_great_circle_arc()</code> in <code>sidecar.py</code>.</p>
+</section>
+<section id="walkthrough-slerp-on-a-simple-polygon" class="level2">
+<h2 class="anchored" data-anchor-id="walkthrough-slerp-on-a-simple-polygon">3. Walkthrough: SLERP on a Simple Polygon</h2>
+<p>Let’s trace what happens for a small rectangle at high latitude, first showing the great-circle arc sampling.</p>
+<div id="aefb3d2b" class="cell" data-execution_count="2">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a simple polygon at high latitude</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>coords <span class="op">=</span> [(<span class="fl">95.0</span>, <span class="fl">70.0</span>), (<span class="fl">105.0</span>, <span class="fl">70.0</span>), (<span class="fl">105.0</span>, <span class="fl">75.0</span>), (<span class="fl">95.0</span>, <span class="fl">75.0</span>), (<span class="fl">95.0</span>, <span class="fl">70.0</span>)]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>poly <span class="op">=</span> Polygon(coords)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>body <span class="op">=</span> Sphere()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Extract vertices</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> np.array(poly.exterior.coords)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>lons_v <span class="op">=</span> c[:, <span class="dv">0</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>lats_v <span class="op">=</span> c[:, <span class="dv">1</span>].astype(<span class="bu">float</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>xyz_v <span class="op">=</span> body.lonlat_to_xyz(lons_v, lats_v)  <span class="co"># (3, N)</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Polygon vertices (lon, lat):"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lon, lat <span class="kw">in</span> <span class="bu">zip</span>(lons_v, lats_v):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  (</span><span class="sc">{</span>lon<span class="sc">:.1f}</span><span class="ss">°, </span><span class="sc">{</span>lat<span class="sc">:.1f}</span><span class="ss">°)"</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Unit vectors (x, y, z):"</span>)</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(xyz_v.shape[<span class="dv">1</span>]):</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  v</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">: [</span><span class="sc">{</span>xyz_v[<span class="dv">0</span>, i]<span class="sc">:+.4f}</span><span class="ss">, </span><span class="sc">{</span>xyz_v[<span class="dv">1</span>, i]<span class="sc">:+.4f}</span><span class="ss">, </span><span class="sc">{</span>xyz_v[<span class="dv">2</span>, i]<span class="sc">:+.4f}</span><span class="ss">]"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Polygon vertices (lon, lat):
+  (95.0°, 70.0°)
+  (105.0°, 70.0°)
+  (105.0°, 75.0°)
+  (95.0°, 75.0°)
+  (95.0°, 70.0°)
+
+Unit vectors (x, y, z):
+  v0: [-0.0298, +0.3407, +0.9397]
+  v1: [-0.0885, +0.3304, +0.9397]
+  v2: [-0.0670, +0.2500, +0.9659]
+  v3: [-0.0226, +0.2578, +0.9659]
+  v4: [-0.0298, +0.3407, +0.9397]</code></pre>
+</div>
+</div>
+<div id="7eaa2a24" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sample the first edge (v0 -&gt; v1) via SLERP</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>v0 <span class="op">=</span> xyz_v[:, <span class="dv">0</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>v1 <span class="op">=</span> xyz_v[:, <span class="dv">1</span>]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>arc_pts <span class="op">=</span> _sample_great_circle_arc(v0, v1, <span class="dv">20</span>)  <span class="co"># 20 points on the great-circle arc</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>arc_lon, arc_lat <span class="op">=</span> body.xyz_to_lonlat(arc_pts)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Edge v0-&gt;v1: (</span><span class="sc">{</span>lons_v[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">°, </span><span class="sc">{</span>lats_v[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">°) → (</span><span class="sc">{</span>lons_v[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">°, </span><span class="sc">{</span>lats_v[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">°)"</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Angular distance: </span><span class="sc">{</span>np<span class="sc">.</span>degrees(np.arccos(np.clip(np.dot(v0, v1), <span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>)))<span class="sc">:.2f}</span><span class="ss">°"</span>)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  SLERP samples (first 5):"</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"    t=</span><span class="sc">{</span>i<span class="op">/</span><span class="dv">19</span><span class="sc">:.2f}</span><span class="ss">: (</span><span class="sc">{</span>arc_lon[i]<span class="sc">:.3f}</span><span class="ss">°, </span><span class="sc">{</span>arc_lat[i]<span class="sc">:.3f}</span><span class="ss">°)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Edge v0-&gt;v1: (95.0°, 70.0°) → (105.0°, 70.0°)
+  Angular distance: 3.42°
+  SLERP samples (first 5):
+    t=0.00: (95.000°, 70.000°)
+    t=0.05: (95.524°, 70.014°)
+    t=0.11: (96.049°, 70.026°)
+    t=0.16: (96.575°, 70.037°)
+    t=0.21: (97.101°, 70.047°)</code></pre>
+</div>
+</div>
+<p>The SLERP samples follow the <strong>shortest great-circle arc</strong> on the sphere. For a 10° edge at 70°N latitude, the arc curves slightly toward the pole — this is physically correct for a sensor footprint on a spherical body.</p>
+</section>
+<section id="antimeridian-crossing-no-fix-needed" class="level2">
+<h2 class="anchored" data-anchor-id="antimeridian-crossing-no-fix-needed">4. Antimeridian Crossing: No Fix Needed</h2>
+<p>A polygon crossing the antimeridian at low latitude: vertices from 179° → -179° span only 2° on the sphere.</p>
+<div id="c54de024" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> plot_polygon_and_slrp(ax, coords_list, body, color, label, n_edge<span class="op">=</span><span class="dv">40</span>, ls<span class="op">=</span><span class="st">"-"</span>):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Plot polygon vertices and SLERP edge samples on a lon/lat map."""</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    xyz_all <span class="op">=</span> []</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(coords_list) <span class="op">-</span> <span class="dv">1</span>):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        lon0, lat0 <span class="op">=</span> coords_list[i]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        lon1, lat1 <span class="op">=</span> coords_list[i <span class="op">+</span> <span class="dv">1</span>]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        v0 <span class="op">=</span> body.lonlat_to_xyz(np.array([lon0]), np.array([lat0])).flatten()</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>        v1 <span class="op">=</span> body.lonlat_to_xyz(np.array([lon1]), np.array([lat1])).flatten()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>        arc <span class="op">=</span> _sample_great_circle_arc(v0, v1, n_edge)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        a_lon, a_lat <span class="op">=</span> body.xyz_to_lonlat(arc)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>        ax.plot(a_lon, a_lat, color<span class="op">=</span>color, lw<span class="op">=</span><span class="fl">1.5</span>, ls<span class="op">=</span>ls, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Vertices</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>    lons <span class="op">=</span> [c[<span class="dv">0</span>] <span class="cf">for</span> c <span class="kw">in</span> coords_list]</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    lats <span class="op">=</span> [c[<span class="dv">1</span>] <span class="cf">for</span> c <span class="kw">in</span> coords_list]</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    ax.scatter(lons, lats, color<span class="op">=</span>color, zorder<span class="op">=</span><span class="dv">5</span>, s<span class="op">=</span><span class="dv">40</span>, label<span class="op">=</span>label)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> lons, lats</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">2</span>, <span class="dv">1</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">8</span>))</span>
+<span id="cb6-21"><a href="#cb6-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-22"><a href="#cb6-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Panel A: Antimeridian crossing ([-180, 180] convention)</span></span>
+<span id="cb6-23"><a href="#cb6-23" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> axes[<span class="dv">0</span>]</span>
+<span id="cb6-24"><a href="#cb6-24" aria-hidden="true" tabindex="-1"></a>am_coords <span class="op">=</span> [(<span class="dv">175</span>, <span class="dv">5</span>), (<span class="dv">179</span>, <span class="dv">5</span>), (<span class="op">-</span><span class="dv">179</span>, <span class="dv">5</span>), (<span class="op">-</span><span class="dv">175</span>, <span class="dv">5</span>), (<span class="op">-</span><span class="dv">175</span>, <span class="op">-</span><span class="dv">5</span>), (<span class="op">-</span><span class="dv">179</span>, <span class="op">-</span><span class="dv">6</span>), (<span class="dv">179</span>, <span class="op">-</span><span class="dv">6</span>), (<span class="dv">175</span>, <span class="op">-</span><span class="dv">5</span>), (<span class="dv">175</span>, <span class="dv">5</span>)]</span>
+<span id="cb6-25"><a href="#cb6-25" aria-hidden="true" tabindex="-1"></a>plot_polygon_and_slrp(ax, am_coords, body, <span class="st">"tab:blue"</span>, <span class="st">"antimeridian FOV"</span>, n_edge<span class="op">=</span><span class="dv">60</span>)</span>
+<span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">180</span>, color<span class="op">=</span><span class="st">"k"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, ls<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb6-27"><a href="#cb6-27" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="op">-</span><span class="dv">180</span>, color<span class="op">=</span><span class="st">"k"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, ls<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb6-28"><a href="#cb6-28" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">0</span>, color<span class="op">=</span><span class="st">"gray"</span>, lw<span class="op">=</span><span class="fl">0.5</span>, ls<span class="op">=</span><span class="st">":"</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb6-29"><a href="#cb6-29" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="op">-</span><span class="dv">200</span>, <span class="dv">200</span>)</span>
+<span id="cb6-30"><a href="#cb6-30" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="dv">15</span>, <span class="dv">15</span>)</span>
+<span id="cb6-31"><a href="#cb6-31" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Longitude (°)"</span>)</span>
+<span id="cb6-32"><a href="#cb6-32" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Latitude (°)"</span>)</span>
+<span id="cb6-33"><a href="#cb6-33" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Antimeridian Crossing ([-180, 180])"</span>)</span>
+<span id="cb6-34"><a href="#cb6-34" aria-hidden="true" tabindex="-1"></a>ax.legend(loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb6-35"><a href="#cb6-35" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb6-36"><a href="#cb6-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-37"><a href="#cb6-37" aria-hidden="true" tabindex="-1"></a><span class="co"># Panel B: Same polygon in [0, 360] convention</span></span>
+<span id="cb6-38"><a href="#cb6-38" aria-hidden="true" tabindex="-1"></a>ax <span class="op">=</span> axes[<span class="dv">1</span>]</span>
+<span id="cb6-39"><a href="#cb6-39" aria-hidden="true" tabindex="-1"></a>am_coords_360 <span class="op">=</span> [(<span class="dv">175</span>, <span class="dv">5</span>), (<span class="dv">179</span>, <span class="dv">5</span>), (<span class="dv">181</span>, <span class="dv">5</span>), (<span class="dv">185</span>, <span class="dv">5</span>), (<span class="dv">185</span>, <span class="op">-</span><span class="dv">5</span>), (<span class="dv">181</span>, <span class="op">-</span><span class="dv">6</span>), (<span class="dv">179</span>, <span class="op">-</span><span class="dv">6</span>), (<span class="dv">175</span>, <span class="op">-</span><span class="dv">5</span>), (<span class="dv">175</span>, <span class="dv">5</span>)]</span>
+<span id="cb6-40"><a href="#cb6-40" aria-hidden="true" tabindex="-1"></a>plot_polygon_and_slrp(ax, am_coords_360, body, <span class="st">"tab:orange"</span>, <span class="st">"antimeridian FOV [0,360]"</span>, n_edge<span class="op">=</span><span class="dv">60</span>)</span>
+<span id="cb6-41"><a href="#cb6-41" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">180</span>, color<span class="op">=</span><span class="st">"k"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, ls<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb6-42"><a href="#cb6-42" aria-hidden="true" tabindex="-1"></a>ax.axvline(<span class="dv">360</span>, color<span class="op">=</span><span class="st">"k"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, ls<span class="op">=</span><span class="st">"--"</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb6-43"><a href="#cb6-43" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">150</span>, <span class="dv">390</span>)</span>
+<span id="cb6-44"><a href="#cb6-44" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="op">-</span><span class="dv">15</span>, <span class="dv">15</span>)</span>
+<span id="cb6-45"><a href="#cb6-45" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Longitude (°)"</span>)</span>
+<span id="cb6-46"><a href="#cb6-46" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Same FOV in [0, 360] Convention"</span>)</span>
+<span id="cb6-47"><a href="#cb6-47" aria-hidden="true" tabindex="-1"></a>ax.legend(loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb6-48"><a href="#cb6-48" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb6-49"><a href="#cb6-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-50"><a href="#cb6-50" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb6-51"><a href="#cb6-51" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03_sphere_native_sidecar_files/figure-html/cell-5-output-1.png" width="949" height="756" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Key observation</strong>: In both panels, the edges follow the <strong>short great-circle arc</strong>. The edge from (179°, 5°) to (-179°, 5°) — which would be drawn across 358° in a planar lon/lat plot — is correctly represented as the 2° arc on the sphere.</p>
+<p>Both conventions ([-180,180] and [0,360]) produce <strong>identical unit vectors</strong>, hence identical SLERP sampling and identical HEALPix cell assignments.</p>
+</section>
+<section id="winding-order-sidestepped-by-dense-sampling" class="level2">
+<h2 class="anchored" data-anchor-id="winding-order-sidestepped-by-dense-sampling">5. Winding Order: Sidestepped by Dense Sampling</h2>
+<p>Our SLERP-based approach does not depend on winding order. We sample <strong>every edge</strong> (CW or CCW) and add interior points. The result is the same set of HEALPix cells regardless of vertex ordering.</p>
+<div id="e4e52415" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create the same polygon with CCW and CW winding</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>coords_ccw <span class="op">=</span> [(<span class="fl">95.0</span>, <span class="fl">70.0</span>), (<span class="fl">105.0</span>, <span class="fl">70.0</span>), (<span class="fl">105.0</span>, <span class="fl">75.0</span>), (<span class="fl">95.0</span>, <span class="fl">75.0</span>), (<span class="fl">95.0</span>, <span class="fl">70.0</span>)]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>coords_cw <span class="op">=</span> <span class="bu">list</span>(<span class="bu">reversed</span>(coords_ccw))</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>poly_ccw <span class="op">=</span> Polygon(coords_ccw)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>poly_cw <span class="op">=</span> Polygon(coords_cw)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>gdf_ccw <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"geometry"</span>: [poly_ccw]})</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>gdf_cw <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"geometry"</span>: [poly_cw]})</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>result_ccw <span class="op">=</span> process_partition(gdf_ccw, nside<span class="op">=</span><span class="dv">32</span>, mode<span class="op">=</span><span class="st">"fuzzy"</span>, lon_convention<span class="op">=</span><span class="st">"minus_plus180"</span>, body<span class="op">=</span>Sphere())</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>result_cw <span class="op">=</span> process_partition(gdf_cw, nside<span class="op">=</span><span class="dv">32</span>, mode<span class="op">=</span><span class="st">"fuzzy"</span>, lon_convention<span class="op">=</span><span class="st">"minus_plus180"</span>, body<span class="op">=</span>Sphere())</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>ccw_cells <span class="op">=</span> <span class="bu">set</span>(result_ccw[<span class="st">"healpix_id"</span>])</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>cw_cells <span class="op">=</span> <span class="bu">set</span>(result_cw[<span class="st">"healpix_id"</span>])</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CCW winding → </span><span class="sc">{</span><span class="bu">len</span>(ccw_cells)<span class="sc">}</span><span class="ss"> HEALPix cells"</span>)</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"CW winding  → </span><span class="sc">{</span><span class="bu">len</span>(cw_cells)<span class="sc">}</span><span class="ss"> HEALPix cells"</span>)</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Sets are identical: </span><span class="sc">{</span>ccw_cells <span class="op">==</span> cw_cells<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>CCW winding → 10 HEALPix cells
+CW winding  → 10 HEALPix cells
+Sets are identical: True</code></pre>
+</div>
+</div>
+<p>Both windings produce the <strong>exact same cell set</strong>. This is because:</p>
+<ol type="1">
+<li><code>_sample_great_circle_arc</code> samples edges regardless of direction</li>
+<li>The centroid (mean of unit vectors) is added as interior coverage</li>
+<li>Original vertices are added for exact corner coverage</li>
+<li><code>compute_healpix_ids_from_lonlat</code> collects all points → HEALPix IDs</li>
+</ol>
+<p>Signed spherical area determines <em>which</em> side of the loop is “inside” — but we never need to know that, because our dense sampling covers both the edges and the interior.</p>
+</section>
+<section id="convention-independence--180180-vs-0360" class="level2">
+<h2 class="anchored" data-anchor-id="convention-independence--180180-vs-0360">6. Convention Independence: [-180,180] vs [0,360]</h2>
+<p>The same physical polygon expressed in different longitude conventions must produce identical sidecars. Unit vectors make this trivially true.</p>
+<div id="fa1f4f7d" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>am_coords <span class="op">=</span> [(<span class="dv">175</span>, <span class="dv">5</span>), (<span class="dv">179</span>, <span class="dv">5</span>), (<span class="op">-</span><span class="dv">179</span>, <span class="dv">5</span>), (<span class="op">-</span><span class="dv">175</span>, <span class="dv">5</span>),</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>             (<span class="op">-</span><span class="dv">175</span>, <span class="op">-</span><span class="dv">5</span>), (<span class="op">-</span><span class="dv">179</span>, <span class="op">-</span><span class="dv">6</span>), (<span class="dv">179</span>, <span class="op">-</span><span class="dv">6</span>), (<span class="dv">175</span>, <span class="op">-</span><span class="dv">5</span>), (<span class="dv">175</span>, <span class="dv">5</span>)]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>poly_m180 <span class="op">=</span> Polygon(am_coords)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>poly_360 <span class="op">=</span> Polygon([(lon <span class="cf">if</span> lon <span class="op">&gt;=</span> <span class="dv">0</span> <span class="cf">else</span> lon <span class="op">+</span> <span class="dv">360</span>, lat) <span class="cf">for</span> lon, lat <span class="kw">in</span> am_coords])</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>gdf_m180 <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"geometry"</span>: [poly_m180]})</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>gdf_360 <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"geometry"</span>: [poly_360]})</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>r_m180 <span class="op">=</span> process_partition(gdf_m180, nside<span class="op">=</span><span class="dv">32</span>, mode<span class="op">=</span><span class="st">"fuzzy"</span>, lon_convention<span class="op">=</span><span class="st">"minus_plus180"</span>, body<span class="op">=</span>Sphere())</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>r_360 <span class="op">=</span> process_partition(gdf_360, nside<span class="op">=</span><span class="dv">32</span>, mode<span class="op">=</span><span class="st">"fuzzy"</span>, lon_convention<span class="op">=</span><span class="st">"0_360"</span>, body<span class="op">=</span>Sphere())</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>cells_m180 <span class="op">=</span> <span class="bu">set</span>(r_m180[<span class="st">"healpix_id"</span>])</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>cells_360 <span class="op">=</span> <span class="bu">set</span>(r_360[<span class="st">"healpix_id"</span>])</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"[-180,180] convention → </span><span class="sc">{</span><span class="bu">len</span>(cells_m180)<span class="sc">}</span><span class="ss"> cells"</span>)</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"[0,360]   convention → </span><span class="sc">{</span><span class="bu">len</span>(cells_360)<span class="sc">}</span><span class="ss"> cells"</span>)</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Identical sets: </span><span class="sc">{</span>cells_m180 <span class="op">==</span> cells_360<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[-180,180] convention → 29 cells
+[0,360]   convention → 29 cells
+Identical sets: True</code></pre>
+</div>
+</div>
+</section>
+<section id="polar-polygon-no-singularity" class="level2">
+<h2 class="anchored" data-anchor-id="polar-polygon-no-singularity">7. Polar Polygon: No Singularity</h2>
+<p>A triangle wrapping around the north pole works correctly because unit vectors have no coordinate singularity.</p>
+<div id="2ac4dbef" class="cell" data-execution_count="7">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Triangle covering area near the north pole</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>polar_coords <span class="op">=</span> [(<span class="fl">0.0</span>, <span class="fl">85.0</span>), (<span class="fl">120.0</span>, <span class="fl">85.0</span>), (<span class="fl">240.0</span>, <span class="fl">85.0</span>), (<span class="fl">0.0</span>, <span class="fl">85.0</span>)]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>poly_polar <span class="op">=</span> Polygon(polar_coords)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>gdf_polar <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"geometry"</span>: [poly_polar]})</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>r_polar <span class="op">=</span> process_partition(gdf_polar, nside<span class="op">=</span><span class="dv">32</span>, mode<span class="op">=</span><span class="st">"fuzzy"</span>, lon_convention<span class="op">=</span><span class="st">"0_360"</span>, body<span class="op">=</span>Sphere())</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>polar_cells <span class="op">=</span> <span class="bu">set</span>(r_polar[<span class="st">"healpix_id"</span>])</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Polar polygon → </span><span class="sc">{</span><span class="bu">len</span>(polar_cells)<span class="sc">}</span><span class="ss"> HEALPix cells"</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify cells are near the pole (high healpy indices in nested ordering)</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpy <span class="im">as</span> hp</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hid <span class="kw">in</span> <span class="bu">sorted</span>(polar_cells)[:<span class="dv">5</span>]:</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    theta, phi <span class="op">=</span> hp.pix2ang(<span class="dv">32</span>, <span class="bu">int</span>(hid), nest<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    lat_d <span class="op">=</span> <span class="fl">90.0</span> <span class="op">-</span> np.degrees(theta)</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    lon_d <span class="op">=</span> np.degrees(phi)</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  cell </span><span class="sc">{</span>hid<span class="sc">}</span><span class="ss">: (lon=</span><span class="sc">{</span>lon_d<span class="sc">:.1f}</span><span class="ss">°, lat=</span><span class="sc">{</span>lat_d<span class="sc">:.1f}</span><span class="ss">°)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Polar polygon → 20 HEALPix cells
+  cell 1018: (lon=11.2°, lat=84.1°)
+  cell 1019: (lon=15.0°, lat=85.6°)
+  cell 1021: (lon=67.5°, lat=87.1°)
+  cell 1022: (lon=22.5°, lat=87.1°)
+  cell 1023: (lon=45.0°, lat=88.5°)</code></pre>
+</div>
+</div>
+</section>
+<section id="full-pipeline-from-footprint-to-sidecar" class="level2">
+<h2 class="anchored" data-anchor-id="full-pipeline-from-footprint-to-sidecar">8. Full Pipeline: From Footprint to Sidecar</h2>
+<p>The complete fuzzy-mode pipeline for a single polygon:</p>
+<div id="ae4a7b40" class="cell" data-execution_count="8">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="dv">6</span>))</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simple rectangle</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>simple_coords <span class="op">=</span> [(<span class="fl">100.0</span>, <span class="fl">70.0</span>), (<span class="fl">105.0</span>, <span class="fl">70.0</span>), (<span class="fl">105.0</span>, <span class="fl">75.0</span>), (<span class="fl">100.0</span>, <span class="fl">75.0</span>), (<span class="fl">100.0</span>, <span class="fl">70.0</span>)]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>simple_poly <span class="op">=</span> Polygon(simple_coords)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>gdf_simple <span class="op">=</span> gpd.GeoDataFrame({<span class="st">"geometry"</span>: [simple_poly]})</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>r_simple <span class="op">=</span> process_partition(gdf_simple, nside<span class="op">=</span><span class="dv">32</span>, mode<span class="op">=</span><span class="st">"fuzzy"</span>, lon_convention<span class="op">=</span><span class="st">"minus_plus180"</span>, body<span class="op">=</span>Sphere())</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>simple_cells <span class="op">=</span> <span class="bu">set</span>(r_simple[<span class="st">"healpix_id"</span>])</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot polygon and SLERP edges</span></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>plot_polygon_and_slrp(ax, simple_coords, body, <span class="st">"tab:blue"</span>, <span class="st">"FOV polygon"</span>, n_edge<span class="op">=</span><span class="dv">80</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot HEALPix cell boundaries for the assigned cells</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpy <span class="im">as</span> hp</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hid <span class="kw">in</span> simple_cells:</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    cell_boundary <span class="op">=</span> hp.boundaries(<span class="dv">32</span>, <span class="bu">int</span>(hid), step<span class="op">=</span><span class="dv">1</span>, nest<span class="op">=</span><span class="va">True</span>)  <span class="co"># (3, 4) corners</span></span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>    cell_lon <span class="op">=</span> np.degrees(hp.vec2ang(cell_boundary)[<span class="dv">1</span>])</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a>    cell_lat <span class="op">=</span> <span class="fl">90.0</span> <span class="op">-</span> np.degrees(hp.vec2ang(cell_boundary)[<span class="dv">0</span>])</span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Close the ring</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    cell_lon <span class="op">=</span> np.append(cell_lon, cell_lon[<span class="dv">0</span>])</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    cell_lat <span class="op">=</span> np.append(cell_lat, cell_lat[<span class="dv">0</span>])</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>    ax.plot(cell_lon, cell_lat, color<span class="op">=</span><span class="st">"tab:red"</span>, lw<span class="op">=</span><span class="fl">0.8</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Vertex cells (subset check)</span></span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpy <span class="im">as</span> hp</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>vertex_hids <span class="op">=</span> compute_healpix_ids_from_lonlat(<span class="dv">32</span>,</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>    np.array([c[<span class="dv">0</span>] <span class="cf">for</span> c <span class="kw">in</span> simple_coords]),</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    np.array([c[<span class="dv">1</span>] <span class="cf">for</span> c <span class="kw">in</span> simple_coords]),</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    body<span class="op">=</span>body)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"FOV polygon: </span><span class="sc">{</span><span class="bu">len</span>(simple_coords)<span class="op">-</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> edges at (70-75°N, 100-105°E)"</span>)</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Fuzzy mode assigned </span><span class="sc">{</span><span class="bu">len</span>(simple_cells)<span class="sc">}</span><span class="ss"> HEALPix cells at nside=32"</span>)</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Vertex cells (</span><span class="sc">{</span><span class="bu">len</span>(vertex_hids)<span class="sc">}</span><span class="ss">): </span><span class="sc">{</span><span class="bu">sorted</span>(vertex_hids)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"All HEALPix cells (</span><span class="sc">{</span><span class="bu">len</span>(simple_cells)<span class="sc">}</span><span class="ss">): </span><span class="sc">{</span><span class="bu">sorted</span>(simple_cells)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Vertices ⊆ Fuzzy: </span><span class="sc">{</span><span class="bu">set</span>(vertex_hids)<span class="sc">.</span>issubset(simple_cells)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="co"># Draw vertex cells more prominently</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> hid <span class="kw">in</span> vertex_hids:</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>    cell_boundary <span class="op">=</span> hp.boundaries(<span class="dv">32</span>, <span class="bu">int</span>(hid), step<span class="op">=</span><span class="dv">1</span>, nest<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a>    cell_lon <span class="op">=</span> np.degrees(hp.vec2ang(cell_boundary)[<span class="dv">1</span>])</span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a>    cell_lat <span class="op">=</span> <span class="fl">90.0</span> <span class="op">-</span> np.degrees(hp.vec2ang(cell_boundary)[<span class="dv">0</span>])</span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>    cell_lon <span class="op">=</span> np.append(cell_lon, cell_lon[<span class="dv">0</span>])</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>    cell_lat <span class="op">=</span> np.append(cell_lat, cell_lat[<span class="dv">0</span>])</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>    ax.plot(cell_lon, cell_lat, color<span class="op">=</span><span class="st">"tab:green"</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(<span class="dv">95</span>, <span class="dv">110</span>)</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(<span class="dv">68</span>, <span class="dv">77</span>)</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Longitude (°)"</span>)</span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Latitude (°)"</span>)</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Sphere-Native Fuzzy Assignment: Polygon → HEALPix Cells"</span>)</span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>ax.legend(handles<span class="op">=</span>[</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>    mpatches.Patch(color<span class="op">=</span><span class="st">"tab:blue"</span>, label<span class="op">=</span><span class="st">"Polygon edges (SLERP)"</span>),</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>    mpatches.Patch(color<span class="op">=</span><span class="st">"tab:red"</span>, label<span class="op">=</span><span class="st">"Fuzzy-mode cells"</span>),</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a>    mpatches.Patch(color<span class="op">=</span><span class="st">"tab:green"</span>, label<span class="op">=</span><span class="st">"Vertex cells (subset)"</span>),</span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>], loc<span class="op">=</span><span class="st">"upper left"</span>)</span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb13-58"><a href="#cb13-58" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-59"><a href="#cb13-59" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>FOV polygon: 4 edges at (70-75°N, 100-105°E)
+Fuzzy mode assigned 7 HEALPix cells at nside=32
+Vertex cells (5): [np.int64(1965), np.int64(1965), np.int64(1970), np.int64(1980), np.int64(1981)]
+All HEALPix cells (7): [np.uint64(1965), np.uint64(1970), np.uint64(1971), np.uint64(1976), np.uint64(1977), np.uint64(1980), np.uint64(1981)]
+Vertices ⊆ Fuzzy: True</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="03_sphere_native_sidecar_files/figure-html/cell-9-output-2.png" width="949" height="564" class="figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Green</strong> = cells touched by polygon vertices (strict mode). <strong>Red</strong> = all cells assigned by fuzzy-mode SLERP. The vertex cells are always a <strong>subset</strong> of the fuzzy cells.</p>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">9. Summary</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 18%">
+<col style="width: 32%">
+<col style="width: 48%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Problem</th>
+<th>Planar lon/lat</th>
+<th>Sphere-native (SLERP)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Antimeridian split</td>
+<td>Needs <code>antimeridian.fix_polygon</code></td>
+<td><strong>No fix needed</strong></td>
+</tr>
+<tr class="even">
+<td>Longitude wrapping (±180°)</td>
+<td>Coordinate discontinuity</td>
+<td><strong>Never appears</strong></td>
+</tr>
+<tr class="odd">
+<td>Pole singularity</td>
+<td>All longitudes = same point</td>
+<td><strong>No singularity</strong></td>
+</tr>
+<tr class="even">
+<td>Winding order</td>
+<td>Matters (CW ≠ CCW)</td>
+<td><strong>Sidestepped by dense sampling</strong></td>
+</tr>
+<tr class="odd">
+<td>Bounding boxes</td>
+<td>Planar distortion</td>
+<td><strong>Not needed</strong></td>
+</tr>
+<tr class="even">
+<td><code>shapely.STRtree</code></td>
+<td>Required for fuzzy mode</td>
+<td><strong>Eliminated</strong></td>
+</tr>
+<tr class="odd">
+<td><code>shapely.interpolate()</code></td>
+<td>Planar, walks long way around</td>
+<td><strong>Replaced by SLERP</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The fuzzy-mode hot path is now fully sphere-native. The only remaining use of <code>antimeridian</code> is in <code>healpyxel_to_geoparquet</code> (Phase 3 of the pipeline) for generating valid GeoParquet polygons for GIS visualization — that is an <strong>I/O concern</strong>, not a geometric one.</p>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var sidebar = document.getElementById('quarto-margin-sidebar');
+  if (!sidebar) return;
+  var text = sidebar.textContent || '';
+  if (text.indexOf('API Reference') === -1) return;
+  var el = document.getElementById('quarto-content');
+  if (!el) return;
+  // Remove sidebar and widen container so <main> fills the page
+  sidebar.remove();
+  el.classList.remove('page-columns');
+  el.style.maxWidth = '90vw';
+  el.style.gridTemplateColumns = '1fr';
+});
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../notebooks/82_example_visualization_psf.html" class="pagination-link" aria-label="Gaussian PSF - WIP!">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Gaussian PSF - WIP!</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../notebooks/90_example_streaming.html" class="pagination-link" aria-label="Streaming WIP!">
+        <span class="nav-page-text">Streaming WIP!</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># ---</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu"># jupyter:</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">#   jupytext:</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">#     text_representation:</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">#       extension: .py</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">#       format_name: percent</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">#       format_version: '1.3'</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">#       jupytext_version: 1.19.1</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">#   kernelspec:</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">#     display_name: python3</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">#     language: python</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">#     name: python3</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu"># ---</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu"># # Sphere-Native Sidecar Generation</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a><span class="fu"># How healpyxel assigns observation footprints to HEALPix cells using</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu"># SLERP-great-circle sampling on unit vectors — sidestepping antimeridian</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="fu"># crossings, pole singularities, and winding-order problems entirely.</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>import numpy as np</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>import matplotlib.pyplot as plt</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>import matplotlib.patches as mpatches</span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>from matplotlib.collections import PatchCollection</span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>from healpyxel.geometry import Sphere</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>from healpyxel.sidecar import (</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    process_partition,</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    _sample_great_circle_arc,</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    _query_healpix_single_polygon,</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    compute_healpix_ids_from_lonlat,</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>import geopandas as gpd</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>from shapely.geometry import Polygon</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 1. The Problem: Planar lon/lat Geometry</span></span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="fu"># Representing planetary footprints as lon/lat polygons in a flat coordinate system</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># creates well-known pathologies:</span></span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a><span class="fu"># - **Antimeridian crossing**: A polygon spanning from 179° to -179° is drawn across</span></span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a><span class="fu">#   358° of the map, not the 2° it spans on the sphere.</span></span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a><span class="fu"># - **Pole singularity**: All longitudes converge at the pole; a "small" polygon near</span></span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a><span class="fu">#   the pole may wrap incorrectly in lon/lat.</span></span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a><span class="fu"># - **Winding order**: In planar GIS, CW vs CCW determines which side is "inside."</span></span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a><span class="fu">#   On the sphere, winding still matters topologically — but dense sampling sidesteps it.</span></span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a><span class="fu"># healpyxel's observation geometry lives on a **spherical body**, not on a projection.</span></span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a><span class="fu"># The computation engine should reflect that.</span></span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 2. The Solution: Unit Vectors + SLERP Great-Circle Arcs</span></span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a><span class="fu"># The key insight: convert every polygon vertex to a **unit vector** (x, y, z) on the</span></span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a><span class="fu"># unit sphere. Consecutive vertices are then connected by the **shortest great-circle</span></span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a><span class="fu"># arc** using SLERP (spherical linear interpolation):</span></span>
+<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a><span class="fu"># $$</span></span>
+<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a><span class="fu"># v(t) = \frac{\sin((1-t)\theta)}{\sin\theta} \cdot v_0 + \frac{\sin(t\theta)}{\sin\theta} \cdot v_1</span></span>
+<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a><span class="fu"># $$</span></span>
+<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a><span class="fu"># where $\theta = \arccos(v_0 \cdot v_1)$ is the angular distance between vertices.</span></span>
+<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a><span class="fu"># Properties:</span></span>
+<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a><span class="fu"># - **Antimeridian crossing**: (179°, 5°) to (-179°, 5°) is only 2° on the sphere —</span></span>
+<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a><span class="fu">#   SLERP takes the short arc automatically.</span></span>
+<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a><span class="fu"># - **Pole safe**: The north pole is just the vector (0, 0, 1).</span></span>
+<span id="cb15-71"><a href="#cb15-71" aria-hidden="true" tabindex="-1"></a><span class="fu"># - **Convention independent**: (181°, 5°) in [0,360] maps to the same unit vector</span></span>
+<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a><span class="fu">#   as (-179°, 5°) in [-180,180].</span></span>
+<span id="cb15-73"><a href="#cb15-73" aria-hidden="true" tabindex="-1"></a><span class="fu"># - **Winding agnostic**: We sample all edges and add interior points; CW and CCW</span></span>
+<span id="cb15-74"><a href="#cb15-74" aria-hidden="true" tabindex="-1"></a><span class="fu">#   windings produce identical HEALPix cell sets.</span></span>
+<span id="cb15-75"><a href="#cb15-75" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-76"><a href="#cb15-76" aria-hidden="true" tabindex="-1"></a><span class="fu"># The SLERP formula is implemented in `_sample_great_circle_arc()` in `sidecar.py`.</span></span>
+<span id="cb15-77"><a href="#cb15-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-78"><a href="#cb15-78" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-79"><a href="#cb15-79" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 3. Walkthrough: SLERP on a Simple Polygon</span></span>
+<span id="cb15-80"><a href="#cb15-80" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-81"><a href="#cb15-81" aria-hidden="true" tabindex="-1"></a><span class="fu"># Let's trace what happens for a small rectangle at high latitude, first showing</span></span>
+<span id="cb15-82"><a href="#cb15-82" aria-hidden="true" tabindex="-1"></a><span class="fu"># the great-circle arc sampling.</span></span>
+<span id="cb15-83"><a href="#cb15-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-84"><a href="#cb15-84" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-85"><a href="#cb15-85" aria-hidden="true" tabindex="-1"></a><span class="fu"># Create a simple polygon at high latitude</span></span>
+<span id="cb15-86"><a href="#cb15-86" aria-hidden="true" tabindex="-1"></a>coords = <span class="co">[</span><span class="ot">(95.0, 70.0), (105.0, 70.0), (105.0, 75.0), (95.0, 75.0), (95.0, 70.0)</span><span class="co">]</span></span>
+<span id="cb15-87"><a href="#cb15-87" aria-hidden="true" tabindex="-1"></a>poly = Polygon(coords)</span>
+<span id="cb15-88"><a href="#cb15-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-89"><a href="#cb15-89" aria-hidden="true" tabindex="-1"></a>body = Sphere()</span>
+<span id="cb15-90"><a href="#cb15-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-91"><a href="#cb15-91" aria-hidden="true" tabindex="-1"></a><span class="fu"># Extract vertices</span></span>
+<span id="cb15-92"><a href="#cb15-92" aria-hidden="true" tabindex="-1"></a>c = np.array(poly.exterior.coords)</span>
+<span id="cb15-93"><a href="#cb15-93" aria-hidden="true" tabindex="-1"></a>lons_v = c<span class="co">[</span><span class="ot">:, 0</span><span class="co">]</span>.astype(float)</span>
+<span id="cb15-94"><a href="#cb15-94" aria-hidden="true" tabindex="-1"></a>lats_v = c<span class="co">[</span><span class="ot">:, 1</span><span class="co">]</span>.astype(float)</span>
+<span id="cb15-95"><a href="#cb15-95" aria-hidden="true" tabindex="-1"></a>xyz_v = body.lonlat_to_xyz(lons_v, lats_v)  # (3, N)</span>
+<span id="cb15-96"><a href="#cb15-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-97"><a href="#cb15-97" aria-hidden="true" tabindex="-1"></a>print("Polygon vertices (lon, lat):")</span>
+<span id="cb15-98"><a href="#cb15-98" aria-hidden="true" tabindex="-1"></a>for lon, lat in zip(lons_v, lats_v):</span>
+<span id="cb15-99"><a href="#cb15-99" aria-hidden="true" tabindex="-1"></a>    print(f"  ({lon:.1f}°, {lat:.1f}°)")</span>
+<span id="cb15-100"><a href="#cb15-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-101"><a href="#cb15-101" aria-hidden="true" tabindex="-1"></a>print(f"\nUnit vectors (x, y, z):")</span>
+<span id="cb15-102"><a href="#cb15-102" aria-hidden="true" tabindex="-1"></a>for i in range(xyz_v.shape<span class="co">[</span><span class="ot">1</span><span class="co">]</span>):</span>
+<span id="cb15-103"><a href="#cb15-103" aria-hidden="true" tabindex="-1"></a>    print(f"  v{i}: <span class="co">[</span><span class="ot">{xyz_v[0, i]:+.4f}, {xyz_v[1, i]:+.4f}, {xyz_v[2, i]:+.4f}</span><span class="co">]</span>")</span>
+<span id="cb15-104"><a href="#cb15-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-105"><a href="#cb15-105" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-106"><a href="#cb15-106" aria-hidden="true" tabindex="-1"></a><span class="fu"># Sample the first edge (v0 -&gt; v1) via SLERP</span></span>
+<span id="cb15-107"><a href="#cb15-107" aria-hidden="true" tabindex="-1"></a>v0 = xyz_v<span class="co">[</span><span class="ot">:, 0</span><span class="co">]</span></span>
+<span id="cb15-108"><a href="#cb15-108" aria-hidden="true" tabindex="-1"></a>v1 = xyz_v<span class="co">[</span><span class="ot">:, 1</span><span class="co">]</span></span>
+<span id="cb15-109"><a href="#cb15-109" aria-hidden="true" tabindex="-1"></a>arc_pts = _sample_great_circle_arc(v0, v1, 20)  # 20 points on the great-circle arc</span>
+<span id="cb15-110"><a href="#cb15-110" aria-hidden="true" tabindex="-1"></a>arc_lon, arc_lat = body.xyz_to_lonlat(arc_pts)</span>
+<span id="cb15-111"><a href="#cb15-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-112"><a href="#cb15-112" aria-hidden="true" tabindex="-1"></a>print(f"Edge v0-&gt;v1: ({lons_v<span class="co">[</span><span class="ot">0</span><span class="co">]</span>}°, {lats_v<span class="co">[</span><span class="ot">0</span><span class="co">]</span>}°) → ({lons_v<span class="co">[</span><span class="ot">1</span><span class="co">]</span>}°, {lats_v<span class="co">[</span><span class="ot">1</span><span class="co">]</span>}°)")</span>
+<span id="cb15-113"><a href="#cb15-113" aria-hidden="true" tabindex="-1"></a>print(f"  Angular distance: {np.degrees(np.arccos(np.clip(np.dot(v0, v1), -1, 1))):.2f}°")</span>
+<span id="cb15-114"><a href="#cb15-114" aria-hidden="true" tabindex="-1"></a>print(f"  SLERP samples (first 5):")</span>
+<span id="cb15-115"><a href="#cb15-115" aria-hidden="true" tabindex="-1"></a>for i in range(5):</span>
+<span id="cb15-116"><a href="#cb15-116" aria-hidden="true" tabindex="-1"></a>    print(f"    t={i/19:.2f}: ({arc_lon<span class="co">[</span><span class="ot">i</span><span class="co">]</span>:.3f}°, {arc_lat<span class="co">[</span><span class="ot">i</span><span class="co">]</span>:.3f}°)")</span>
+<span id="cb15-117"><a href="#cb15-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-118"><a href="#cb15-118" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-119"><a href="#cb15-119" aria-hidden="true" tabindex="-1"></a><span class="fu"># The SLERP samples follow the **shortest great-circle arc** on the sphere.</span></span>
+<span id="cb15-120"><a href="#cb15-120" aria-hidden="true" tabindex="-1"></a><span class="fu"># For a 10° edge at 70°N latitude, the arc curves slightly toward the pole —</span></span>
+<span id="cb15-121"><a href="#cb15-121" aria-hidden="true" tabindex="-1"></a><span class="fu"># this is physically correct for a sensor footprint on a spherical body.</span></span>
+<span id="cb15-122"><a href="#cb15-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-123"><a href="#cb15-123" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-124"><a href="#cb15-124" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 4. Antimeridian Crossing: No Fix Needed</span></span>
+<span id="cb15-125"><a href="#cb15-125" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-126"><a href="#cb15-126" aria-hidden="true" tabindex="-1"></a><span class="fu"># A polygon crossing the antimeridian at low latitude:</span></span>
+<span id="cb15-127"><a href="#cb15-127" aria-hidden="true" tabindex="-1"></a><span class="fu"># vertices from 179° → -179° span only 2° on the sphere.</span></span>
+<span id="cb15-128"><a href="#cb15-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-129"><a href="#cb15-129" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-130"><a href="#cb15-130" aria-hidden="true" tabindex="-1"></a>def plot_polygon_and_slrp(ax, coords_list, body, color, label, n_edge=40, ls="-"):</span>
+<span id="cb15-131"><a href="#cb15-131" aria-hidden="true" tabindex="-1"></a>    """Plot polygon vertices and SLERP edge samples on a lon/lat map."""</span>
+<span id="cb15-132"><a href="#cb15-132" aria-hidden="true" tabindex="-1"></a>    xyz_all = []</span>
+<span id="cb15-133"><a href="#cb15-133" aria-hidden="true" tabindex="-1"></a>    for i in range(len(coords_list) - 1):</span>
+<span id="cb15-134"><a href="#cb15-134" aria-hidden="true" tabindex="-1"></a>        lon0, lat0 = coords_list<span class="co">[</span><span class="ot">i</span><span class="co">]</span></span>
+<span id="cb15-135"><a href="#cb15-135" aria-hidden="true" tabindex="-1"></a>        lon1, lat1 = coords_list<span class="co">[</span><span class="ot">i + 1</span><span class="co">]</span></span>
+<span id="cb15-136"><a href="#cb15-136" aria-hidden="true" tabindex="-1"></a>        v0 = body.lonlat_to_xyz(np.array(<span class="co">[</span><span class="ot">lon0</span><span class="co">]</span>), np.array(<span class="co">[</span><span class="ot">lat0</span><span class="co">]</span>)).flatten()</span>
+<span id="cb15-137"><a href="#cb15-137" aria-hidden="true" tabindex="-1"></a>        v1 = body.lonlat_to_xyz(np.array(<span class="co">[</span><span class="ot">lon1</span><span class="co">]</span>), np.array(<span class="co">[</span><span class="ot">lat1</span><span class="co">]</span>)).flatten()</span>
+<span id="cb15-138"><a href="#cb15-138" aria-hidden="true" tabindex="-1"></a>        arc = _sample_great_circle_arc(v0, v1, n_edge)</span>
+<span id="cb15-139"><a href="#cb15-139" aria-hidden="true" tabindex="-1"></a>        a_lon, a_lat = body.xyz_to_lonlat(arc)</span>
+<span id="cb15-140"><a href="#cb15-140" aria-hidden="true" tabindex="-1"></a>        ax.plot(a_lon, a_lat, color=color, lw=1.5, ls=ls, alpha=0.7)</span>
+<span id="cb15-141"><a href="#cb15-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-142"><a href="#cb15-142" aria-hidden="true" tabindex="-1"></a><span class="in">    # Vertices</span></span>
+<span id="cb15-143"><a href="#cb15-143" aria-hidden="true" tabindex="-1"></a><span class="in">    lons = [c[0] for c in coords_list]</span></span>
+<span id="cb15-144"><a href="#cb15-144" aria-hidden="true" tabindex="-1"></a><span class="in">    lats = [c[1] for c in coords_list]</span></span>
+<span id="cb15-145"><a href="#cb15-145" aria-hidden="true" tabindex="-1"></a><span class="in">    ax.scatter(lons, lats, color=color, zorder=5, s=40, label=label)</span></span>
+<span id="cb15-146"><a href="#cb15-146" aria-hidden="true" tabindex="-1"></a><span class="in">    return lons, lats</span></span>
+<span id="cb15-147"><a href="#cb15-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-148"><a href="#cb15-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-149"><a href="#cb15-149" aria-hidden="true" tabindex="-1"></a>fig, axes = plt.subplots(2, 1, figsize=(10, 8))</span>
+<span id="cb15-150"><a href="#cb15-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-151"><a href="#cb15-151" aria-hidden="true" tabindex="-1"></a><span class="fu"># Panel A: Antimeridian crossing ([-180, 180] convention)</span></span>
+<span id="cb15-152"><a href="#cb15-152" aria-hidden="true" tabindex="-1"></a>ax = axes<span class="co">[</span><span class="ot">0</span><span class="co">]</span></span>
+<span id="cb15-153"><a href="#cb15-153" aria-hidden="true" tabindex="-1"></a>am_coords = <span class="co">[</span><span class="ot">(175, 5), (179, 5), (-179, 5), (-175, 5), (-175, -5), (-179, -6), (179, -6), (175, -5), (175, 5)</span><span class="co">]</span></span>
+<span id="cb15-154"><a href="#cb15-154" aria-hidden="true" tabindex="-1"></a>plot_polygon_and_slrp(ax, am_coords, body, "tab:blue", "antimeridian FOV", n_edge=60)</span>
+<span id="cb15-155"><a href="#cb15-155" aria-hidden="true" tabindex="-1"></a>ax.axvline(180, color="k", lw=0.8, ls="--", alpha=0.4)</span>
+<span id="cb15-156"><a href="#cb15-156" aria-hidden="true" tabindex="-1"></a>ax.axvline(-180, color="k", lw=0.8, ls="--", alpha=0.4)</span>
+<span id="cb15-157"><a href="#cb15-157" aria-hidden="true" tabindex="-1"></a>ax.axvline(0, color="gray", lw=0.5, ls=":", alpha=0.3)</span>
+<span id="cb15-158"><a href="#cb15-158" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(-200, 200)</span>
+<span id="cb15-159"><a href="#cb15-159" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(-15, 15)</span>
+<span id="cb15-160"><a href="#cb15-160" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel("Longitude (°)")</span>
+<span id="cb15-161"><a href="#cb15-161" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel("Latitude (°)")</span>
+<span id="cb15-162"><a href="#cb15-162" aria-hidden="true" tabindex="-1"></a>ax.set_title("Antimeridian Crossing (<span class="co">[</span><span class="ot">-180, 180</span><span class="co">]</span>)")</span>
+<span id="cb15-163"><a href="#cb15-163" aria-hidden="true" tabindex="-1"></a>ax.legend(loc="upper left")</span>
+<span id="cb15-164"><a href="#cb15-164" aria-hidden="true" tabindex="-1"></a>ax.grid(True, alpha=0.3)</span>
+<span id="cb15-165"><a href="#cb15-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-166"><a href="#cb15-166" aria-hidden="true" tabindex="-1"></a><span class="fu"># Panel B: Same polygon in [0, 360] convention</span></span>
+<span id="cb15-167"><a href="#cb15-167" aria-hidden="true" tabindex="-1"></a>ax = axes<span class="co">[</span><span class="ot">1</span><span class="co">]</span></span>
+<span id="cb15-168"><a href="#cb15-168" aria-hidden="true" tabindex="-1"></a>am_coords_360 = <span class="co">[</span><span class="ot">(175, 5), (179, 5), (181, 5), (185, 5), (185, -5), (181, -6), (179, -6), (175, -5), (175, 5)</span><span class="co">]</span></span>
+<span id="cb15-169"><a href="#cb15-169" aria-hidden="true" tabindex="-1"></a>plot_polygon_and_slrp(ax, am_coords_360, body, "tab:orange", "antimeridian FOV <span class="co">[</span><span class="ot">0,360</span><span class="co">]</span>", n_edge=60)</span>
+<span id="cb15-170"><a href="#cb15-170" aria-hidden="true" tabindex="-1"></a>ax.axvline(180, color="k", lw=0.8, ls="--", alpha=0.4)</span>
+<span id="cb15-171"><a href="#cb15-171" aria-hidden="true" tabindex="-1"></a>ax.axvline(360, color="k", lw=0.8, ls="--", alpha=0.4)</span>
+<span id="cb15-172"><a href="#cb15-172" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(150, 390)</span>
+<span id="cb15-173"><a href="#cb15-173" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(-15, 15)</span>
+<span id="cb15-174"><a href="#cb15-174" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel("Longitude (°)")</span>
+<span id="cb15-175"><a href="#cb15-175" aria-hidden="true" tabindex="-1"></a>ax.set_title("Same FOV in <span class="co">[</span><span class="ot">0, 360</span><span class="co">]</span> Convention")</span>
+<span id="cb15-176"><a href="#cb15-176" aria-hidden="true" tabindex="-1"></a>ax.legend(loc="upper left")</span>
+<span id="cb15-177"><a href="#cb15-177" aria-hidden="true" tabindex="-1"></a>ax.grid(True, alpha=0.3)</span>
+<span id="cb15-178"><a href="#cb15-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-179"><a href="#cb15-179" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb15-180"><a href="#cb15-180" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb15-181"><a href="#cb15-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-182"><a href="#cb15-182" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-183"><a href="#cb15-183" aria-hidden="true" tabindex="-1"></a><span class="fu"># **Key observation**: In both panels, the edges follow the **short great-circle arc**.</span></span>
+<span id="cb15-184"><a href="#cb15-184" aria-hidden="true" tabindex="-1"></a><span class="fu"># The edge from (179°, 5°) to (-179°, 5°) — which would be drawn across 358° in a</span></span>
+<span id="cb15-185"><a href="#cb15-185" aria-hidden="true" tabindex="-1"></a><span class="fu"># planar lon/lat plot — is correctly represented as the 2° arc on the sphere.</span></span>
+<span id="cb15-186"><a href="#cb15-186" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-187"><a href="#cb15-187" aria-hidden="true" tabindex="-1"></a><span class="fu"># Both conventions ([-180,180] and [0,360]) produce **identical unit vectors**,</span></span>
+<span id="cb15-188"><a href="#cb15-188" aria-hidden="true" tabindex="-1"></a><span class="fu"># hence identical SLERP sampling and identical HEALPix cell assignments.</span></span>
+<span id="cb15-189"><a href="#cb15-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-190"><a href="#cb15-190" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-191"><a href="#cb15-191" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 5. Winding Order: Sidestepped by Dense Sampling</span></span>
+<span id="cb15-192"><a href="#cb15-192" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-193"><a href="#cb15-193" aria-hidden="true" tabindex="-1"></a><span class="fu"># Our SLERP-based approach does not depend on winding order. We sample **every edge**</span></span>
+<span id="cb15-194"><a href="#cb15-194" aria-hidden="true" tabindex="-1"></a><span class="fu"># (CW or CCW) and add interior points. The result is the same set of HEALPix cells</span></span>
+<span id="cb15-195"><a href="#cb15-195" aria-hidden="true" tabindex="-1"></a><span class="fu"># regardless of vertex ordering.</span></span>
+<span id="cb15-196"><a href="#cb15-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-197"><a href="#cb15-197" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-198"><a href="#cb15-198" aria-hidden="true" tabindex="-1"></a><span class="fu"># Create the same polygon with CCW and CW winding</span></span>
+<span id="cb15-199"><a href="#cb15-199" aria-hidden="true" tabindex="-1"></a>coords_ccw = <span class="co">[</span><span class="ot">(95.0, 70.0), (105.0, 70.0), (105.0, 75.0), (95.0, 75.0), (95.0, 70.0)</span><span class="co">]</span></span>
+<span id="cb15-200"><a href="#cb15-200" aria-hidden="true" tabindex="-1"></a>coords_cw = list(reversed(coords_ccw))</span>
+<span id="cb15-201"><a href="#cb15-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-202"><a href="#cb15-202" aria-hidden="true" tabindex="-1"></a>poly_ccw = Polygon(coords_ccw)</span>
+<span id="cb15-203"><a href="#cb15-203" aria-hidden="true" tabindex="-1"></a>poly_cw = Polygon(coords_cw)</span>
+<span id="cb15-204"><a href="#cb15-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-205"><a href="#cb15-205" aria-hidden="true" tabindex="-1"></a>gdf_ccw = gpd.GeoDataFrame({"geometry": <span class="co">[</span><span class="ot">poly_ccw</span><span class="co">]</span>})</span>
+<span id="cb15-206"><a href="#cb15-206" aria-hidden="true" tabindex="-1"></a>gdf_cw = gpd.GeoDataFrame({"geometry": <span class="co">[</span><span class="ot">poly_cw</span><span class="co">]</span>})</span>
+<span id="cb15-207"><a href="#cb15-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-208"><a href="#cb15-208" aria-hidden="true" tabindex="-1"></a>result_ccw = process_partition(gdf_ccw, nside=32, mode="fuzzy", lon_convention="minus_plus180", body=Sphere())</span>
+<span id="cb15-209"><a href="#cb15-209" aria-hidden="true" tabindex="-1"></a>result_cw = process_partition(gdf_cw, nside=32, mode="fuzzy", lon_convention="minus_plus180", body=Sphere())</span>
+<span id="cb15-210"><a href="#cb15-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-211"><a href="#cb15-211" aria-hidden="true" tabindex="-1"></a>ccw_cells = set(result_ccw<span class="co">[</span><span class="ot">"healpix_id"</span><span class="co">]</span>)</span>
+<span id="cb15-212"><a href="#cb15-212" aria-hidden="true" tabindex="-1"></a>cw_cells = set(result_cw<span class="co">[</span><span class="ot">"healpix_id"</span><span class="co">]</span>)</span>
+<span id="cb15-213"><a href="#cb15-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-214"><a href="#cb15-214" aria-hidden="true" tabindex="-1"></a>print(f"CCW winding → {len(ccw_cells)} HEALPix cells")</span>
+<span id="cb15-215"><a href="#cb15-215" aria-hidden="true" tabindex="-1"></a>print(f"CW winding  → {len(cw_cells)} HEALPix cells")</span>
+<span id="cb15-216"><a href="#cb15-216" aria-hidden="true" tabindex="-1"></a>print(f"Sets are identical: {ccw_cells == cw_cells}")</span>
+<span id="cb15-217"><a href="#cb15-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-218"><a href="#cb15-218" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-219"><a href="#cb15-219" aria-hidden="true" tabindex="-1"></a><span class="fu"># Both windings produce the **exact same cell set**. This is because:</span></span>
+<span id="cb15-220"><a href="#cb15-220" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-221"><a href="#cb15-221" aria-hidden="true" tabindex="-1"></a><span class="fu"># 1. `_sample_great_circle_arc` samples edges regardless of direction</span></span>
+<span id="cb15-222"><a href="#cb15-222" aria-hidden="true" tabindex="-1"></a><span class="fu"># 2. The centroid (mean of unit vectors) is added as interior coverage</span></span>
+<span id="cb15-223"><a href="#cb15-223" aria-hidden="true" tabindex="-1"></a><span class="fu"># 3. Original vertices are added for exact corner coverage</span></span>
+<span id="cb15-224"><a href="#cb15-224" aria-hidden="true" tabindex="-1"></a><span class="fu"># 4. `compute_healpix_ids_from_lonlat` collects all points → HEALPix IDs</span></span>
+<span id="cb15-225"><a href="#cb15-225" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-226"><a href="#cb15-226" aria-hidden="true" tabindex="-1"></a><span class="fu"># Signed spherical area determines *which* side of the loop is "inside" — but we</span></span>
+<span id="cb15-227"><a href="#cb15-227" aria-hidden="true" tabindex="-1"></a><span class="fu"># never need to know that, because our dense sampling covers both the edges and</span></span>
+<span id="cb15-228"><a href="#cb15-228" aria-hidden="true" tabindex="-1"></a><span class="fu"># the interior.</span></span>
+<span id="cb15-229"><a href="#cb15-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-230"><a href="#cb15-230" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-231"><a href="#cb15-231" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 6. Convention Independence: [-180,180] vs [0,360]</span></span>
+<span id="cb15-232"><a href="#cb15-232" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-233"><a href="#cb15-233" aria-hidden="true" tabindex="-1"></a><span class="fu"># The same physical polygon expressed in different longitude conventions must</span></span>
+<span id="cb15-234"><a href="#cb15-234" aria-hidden="true" tabindex="-1"></a><span class="fu"># produce identical sidecars. Unit vectors make this trivially true.</span></span>
+<span id="cb15-235"><a href="#cb15-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-236"><a href="#cb15-236" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-237"><a href="#cb15-237" aria-hidden="true" tabindex="-1"></a>am_coords = [(175, 5), (179, 5), (-179, 5), (-175, 5),</span>
+<span id="cb15-238"><a href="#cb15-238" aria-hidden="true" tabindex="-1"></a>             (-175, -5), (-179, -6), (179, -6), (175, -5), (175, 5)]</span>
+<span id="cb15-239"><a href="#cb15-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-240"><a href="#cb15-240" aria-hidden="true" tabindex="-1"></a>poly_m180 = Polygon(am_coords)</span>
+<span id="cb15-241"><a href="#cb15-241" aria-hidden="true" tabindex="-1"></a>poly_360 = Polygon(<span class="co">[</span><span class="ot">(lon if lon &gt;= 0 else lon + 360, lat) for lon, lat in am_coords</span><span class="co">]</span>)</span>
+<span id="cb15-242"><a href="#cb15-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-243"><a href="#cb15-243" aria-hidden="true" tabindex="-1"></a>gdf_m180 = gpd.GeoDataFrame({"geometry": <span class="co">[</span><span class="ot">poly_m180</span><span class="co">]</span>})</span>
+<span id="cb15-244"><a href="#cb15-244" aria-hidden="true" tabindex="-1"></a>gdf_360 = gpd.GeoDataFrame({"geometry": <span class="co">[</span><span class="ot">poly_360</span><span class="co">]</span>})</span>
+<span id="cb15-245"><a href="#cb15-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-246"><a href="#cb15-246" aria-hidden="true" tabindex="-1"></a>r_m180 = process_partition(gdf_m180, nside=32, mode="fuzzy", lon_convention="minus_plus180", body=Sphere())</span>
+<span id="cb15-247"><a href="#cb15-247" aria-hidden="true" tabindex="-1"></a>r_360 = process_partition(gdf_360, nside=32, mode="fuzzy", lon_convention="0_360", body=Sphere())</span>
+<span id="cb15-248"><a href="#cb15-248" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-249"><a href="#cb15-249" aria-hidden="true" tabindex="-1"></a>cells_m180 = set(r_m180<span class="co">[</span><span class="ot">"healpix_id"</span><span class="co">]</span>)</span>
+<span id="cb15-250"><a href="#cb15-250" aria-hidden="true" tabindex="-1"></a>cells_360 = set(r_360<span class="co">[</span><span class="ot">"healpix_id"</span><span class="co">]</span>)</span>
+<span id="cb15-251"><a href="#cb15-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-252"><a href="#cb15-252" aria-hidden="true" tabindex="-1"></a>print(f"<span class="co">[</span><span class="ot">-180,180</span><span class="co">]</span> convention → {len(cells_m180)} cells")</span>
+<span id="cb15-253"><a href="#cb15-253" aria-hidden="true" tabindex="-1"></a>print(f"<span class="co">[</span><span class="ot">0,360</span><span class="co">]</span>   convention → {len(cells_360)} cells")</span>
+<span id="cb15-254"><a href="#cb15-254" aria-hidden="true" tabindex="-1"></a>print(f"Identical sets: {cells_m180 == cells_360}")</span>
+<span id="cb15-255"><a href="#cb15-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-256"><a href="#cb15-256" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-257"><a href="#cb15-257" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 7. Polar Polygon: No Singularity</span></span>
+<span id="cb15-258"><a href="#cb15-258" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-259"><a href="#cb15-259" aria-hidden="true" tabindex="-1"></a><span class="fu"># A triangle wrapping around the north pole works correctly because unit vectors</span></span>
+<span id="cb15-260"><a href="#cb15-260" aria-hidden="true" tabindex="-1"></a><span class="fu"># have no coordinate singularity.</span></span>
+<span id="cb15-261"><a href="#cb15-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-262"><a href="#cb15-262" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-263"><a href="#cb15-263" aria-hidden="true" tabindex="-1"></a><span class="fu"># Triangle covering area near the north pole</span></span>
+<span id="cb15-264"><a href="#cb15-264" aria-hidden="true" tabindex="-1"></a>polar_coords = <span class="co">[</span><span class="ot">(0.0, 85.0), (120.0, 85.0), (240.0, 85.0), (0.0, 85.0)</span><span class="co">]</span></span>
+<span id="cb15-265"><a href="#cb15-265" aria-hidden="true" tabindex="-1"></a>poly_polar = Polygon(polar_coords)</span>
+<span id="cb15-266"><a href="#cb15-266" aria-hidden="true" tabindex="-1"></a>gdf_polar = gpd.GeoDataFrame({"geometry": <span class="co">[</span><span class="ot">poly_polar</span><span class="co">]</span>})</span>
+<span id="cb15-267"><a href="#cb15-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-268"><a href="#cb15-268" aria-hidden="true" tabindex="-1"></a>r_polar = process_partition(gdf_polar, nside=32, mode="fuzzy", lon_convention="0_360", body=Sphere())</span>
+<span id="cb15-269"><a href="#cb15-269" aria-hidden="true" tabindex="-1"></a>polar_cells = set(r_polar<span class="co">[</span><span class="ot">"healpix_id"</span><span class="co">]</span>)</span>
+<span id="cb15-270"><a href="#cb15-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-271"><a href="#cb15-271" aria-hidden="true" tabindex="-1"></a>print(f"Polar polygon → {len(polar_cells)} HEALPix cells")</span>
+<span id="cb15-272"><a href="#cb15-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-273"><a href="#cb15-273" aria-hidden="true" tabindex="-1"></a><span class="fu"># Verify cells are near the pole (high healpy indices in nested ordering)</span></span>
+<span id="cb15-274"><a href="#cb15-274" aria-hidden="true" tabindex="-1"></a>import healpy as hp</span>
+<span id="cb15-275"><a href="#cb15-275" aria-hidden="true" tabindex="-1"></a>for hid in sorted(polar_cells)<span class="co">[</span><span class="ot">:5</span><span class="co">]</span>:</span>
+<span id="cb15-276"><a href="#cb15-276" aria-hidden="true" tabindex="-1"></a>    theta, phi = hp.pix2ang(32, int(hid), nest=True)</span>
+<span id="cb15-277"><a href="#cb15-277" aria-hidden="true" tabindex="-1"></a>    lat_d = 90.0 - np.degrees(theta)</span>
+<span id="cb15-278"><a href="#cb15-278" aria-hidden="true" tabindex="-1"></a>    lon_d = np.degrees(phi)</span>
+<span id="cb15-279"><a href="#cb15-279" aria-hidden="true" tabindex="-1"></a>    print(f"  cell {hid}: (lon={lon_d:.1f}°, lat={lat_d:.1f}°)")</span>
+<span id="cb15-280"><a href="#cb15-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-281"><a href="#cb15-281" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-282"><a href="#cb15-282" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 8. Full Pipeline: From Footprint to Sidecar</span></span>
+<span id="cb15-283"><a href="#cb15-283" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-284"><a href="#cb15-284" aria-hidden="true" tabindex="-1"></a><span class="fu"># The complete fuzzy-mode pipeline for a single polygon:</span></span>
+<span id="cb15-285"><a href="#cb15-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-286"><a href="#cb15-286" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-287"><a href="#cb15-287" aria-hidden="true" tabindex="-1"></a>fig, ax = plt.subplots(figsize=(10, 6))</span>
+<span id="cb15-288"><a href="#cb15-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-289"><a href="#cb15-289" aria-hidden="true" tabindex="-1"></a><span class="fu"># Simple rectangle</span></span>
+<span id="cb15-290"><a href="#cb15-290" aria-hidden="true" tabindex="-1"></a>simple_coords = <span class="co">[</span><span class="ot">(100.0, 70.0), (105.0, 70.0), (105.0, 75.0), (100.0, 75.0), (100.0, 70.0)</span><span class="co">]</span></span>
+<span id="cb15-291"><a href="#cb15-291" aria-hidden="true" tabindex="-1"></a>simple_poly = Polygon(simple_coords)</span>
+<span id="cb15-292"><a href="#cb15-292" aria-hidden="true" tabindex="-1"></a>gdf_simple = gpd.GeoDataFrame({"geometry": <span class="co">[</span><span class="ot">simple_poly</span><span class="co">]</span>})</span>
+<span id="cb15-293"><a href="#cb15-293" aria-hidden="true" tabindex="-1"></a>r_simple = process_partition(gdf_simple, nside=32, mode="fuzzy", lon_convention="minus_plus180", body=Sphere())</span>
+<span id="cb15-294"><a href="#cb15-294" aria-hidden="true" tabindex="-1"></a>simple_cells = set(r_simple<span class="co">[</span><span class="ot">"healpix_id"</span><span class="co">]</span>)</span>
+<span id="cb15-295"><a href="#cb15-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-296"><a href="#cb15-296" aria-hidden="true" tabindex="-1"></a><span class="fu"># Plot polygon and SLERP edges</span></span>
+<span id="cb15-297"><a href="#cb15-297" aria-hidden="true" tabindex="-1"></a>plot_polygon_and_slrp(ax, simple_coords, body, "tab:blue", "FOV polygon", n_edge=80)</span>
+<span id="cb15-298"><a href="#cb15-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-299"><a href="#cb15-299" aria-hidden="true" tabindex="-1"></a><span class="fu"># Plot HEALPix cell boundaries for the assigned cells</span></span>
+<span id="cb15-300"><a href="#cb15-300" aria-hidden="true" tabindex="-1"></a>import healpy as hp</span>
+<span id="cb15-301"><a href="#cb15-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-302"><a href="#cb15-302" aria-hidden="true" tabindex="-1"></a>for hid in simple_cells:</span>
+<span id="cb15-303"><a href="#cb15-303" aria-hidden="true" tabindex="-1"></a>    cell_boundary = hp.boundaries(32, int(hid), step=1, nest=True)  # (3, 4) corners</span>
+<span id="cb15-304"><a href="#cb15-304" aria-hidden="true" tabindex="-1"></a>    cell_lon = np.degrees(hp.vec2ang(cell_boundary)<span class="co">[</span><span class="ot">1</span><span class="co">]</span>)</span>
+<span id="cb15-305"><a href="#cb15-305" aria-hidden="true" tabindex="-1"></a>    cell_lat = 90.0 - np.degrees(hp.vec2ang(cell_boundary)<span class="co">[</span><span class="ot">0</span><span class="co">]</span>)</span>
+<span id="cb15-306"><a href="#cb15-306" aria-hidden="true" tabindex="-1"></a>    # Close the ring</span>
+<span id="cb15-307"><a href="#cb15-307" aria-hidden="true" tabindex="-1"></a>    cell_lon = np.append(cell_lon, cell_lon<span class="co">[</span><span class="ot">0</span><span class="co">]</span>)</span>
+<span id="cb15-308"><a href="#cb15-308" aria-hidden="true" tabindex="-1"></a>    cell_lat = np.append(cell_lat, cell_lat<span class="co">[</span><span class="ot">0</span><span class="co">]</span>)</span>
+<span id="cb15-309"><a href="#cb15-309" aria-hidden="true" tabindex="-1"></a>    ax.plot(cell_lon, cell_lat, color="tab:red", lw=0.8, alpha=0.5)</span>
+<span id="cb15-310"><a href="#cb15-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-311"><a href="#cb15-311" aria-hidden="true" tabindex="-1"></a><span class="fu"># Vertex cells (subset check)</span></span>
+<span id="cb15-312"><a href="#cb15-312" aria-hidden="true" tabindex="-1"></a>import healpy as hp</span>
+<span id="cb15-313"><a href="#cb15-313" aria-hidden="true" tabindex="-1"></a>vertex_hids = compute_healpix_ids_from_lonlat(32,</span>
+<span id="cb15-314"><a href="#cb15-314" aria-hidden="true" tabindex="-1"></a>    np.array(<span class="co">[</span><span class="ot">c[0] for c in simple_coords</span><span class="co">]</span>),</span>
+<span id="cb15-315"><a href="#cb15-315" aria-hidden="true" tabindex="-1"></a>    np.array(<span class="co">[</span><span class="ot">c[1] for c in simple_coords</span><span class="co">]</span>),</span>
+<span id="cb15-316"><a href="#cb15-316" aria-hidden="true" tabindex="-1"></a>    body=body)</span>
+<span id="cb15-317"><a href="#cb15-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-318"><a href="#cb15-318" aria-hidden="true" tabindex="-1"></a>print(f"FOV polygon: {len(simple_coords)-1} edges at (70-75°N, 100-105°E)")</span>
+<span id="cb15-319"><a href="#cb15-319" aria-hidden="true" tabindex="-1"></a>print(f"Fuzzy mode assigned {len(simple_cells)} HEALPix cells at nside=32")</span>
+<span id="cb15-320"><a href="#cb15-320" aria-hidden="true" tabindex="-1"></a>print(f"Vertex cells ({len(vertex_hids)}): {sorted(vertex_hids)}")</span>
+<span id="cb15-321"><a href="#cb15-321" aria-hidden="true" tabindex="-1"></a>print(f"All HEALPix cells ({len(simple_cells)}): {sorted(simple_cells)}")</span>
+<span id="cb15-322"><a href="#cb15-322" aria-hidden="true" tabindex="-1"></a>print(f"Vertices ⊆ Fuzzy: {set(vertex_hids).issubset(simple_cells)}")</span>
+<span id="cb15-323"><a href="#cb15-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-324"><a href="#cb15-324" aria-hidden="true" tabindex="-1"></a><span class="fu"># Draw vertex cells more prominently</span></span>
+<span id="cb15-325"><a href="#cb15-325" aria-hidden="true" tabindex="-1"></a>for hid in vertex_hids:</span>
+<span id="cb15-326"><a href="#cb15-326" aria-hidden="true" tabindex="-1"></a>    cell_boundary = hp.boundaries(32, int(hid), step=1, nest=True)</span>
+<span id="cb15-327"><a href="#cb15-327" aria-hidden="true" tabindex="-1"></a>    cell_lon = np.degrees(hp.vec2ang(cell_boundary)<span class="co">[</span><span class="ot">1</span><span class="co">]</span>)</span>
+<span id="cb15-328"><a href="#cb15-328" aria-hidden="true" tabindex="-1"></a>    cell_lat = 90.0 - np.degrees(hp.vec2ang(cell_boundary)<span class="co">[</span><span class="ot">0</span><span class="co">]</span>)</span>
+<span id="cb15-329"><a href="#cb15-329" aria-hidden="true" tabindex="-1"></a>    cell_lon = np.append(cell_lon, cell_lon<span class="co">[</span><span class="ot">0</span><span class="co">]</span>)</span>
+<span id="cb15-330"><a href="#cb15-330" aria-hidden="true" tabindex="-1"></a>    cell_lat = np.append(cell_lat, cell_lat<span class="co">[</span><span class="ot">0</span><span class="co">]</span>)</span>
+<span id="cb15-331"><a href="#cb15-331" aria-hidden="true" tabindex="-1"></a>    ax.plot(cell_lon, cell_lat, color="tab:green", lw=2)</span>
+<span id="cb15-332"><a href="#cb15-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-333"><a href="#cb15-333" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(95, 110)</span>
+<span id="cb15-334"><a href="#cb15-334" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(68, 77)</span>
+<span id="cb15-335"><a href="#cb15-335" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel("Longitude (°)")</span>
+<span id="cb15-336"><a href="#cb15-336" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel("Latitude (°)")</span>
+<span id="cb15-337"><a href="#cb15-337" aria-hidden="true" tabindex="-1"></a>ax.set_title("Sphere-Native Fuzzy Assignment: Polygon → HEALPix Cells")</span>
+<span id="cb15-338"><a href="#cb15-338" aria-hidden="true" tabindex="-1"></a>ax.legend(handles=[</span>
+<span id="cb15-339"><a href="#cb15-339" aria-hidden="true" tabindex="-1"></a>    mpatches.Patch(color="tab:blue", label="Polygon edges (SLERP)"),</span>
+<span id="cb15-340"><a href="#cb15-340" aria-hidden="true" tabindex="-1"></a>    mpatches.Patch(color="tab:red", label="Fuzzy-mode cells"),</span>
+<span id="cb15-341"><a href="#cb15-341" aria-hidden="true" tabindex="-1"></a>    mpatches.Patch(color="tab:green", label="Vertex cells (subset)"),</span>
+<span id="cb15-342"><a href="#cb15-342" aria-hidden="true" tabindex="-1"></a>], loc="upper left")</span>
+<span id="cb15-343"><a href="#cb15-343" aria-hidden="true" tabindex="-1"></a>ax.grid(True, alpha=0.3)</span>
+<span id="cb15-344"><a href="#cb15-344" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb15-345"><a href="#cb15-345" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb15-346"><a href="#cb15-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-347"><a href="#cb15-347" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-348"><a href="#cb15-348" aria-hidden="true" tabindex="-1"></a><span class="fu"># **Green** = cells touched by polygon vertices (strict mode).</span></span>
+<span id="cb15-349"><a href="#cb15-349" aria-hidden="true" tabindex="-1"></a><span class="fu"># **Red** = all cells assigned by fuzzy-mode SLERP.</span></span>
+<span id="cb15-350"><a href="#cb15-350" aria-hidden="true" tabindex="-1"></a><span class="fu"># The vertex cells are always a **subset** of the fuzzy cells.</span></span>
+<span id="cb15-351"><a href="#cb15-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-352"><a href="#cb15-352" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-353"><a href="#cb15-353" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 9. Summary</span></span>
+<span id="cb15-354"><a href="#cb15-354" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-355"><a href="#cb15-355" aria-hidden="true" tabindex="-1"></a><span class="fu"># | Problem | Planar lon/lat | Sphere-native (SLERP) |</span></span>
+<span id="cb15-356"><a href="#cb15-356" aria-hidden="true" tabindex="-1"></a><span class="fu"># |---------|----------------|------------------------|</span></span>
+<span id="cb15-357"><a href="#cb15-357" aria-hidden="true" tabindex="-1"></a><span class="fu"># | Antimeridian split | Needs `antimeridian.fix_polygon` | **No fix needed** |</span></span>
+<span id="cb15-358"><a href="#cb15-358" aria-hidden="true" tabindex="-1"></a><span class="fu"># | Longitude wrapping (±180°) | Coordinate discontinuity | **Never appears** |</span></span>
+<span id="cb15-359"><a href="#cb15-359" aria-hidden="true" tabindex="-1"></a><span class="fu"># | Pole singularity | All longitudes = same point | **No singularity** |</span></span>
+<span id="cb15-360"><a href="#cb15-360" aria-hidden="true" tabindex="-1"></a><span class="fu"># | Winding order | Matters (CW ≠ CCW) | **Sidestepped by dense sampling** |</span></span>
+<span id="cb15-361"><a href="#cb15-361" aria-hidden="true" tabindex="-1"></a><span class="fu"># | Bounding boxes | Planar distortion | **Not needed** |</span></span>
+<span id="cb15-362"><a href="#cb15-362" aria-hidden="true" tabindex="-1"></a><span class="fu"># | `shapely.STRtree` | Required for fuzzy mode | **Eliminated** |</span></span>
+<span id="cb15-363"><a href="#cb15-363" aria-hidden="true" tabindex="-1"></a><span class="fu"># | `shapely.interpolate()` | Planar, walks long way around | **Replaced by SLERP** |</span></span>
+<span id="cb15-364"><a href="#cb15-364" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-365"><a href="#cb15-365" aria-hidden="true" tabindex="-1"></a><span class="fu"># The fuzzy-mode hot path is now fully sphere-native. The only remaining use of</span></span>
+<span id="cb15-366"><a href="#cb15-366" aria-hidden="true" tabindex="-1"></a><span class="fu"># `antimeridian` is in `healpyxel_to_geoparquet` (Phase 3 of the pipeline) for</span></span>
+<span id="cb15-367"><a href="#cb15-367" aria-hidden="true" tabindex="-1"></a><span class="fu"># generating valid GeoParquet polygons for GIS visualization — that is an</span></span>
+<span id="cb15-368"><a href="#cb15-368" aria-hidden="true" tabindex="-1"></a><span class="fu"># **I/O concern**, not a geometric one.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
