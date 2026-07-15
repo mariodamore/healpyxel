@@ -1,0 +1,37 @@
+
+direction: right
+
+Observations: {
+  shape: sql_table
+  style: {fill: "#f8cecc"}
+  source_id: "value | geometry"
+  "src_1   ": "10000 | POLY(..)"
+  "src_2   ": "20000 | POLY(..)"
+  "src_3   ": "30000 | POLY(..)"
+}
+
+Sidecar: {
+  shape: sql_table
+  style: {fill: "#dae8fc"}
+  source_id: "healpix_id"
+  "src_1": "pix_A"
+  "src_2": "pix_A"
+  "src_3": "pix_B"
+}
+
+healpyxel_aggregate: {
+  style: {fill: "#fff4e6"}
+  "Median(value)"
+}
+
+Aggregated: {
+  shape: sql_table
+  style: {fill: "#d5e8d4"}
+  healpix_id: "median | n_sources"
+  "pix_A": "015000 | 0000002"
+  "pix_B": "030000 | 0000001"
+}
+
+Observations -> healpyxel_aggregate #: "group by\nhealpix_id"
+Sidecar -> healpyxel_aggregate #: "via source_id"
+healpyxel_aggregate -> Aggregated

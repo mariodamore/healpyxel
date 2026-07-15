@@ -38,14 +38,17 @@ docs-notebooks: ## Render notebook tutorials only with Quarto
 quartodoc-build: ## Build the quartodoc API reference pages into docs_src/reference/
 	python -m quartodoc build
 
+docs-images: ## Generate static images used by docs_src/index.qmd (PNG + D2 SVGs)
+	python docs_src/utils_diagrams.py
+
 docs: quartodoc-build ## Build complete Quarto documentation
 	quarto render
 
 docs-preview: quartodoc-build ## Preview Quarto documentation locally
-	quarto preview
+	quarto preview docs_src/index.qmd
 
 docs-server: quartodoc-build ## Serve Quarto documentation locally
-	quarto preview
+	quarto preview docs_src/index.qmd
 
 docs-clean: ## Remove rendered documentation
 	rm -rf docs/docs_src/ docs/_site/ docs/.quarto/ .quarto/
@@ -143,5 +146,6 @@ help: ## Show this help message
 	@echo ""
 
 .PHONY: install install-dev test test-quick test-cov docs docs-notebooks docs-preview docs-server docs-clean \
+        docs-images \
         notebooks-export notebooks-to-ipynb notebook-render \
         clean-pyc clean-build clean-docs clean-test clean check audit tree help

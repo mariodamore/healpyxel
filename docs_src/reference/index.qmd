@@ -6,6 +6,7 @@ Validation, robust statistics, and logging utilities.
 
 | | |
 | --- | --- |
+| [core.healpix_cell_sizes](core.healpix_cell_sizes.qmd#healpyxel.core.healpix_cell_sizes) | Return HEALPix cell sizes for one or more spherical bodies. |
 | [core.validate_nside](core.validate_nside.qmd#healpyxel.core.validate_nside) | Validate that nside is a power of 2. |
 | [core.mad](core.mad.qmd#healpyxel.core.mad) | Compute Median Absolute Deviation. |
 | [core.robust_std](core.robust_std.qmd#healpyxel.core.robust_std) | Compute robust standard deviation using MAD * 1.4826. |

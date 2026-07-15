@@ -739,7 +739,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p><span style="color: red;"><em>STILL WORK IN PROGRESS</em></span></p>
-<div id="7d511b33" class="cell" data-execution_count="1">
+<div id="c39e5f54" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -755,7 +755,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-1-load-first-batch" class="level2">
 <h2 class="anchored" data-anchor-id="step-1-load-first-batch">Step 1: Load First Batch</h2>
 <p>Let’s inspect the first batch to understand the data structure:</p>
-<div id="0c8f5317" class="cell" data-execution_count="2">
+<div id="2e46b156" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>batch_001 <span class="op">=</span> pd.read_parquet(batches_dir <span class="op">/</span> <span class="st">'batch_001.parquet'</span>)</span>
@@ -899,7 +899,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="step-2-generate-healpix-sidecar" class="level2">
 <h2 class="anchored" data-anchor-id="step-2-generate-healpix-sidecar">Step 2: Generate HEALPix Sidecar</h2>
 <p>For this example, we’ll use the existing <code>healpix_sidecar.py</code> script (will be converted to module later):</p>
-<div id="87e92111" class="cell" data-execution_count="3">
+<div id="3392bede" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Once healpix_sidecar is converted to a module, this will be:</span></span>
@@ -957,7 +957,7 @@ This will create: batch_001.cell-healpix_assignment-fuzzy_nside-64_order-nested.
 <section id="step-4-validation" class="level2">
 <h2 class="anchored" data-anchor-id="step-4-validation">Step 4: Validation</h2>
 <p>Compare streaming results with batch processing:</p>
-<div id="3215452b" class="cell" data-execution_count="4">
+<div id="dab02e13" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load combined validation file</span></span>
@@ -1001,7 +1001,7 @@ This will create: batch_001.cell-healpix_assignment-fuzzy_nside-64_order-nested.
 <section id="step-5-performance-metrics" class="level2">
 <h2 class="anchored" data-anchor-id="step-5-performance-metrics">Step 5: Performance Metrics</h2>
 <p>Compare memory usage between approaches:</p>
-<div id="869070f4" class="cell" data-execution_count="5">
+<div id="6db28883" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
@@ -1047,21 +1047,6 @@ This will create: batch_001.cell-healpix_assignment-fuzzy_nside-64_order-nested.
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var sidebar = document.getElementById('quarto-margin-sidebar');
-  if (!sidebar) return;
-  var text = sidebar.textContent || '';
-  if (text.indexOf('API Reference') === -1) return;
-  var el = document.getElementById('quarto-content');
-  if (!el) return;
-  // Remove sidebar and widen container so <main> fills the page
-  sidebar.remove();
-  el.classList.remove('page-columns');
-  el.style.maxWidth = '90vw';
-  el.style.gridTemplateColumns = '1fr';
-});
-</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right

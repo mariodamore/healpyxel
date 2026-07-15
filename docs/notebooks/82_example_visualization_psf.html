@@ -726,7 +726,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p>Use of Gaussian spread function both for measurement or healpix cell assignment and weigthing.</p>
 <p><span style="color: red;"><em>STILL WORK IN PROGRESS</em></span></p>
-<div id="a8c4ec5d" class="cell" data-execution_count="1">
+<div id="46c92e3f" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Import the GaussianPSF class from healpyxel.sidecar</span></span>
@@ -736,7 +736,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="e5a08df7" class="cell" data-execution_count="2">
+<div id="c1d4dcf5" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a Gaussian PSF with a chosen sigma</span></span>
@@ -754,7 +754,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>z <span class="op">=</span> psf(dx, dy)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="b9616749" class="cell" data-execution_count="3">
+<div id="61542b93" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">5</span>))</span>
@@ -773,7 +773,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="045765be" class="cell" data-execution_count="4">
+<div id="7d3cbf00" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
@@ -792,7 +792,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="7e17c156" class="cell" data-execution_count="5">
+<div id="fdd78853" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -824,7 +824,7 @@ Contents:
   validation/: 2 files</code></pre>
 </div>
 </div>
-<div id="a4d12792" class="cell" data-execution_count="6">
+<div id="7f5400d4" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.sidecar <span class="im">import</span> process_partition, write_coalesced_output, get_psf</span>
@@ -972,7 +972,7 @@ CRS: EPSG:4326</code></pre>
 </div>
 </div>
 </div>
-<div id="dd9facfd" class="cell" data-execution_count="7">
+<div id="d0e45297" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>gdf[<span class="st">'lon_center'</span>].describe()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -989,7 +989,7 @@ max        10.999325
 Name: lon_center, dtype: float64</code></pre>
 </div>
 </div>
-<div id="d292de71" class="cell" data-execution_count="8">
+<div id="b3a7dcc0" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -1004,7 +1004,7 @@ Name: lon_center, dtype: float64</code></pre>
 <span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> diameter_deg</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="558faf69" class="cell" data-execution_count="9">
+<div id="1e427f66" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Set parameters</span></span>
@@ -1025,7 +1025,7 @@ sigma_level=0.01
 sigma=103.374167891586</code></pre>
 </div>
 </div>
-<div id="8e4c65fb" class="cell" data-execution_count="10">
+<div id="68bbe861" class="cell" data-execution_count="10">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plt.figure()</span>
@@ -1052,7 +1052,7 @@ sigma=103.374167891586</code></pre>
 </div>
 </div>
 </div>
-<div id="0959d554" class="cell" data-execution_count="11">
+<div id="61045858" class="cell" data-execution_count="11">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>processed_partition <span class="op">=</span> process_partition(</span>
@@ -1079,7 +1079,7 @@ min       0.000000       4175.0     0.856722
 max    1467.000000       4976.0     0.986331</code></pre>
 </div>
 </div>
-<div id="647ca6ca" class="cell" data-execution_count="12">
+<div id="1bb4ba25" class="cell" data-execution_count="12">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>processed_partition[<span class="st">'weight'</span>].plot( cmap<span class="op">=</span><span class="st">'viridis'</span>, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>), legend<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1092,7 +1092,7 @@ max    1467.000000       4976.0     0.986331</code></pre>
 </div>
 </div>
 </div>
-<div id="18f11d87" class="cell" data-execution_count="13">
+<div id="adb03c5b" class="cell" data-execution_count="13">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>processed_partition.groupby(<span class="st">'healpix_id'</span>).agg(<span class="bu">len</span>)[[<span class="st">'weight'</span>]].sort_values(by<span class="op">=</span><span class="st">'weight'</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1159,7 +1159,7 @@ max    1467.000000       4976.0     0.986331</code></pre>
 </div>
 </div>
 </div>
-<div id="59270770" class="cell" data-execution_count="14">
+<div id="35e20024" class="cell" data-execution_count="14">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>processed_partition.groupby(<span class="st">'healpix_id'</span>).agg(<span class="bu">sum</span>)[[<span class="st">'weight'</span>]].sort_values(by<span class="op">=</span><span class="st">'weight'</span>, ascending<span class="op">=</span><span class="va">False</span>).head(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1226,7 +1226,7 @@ max    1467.000000       4976.0     0.986331</code></pre>
 </div>
 </div>
 </div>
-<div id="fd7789d9" class="cell" data-execution_count="15">
+<div id="04dde972" class="cell" data-execution_count="15">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>healpix_id <span class="op">=</span> <span class="dv">6374</span></span>
@@ -1254,7 +1254,7 @@ max    1467.000000       4976.0     0.986331</code></pre>
 </div>
 </div>
 </div>
-<div id="4ac20ec7" class="cell" data-execution_count="16">
+<div id="0cb701cf" class="cell" data-execution_count="16">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpy <span class="im">as</span> hp</span>
@@ -1276,13 +1276,13 @@ max    1467.000000       4976.0     0.986331</code></pre>
 (array('d', [-32.94412311703627, -33.52804087419743, -34.82172104878954, -34.23461408949813, -32.94412311703627]), array('d', [100.70419447584689, 102.7155086769465, 102.67406996768031, 100.66793719134546, 100.70419447584689]))</code></pre>
 </div>
 </div>
-<div id="8bb390a1" class="cell" data-execution_count="17">
+<div id="b58c0e64" class="cell" data-execution_count="17">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>gdf_cell <span class="op">=</span> gdf.iloc[cell[<span class="st">'source_id'</span>].values].copy()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="358496b9" class="cell" data-execution_count="18">
+<div id="c65cd8a5" class="cell" data-execution_count="18">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>gdf_cell[<span class="st">'weight'</span>] <span class="op">=</span> cell.set_index(<span class="st">'source_id'</span>)[<span class="st">'weight'</span>]</span>
@@ -1297,7 +1297,7 @@ max    1467.000000       4976.0     0.986331</code></pre>
 </div>
 </div>
 </div>
-<div id="4caf3baf" class="cell" data-execution_count="19">
+<div id="718ee76b" class="cell" data-execution_count="19">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>gdf_cell[<span class="st">'weight'</span>].plot( cmap<span class="op">=</span><span class="st">'viridis'</span>, figsize<span class="op">=</span>(<span class="dv">8</span>,<span class="dv">6</span>), legend<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1310,7 +1310,7 @@ max    1467.000000       4976.0     0.986331</code></pre>
 </div>
 </div>
 </div>
-<div id="d38dbbbc" class="cell" data-execution_count="20">
+<div id="4d3cc396" class="cell" data-execution_count="20">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sqlalchemy <span class="im">import</span> column</span>
@@ -1338,21 +1338,6 @@ max    1467.000000       4976.0     0.986331</code></pre>
 
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var sidebar = document.getElementById('quarto-margin-sidebar');
-  if (!sidebar) return;
-  var text = sidebar.textContent || '';
-  if (text.indexOf('API Reference') === -1) return;
-  var el = document.getElementById('quarto-content');
-  if (!el) return;
-  // Remove sidebar and widen container so <main> fills the page
-  sidebar.remove();
-  el.classList.remove('page-columns');
-  el.style.maxWidth = '90vw';
-  el.style.gridTemplateColumns = '1fr';
-});
-</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right

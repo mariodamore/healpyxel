@@ -1,8 +1,8 @@
 {
   "processing": {
     "stage": "aggregate",
-    "timestamp": "2026-02-05T15:00:53.553135Z",
-    "source_file": "../../samples/sample_50k.parquet",
+    "timestamp": "2026-07-15T12:29:59.375955Z",
+    "source_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet",
     "sidecar_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet",
     "output_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k-aggregated-densified.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet"
   },
@@ -37,7 +37,7 @@
   "sidecar_metadata": {
     "processing": {
       "stage": "sidecar",
-      "timestamp": "2026-02-05T14:36:06.101366Z",
+      "timestamp": "2026-07-15T12:27:38.374271Z",
       "source_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet",
       "output_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet"
     },

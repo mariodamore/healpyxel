@@ -1,0 +1,54 @@
+# core.healpix_cell_sizes { #healpyxel.core.healpix_cell_sizes }
+
+```python
+core.healpix_cell_sizes(
+    radii=None,
+    nside=(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192),
+)
+```
+
+Return HEALPix cell sizes for one or more spherical bodies.
+
+Computes ``cells`` (total count) and ``angular_size_deg`` once — these
+depend only on ``nside`` — then adds one ``cell_size_km`` column per
+body.  This matches the structure of the reference table in the docs.
+
+Args:
+    radii: Sequence of ``(column_name, body_radius_km)`` pairs.
+        ``column_name`` is the label for the output column (e.g.
+        ``"Mercury Cell Size (km)"``).  Pass ``None`` or an empty
+        sequence to get only the radius-independent columns.
+    nside: Sequence of NSIDE values to compute.  Defaults to the
+        standard set (1 … 8192).
+
+Returns:
+    Flat DataFrame (no MultiIndex) with columns:
+
+    - ``nside``
+    - ``Number of Cells``
+    - ``Cell Angular Size (deg)``
+    - one ``cell_size_km`` column per element in ``radii``
+
+    If ``radii`` is empty/None, only the first three columns are
+    present.
+
+Examples:
+    Single body:
+
+    >>> df = healpix_cell_sizes(radii=[("Moon", 1737.4)])
+    >>> float(df.loc[df["nside"] == 64, "Moon"].iloc[0])
+    27.78
+
+    Multiple bodies:
+
+    >>> df = healpix_cell_sizes(radii=[("Mercury", 2439.7), ("Moon", 1737.4)])
+    >>> sorted(df.columns.tolist())
+    ['Cell Angular Size (deg)', 'Mercury', 'Moon', 'Number of Cells', 'nside']
+
+    No radii (nside-only quantities):
+
+    >>> df = healpix_cell_sizes()
+    >>> sorted(df.columns.tolist())
+    ['Cell Angular Size (deg)', 'Number of Cells', 'nside']
+    >>> len(df)
+    14

@@ -127,10 +127,10 @@ format:
     code-fold: true
     code-tools: true
     codefold: true
-    css:
-      # custom CSS overrides
-      - docs_src/reference/custom.css
-    include-after-body: docs_src/reference/custom-width.html
+    max-width: 2200px
+    # css:
+    #   # custom CSS overrides
+    #   - docs_src/reference/custom.css
 execute:
   echo: true
   warning: false
@@ -150,6 +150,7 @@ quartodoc:
     - title: Core
       desc: Validation, robust statistics, and logging utilities.
       contents:
+        - core.healpix_cell_sizes
         - core.validate_nside
         - core.mad
         - core.robust_std

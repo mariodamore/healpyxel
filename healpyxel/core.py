@@ -94,41 +94,77 @@ def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
 
 # ADR-size-recovery: HEALPix cell size utility
 def healpix_cell_sizes(
-    body_radius_km: float,
+    radii: Sequence[tuple[str, float]] | None = None,
     nside: Sequence[int] = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192),
 ) -> pd.DataFrame:
-    """Return cell angular and linear sizes for a spherical body.
+    """Return HEALPix cell sizes for one or more spherical bodies.
 
-    Computes the cell angular size (deg) and arc-length (km) for each
-    HEALPix ``nside`` resolution, assuming a spherical body of given
-    radius.  Useful for building reference tables like those in the
-    docs.
+    Computes ``cells`` (total count) and ``angular_size_deg`` once — these
+    depend only on ``nside`` — then adds one ``cell_size_km`` column per
+    body.  This matches the structure of the reference table in the docs.
 
     Args:
-        body_radius_km: Radius of the spherical body in km.
+        radii: Sequence of ``(column_name, body_radius_km)`` pairs.
+            ``column_name`` is the label for the output column (e.g.
+            ``"Mercury Cell Size (km)"``).  Pass ``None`` or an empty
+            sequence to get only the radius-independent columns.
         nside: Sequence of NSIDE values to compute.  Defaults to the
-            standard set (1 .. 8192).
+            standard set (1 … 8192).
 
     Returns:
-        DataFrame with columns ``nside``, ``cells`` (total count),
-        ``angular_size_deg``, ``cell_size_km``.
+        Flat DataFrame (no MultiIndex) with columns:
+
+        - ``nside``
+        - ``Number of Cells``
+        - ``Cell Angular Size (deg)``
+        - one ``cell_size_km`` column per element in ``radii``
+
+        If ``radii`` is empty/None, only the first three columns are
+        present.
 
     Examples:
-        >>> df = healpix_cell_sizes(body_radius_km=1737.4)
-        >>> df.loc[df["nside"] == 64, "cell_size_km"].round(3).iloc[0]
+        Single body:
+
+        >>> df = healpix_cell_sizes(radii=[("Moon", 1737.4)])
+        >>> float(df.loc[df["nside"] == 64, "Moon"].iloc[0])
         27.78
+
+        Multiple bodies:
+
+        >>> df = healpix_cell_sizes(radii=[("Mercury", 2439.7), ("Moon", 1737.4)])
+        >>> sorted(df.columns.tolist())
+        ['Cell Angular Size (deg)', 'Mercury', 'Moon', 'Number of Cells', 'nside']
+
+        No radii (nside-only quantities):
+
+        >>> df = healpix_cell_sizes()
+        >>> sorted(df.columns.tolist())
+        ['Cell Angular Size (deg)', 'Number of Cells', 'nside']
+        >>> len(df)
+        14
     """
-    results = []
+    rows = []
     for n in nside:
         pix_area_sr = hp.nside2pixarea(n)
         area_deg2 = pix_area_sr * (180.0 / np.pi) ** 2
         ang_deg = np.sqrt(area_deg2)
         ang_rad = np.radians(ang_deg)
-        cell_km = body_radius_km * ang_rad
-        results.append({
+        rows.append({
             "nside": n,
-            "cells": hp.nside2npix(n),
-            "angular_size_deg": round(ang_deg, 3),
-            "cell_size_km": round(cell_km, 3),
+            "Number of Cells": hp.nside2npix(n),
+            "Cell Angular Size (deg)": round(ang_deg, 3),
         })
-    return pd.DataFrame(results).set_index("nside")
+
+    df = pd.DataFrame(rows)
+
+    if radii:
+        for name, r_km in radii:
+            values = []
+            for n in nside:
+                pix_area_sr = hp.nside2pixarea(n)
+                area_deg2 = pix_area_sr * (180.0 / np.pi) ** 2
+                ang_rad = np.radians(np.sqrt(area_deg2))
+                values.append(round(r_km * ang_rad, 3))
+            df[name] = values
+
+    return df

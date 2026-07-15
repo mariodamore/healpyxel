@@ -733,7 +733,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<div id="513df7a5" class="cell" data-execution_count="1">
+<div id="f7b8b1a7" class="cell" data-execution_count="1">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> healpyxel</span>
@@ -744,13 +744,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"healpyxel version: </span><span class="sc">{</span>healpyxel<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>healpyxel version: 0.2.0</code></pre>
+<pre><code>healpyxel version: 0.3.0</code></pre>
 </div>
 </div>
 <section id="core-utilities" class="level2">
 <h2 class="anchored" data-anchor-id="core-utilities">Core Utilities</h2>
 <p>Test the core utility functions:</p>
-<div id="5c4e0ec3" class="cell" data-execution_count="2">
+<div id="8e7032e9" class="cell" data-execution_count="2">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Validate nside parameter</span></span>
@@ -770,7 +770,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 ✓ Caught invalid nside: nside must be a power of 2, got 100</code></pre>
 </div>
 </div>
-<div id="848cf1f5" class="cell" data-execution_count="3">
+<div id="16cbb7b8" class="cell" data-execution_count="3">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test MAD (Median Absolute Deviation)</span></span>
@@ -782,7 +782,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>MAD of [  1   2   3   4   5 100]: 1.50</code></pre>
 </div>
 </div>
-<div id="08c524e4" class="cell" data-execution_count="4">
+<div id="11d0e975" class="cell" data-execution_count="4">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Test robust standard deviation</span></span>
@@ -802,7 +802,7 @@ Robust std is less affected by the outlier (100)</code></pre>
 <section id="test-data" class="level2">
 <h2 class="anchored" data-anchor-id="test-data">Test Data</h2>
 <p>Check available test data in the package:</p>
-<div id="73647252" class="cell" data-execution_count="5">
+<div id="47a00923" class="cell" data-execution_count="5">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -845,7 +845,7 @@ Contents:
 <li><code>healpix_finalize</code> - Finalize accumulated state to statistical maps</li>
 </ul>
 <p>Check if commands are available:</p>
-<div id="6bd5abff" class="cell" data-execution_count="6">
+<div id="209b290f" class="cell" data-execution_count="6">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> subprocess</span>
@@ -870,7 +870,7 @@ Contents:
 <section id="quick-test-with-sample-data" class="level2">
 <h2 class="anchored" data-anchor-id="quick-test-with-sample-data">Quick Test with Sample Data</h2>
 <p>If test data is available, let’s try a quick aggregation:</p>
-<div id="287a46c0" class="cell" data-execution_count="7">
+<div id="34b45a86" class="cell" data-execution_count="7">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for sample data</span></span>
@@ -947,7 +947,7 @@ Contents:
   --all-columns \
   --aggs mean median std \
   --output "$OUT_DIR/sample_50k_nside${NSIDE}_all_cols_aggregate.parquet"</code></pre>
-<div id="a4a28f71" class="cell" data-execution_count="8">
+<div id="b7037bc7" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
@@ -985,7 +985,7 @@ Contents:
 </section>
 <section id="package-information" class="level2">
 <h2 class="anchored" data-anchor-id="package-information">Package Information</h2>
-<div id="7c0cbb51" class="cell" data-execution_count="9">
+<div id="98567ae4" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show available modules</span></span>
@@ -1016,21 +1016,6 @@ Contents:
 </section>
 
 <a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  var sidebar = document.getElementById('quarto-margin-sidebar');
-  if (!sidebar) return;
-  var text = sidebar.textContent || '';
-  if (text.indexOf('API Reference') === -1) return;
-  var el = document.getElementById('quarto-content');
-  if (!el) return;
-  // Remove sidebar and widen container so <main> fills the page
-  sidebar.remove();
-  el.classList.remove('page-columns');
-  el.style.maxWidth = '90vw';
-  el.style.gridTemplateColumns = '1fr';
-});
-</script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
     // Ensure there is a toggle, if there isn't float one in the top right

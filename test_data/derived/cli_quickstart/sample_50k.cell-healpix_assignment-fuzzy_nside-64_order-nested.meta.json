@@ -1,7 +1,7 @@
 {
   "processing": {
     "stage": "sidecar",
-    "timestamp": "2026-02-05T14:36:22.550667Z",
+    "timestamp": "2026-07-15T12:28:21.099497Z",
     "source_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/samples/sample_50k.parquet",
     "output_file": "/home/kidpixo/Documents/work/MESSENGER/MASCS_gn_dlr_processed/healpyxel/test_data/derived/cli_quickstart/sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet"
   },
