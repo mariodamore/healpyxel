@@ -172,6 +172,8 @@ class CellAccumulator:
 
     def __init__(self, use_tdigest: bool = True):
         self.stats_by_column: Dict[str, StreamingStats] = {}
+        # ADR-014: TDigest is the QuantileReducer.
+        # Accuracy: ~1e-3 vs exact batch median when using batch_update().
         self.use_tdigest = use_tdigest and TDIGEST_AVAILABLE
 
         if self.use_tdigest:
@@ -216,12 +218,13 @@ class CellAccumulator:
             self.stats_by_column[col].merge(stats)
 
         # Merge T-Digests
+        # ADR-014: TDigest is the QuantileReducer — mergeable via centroid re-insertion
         if self.use_tdigest and hasattr(other, 'tdigests'):
             for col, digest in other.tdigests.items():
                 if col not in self.tdigests:
                     self.tdigests[col] = TDigest()
-                # Merge by adding all centroids
-                for centroid in digest.C:
+                # Merge by adding all centroids (digest.C is an AccumulationTree, use values())
+                for centroid in digest.C.values():
                     self.tdigests[col].update(centroid.mean, centroid.count)
 
     def to_dict(self) -> dict:

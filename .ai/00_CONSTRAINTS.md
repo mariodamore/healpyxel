@@ -50,4 +50,4 @@ All tutorial notebooks must use the `.py:percent` format (ADR-007):
 - **ADR comments in code** — Add `# ADR-NNN` comments when code implements architectural decisions
 - **Session logging** — Dead ends are as important as progress; record both
 
-_Last updated: 2026-07-10_
+_Last updated: 2026-07-14_

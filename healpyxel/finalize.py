@@ -94,6 +94,7 @@ def finalize_statistics(
             row[f'{col}_max'] = stats.max_val if np.isfinite(stats.max_val) else float('nan')
 
             # Percentiles from T-Digest
+            # ADR-014: TDigest provides approximate quantiles (~1e-3 vs exact batch)
             if hasattr(acc, 'tdigests') and col in acc.tdigests:
                 digest = acc.tdigests[col]
                 for p in percentiles:
@@ -109,6 +110,9 @@ def finalize_statistics(
                     row[f'{col}_p{int(p)}'] = float('nan')
 
         rows.append(row)
+
+    if not rows:
+        return pd.DataFrame(index=pd.Index([], name='healpix_id'))
 
     df = pd.DataFrame(rows).set_index('healpix_id').sort_index()
 
@@ -225,9 +229,13 @@ def export_to_geotiff(
     logger.info(f"✓ Exported GeoTIFF ({width}x{height})")
 
 def _normalize_load_state_result(result) -> Tuple[Dict[int, CellAccumulator], Optional[HEALPyxelxMetadata]]:
-    """Normalize load_state outputs across versions."""
-    if isinstance(result, tuple) and len(result) == 2:
-        return result
+    """Normalize load_state outputs across versions.
+
+    load_state() returns (state, meta, processing_metadata) — a 3-tuple.
+    This function extracts just (state, meta) for backward compatibility.
+    """
+    if isinstance(result, tuple) and len(result) >= 2:
+        return result[0], result[1]
     return result, None
 
 def _in_ipython_kernel() -> bool:
@@ -307,8 +315,9 @@ def run(config):
     except Exception as e:
         raise RuntimeError(f"Failed to load state: {e}")
 
+    # ADR-014: detect whether TDigest data is present in the loaded state
     has_tdigest = any(
-        hasattr(acc, 'tdigests') and len(acc.tdigest) > 0
+        hasattr(acc, 'tdigests') and len(acc.tdigests) > 0
         for acc in state.values()
     )
 

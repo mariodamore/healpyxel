@@ -15,6 +15,7 @@
 | ADR-011 | Exclude WIP notebooks from published docs | Active | 2026-07-13 |
 | ADR-012 | Global sidebar/navbar for Quarto docs | Active | 2026-07-13 |
 | ADR-013 | Pluggable body geometry backend (Sphere/Ellipsoid/DSK) | Active | 2026-07-13 |
+| ADR-014 | TDigest for streaming quantile computation | Active | 2026-07-15 |
 
 ## Notes
 

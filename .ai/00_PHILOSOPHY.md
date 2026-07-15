@@ -5,13 +5,13 @@ Guidance, not rules. These evolve as the project matures.
 ## Core Principles
 
 - **Science-first vectorization** — No Python loops over datasets. Performance targets (<100ms on 1M rows) are not goals; they are minimum viability thresholds.
-- **Robustness over convenience** — We implement `mad()` and `robust_std()` ourselves. Consistency across 10+ notebooks matters more than using "standard" libraries. One bug, one fix.
+- **Robustness over convenience** — We implement `mad()` and `robust_std()` ourselves. Consistency across notebooks matters more than using "standard" libraries. One bug, one fix.
 - **HEALPix as the single coordinate system** — `healpy` (NEST ordering), `antimeridian` for edge cases. Context collapse is the enemy; too many tools create too many failure modes.
 - **Predictability over speed** — We don't optimize for speed first. We optimize for *predictability* first — speed follows.
 
 ## Architectural Style
 
-- **Notebooks as source of truth** — nbdev is not "literate programming" as a buzzword, but as a *debugging discipline*. Every notebook cell is a testable hypothesis. Every `#| export` is a promise: *this will run in production*.
+- **Hand-edited Python as source of truth** — `.py` modules in `healpyxel/` are the source of truth (hand-edited). `.py:percent` notebooks in `notebooks/` are tested examples rendered by Quarto. No auto-generation.
 - **Single responsibility per phase** — The 4-phase pipeline isn't arbitrary. Each phase has a *single* job — and if it tries to do more, we refactor.
 - **Trust internal guarantees** — Don't add error handling, fallbacks, or validation for scenarios that can't happen. Validate only at system boundaries (user input, external APIs).
 
@@ -38,10 +38,10 @@ Each phase has a *single* job — and if it tries to do more, we refactor.
 
 ## For AI Agents
 
-- **Before writing code**: Check `.ai/IMPLEMENTATION_PLAN.md` — don't re-implement ✅ items.
-- **Before refactoring**: Check `.ai/PROJECT_PLAN.md` — is this in Phase 1 or Phase 3?
+- **Before writing code**: Check `03_CURRENT_STATUS.md` — know what is in progress and what is actively blocked
+- **Before refactoring**: Check `decisions/index.md` — has this approach been decided or rejected?
 - **When in doubt**: Assume the constraint exists for a reason. Ask *why*, don't ask *can I*.
 
 > This isn't a "guide for AI agents." It's a *handshake* — between past decisions and future code.
 
-_Last updated: 2026-05-22_
+_Last updated: 2026-07-15_
