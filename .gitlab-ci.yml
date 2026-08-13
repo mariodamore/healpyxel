@@ -1,5 +1,32 @@
 stages:
+  - test
   - deploy
+
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.pip-cache"
+
+cache:
+  paths:
+    - .pip-cache/
+
+test:
+  stage: test
+  image: python:3.11-slim
+  before_script:
+    - pip install -e ".[dev]"
+    - pip install pytest pytest-cov
+  script:
+    - pytest --cov=healpyxel --cov-report=xml --cov-report=term --cov-fail-under=45 tests/
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    paths:
+      - coverage.xml
+  only:
+    - dev
+    - master
 
 pages:
   stage: deploy
