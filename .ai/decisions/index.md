@@ -16,6 +16,10 @@
 | ADR-012 | Global sidebar/navbar for Quarto docs | Active | 2026-07-13 |
 | ADR-013 | Pluggable body geometry backend (Sphere/Ellipsoid/DSK) | Active | 2026-07-13 |
 | ADR-014 | TDigest for streaming quantile computation | Active | 2026-07-15 |
+| ADR-015 | Multi-resolution sidecar via NEST bit-shift aggregation | Active | 2026-08-11 |
+| ADR-016 | Pipeline wrapper for healpyxel 3-phase workflow | Active | 2026-08-11 |
+| ADR-017 | Separate inspection CLI (`healpyxel_inspect`) from aggregation | Active | 2026-08-12 |
+| ADR-018 | WKB fallback + --correct-geometry for broken spatial partition metadata | Active | 2026-08-13 |
 
 ## Notes
 
