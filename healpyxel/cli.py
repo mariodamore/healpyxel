@@ -1,51 +1,163 @@
 """CLI entry points for healpyxel commands.
 
 All argparse definitions live here. Submodules expose pure run(config) APIs.
+
+Pipeline stages
+----------------
+- ``healpyxel_sidecar``   — spatial join (strict or fuzzy) per HEALPix cell
+- ``healpyxel_aggregate`` — split-apply-combine over sidecar outputs
+- ``healpyxel_to_geoparquet`` — join aggregate stats with HEALPix geometry
+- ``healpyxel_accumulator`` — streaming statistics per cell
+- ``healpyxel_finalize``  — compute final maps from accumulator state
+- ``healpyxel_pipeline``  — orchestrate the full 3-phase workflow
+- ``healpyxel-cache``     — manage HEALPix grid cache (XDG-compliant)
+- ``healpyxel_inspect``   — inspect and visualise results
 """
 
 import sys
 
 
 def sidecar_cli(argv=None):
-    """CLI entry point for healpyxel_sidecar."""
+    """CLI entry point for healpyxel_sidecar.
+
+    Defines the ``healpyxel_sidecar`` command used to project input
+    parquet observations onto HEALPix cells.  Invokes
+    :func:`healpyxel.sidecar.parse_arguments` then
+    :func:`healpyxel.sidecar.run`.
+
+    Parameters
+    ----------
+    argv : list[str] or None
+        Argument list (defaults to ``sys.argv[1:]`` when ``None``).
+    """
     from healpyxel.sidecar import parse_arguments, run
     args = parse_arguments(argv)
     return run(args)
 
 
 def aggregate_cli(argv=None):
-    """CLI entry point for healpyxel_aggregate."""
+    """CLI entry point for healpyxel_aggregate.
+
+    Defines the ``healpyxel_aggregate`` command for computing per-cell
+    statistics from sidecar parquet files.  Invokes
+    :func:`healpyxel.aggregate.parse_arguments` then
+    :func:`healpyxel.aggregate.run`.
+
+    Parameters
+    ----------
+    argv : list[str] or None
+        Argument list (defaults to ``sys.argv[1:]`` when ``None``).
+    """
     from healpyxel.aggregate import parse_arguments, run
     args = parse_arguments(argv)
     return run(args)
 
 
 def accumulator_cli(argv=None):
-    """CLI entry point for healpyxel_accumulator."""
+    """CLI entry point for healpyxel_accumulator.
+
+    Defines the ``healpyxel_accumulator`` command for streaming
+    accumulation of per-cell statistics.  Invokes
+    :func:`healpyxel.accumulator.parse_arguments` then
+    :func:`healpyxel.accumulator.run`.
+
+    Parameters
+    ----------
+    argv : list[str] or None
+        Argument list (defaults to ``sys.argv[1:]`` when ``None``).
+    """
     from healpyxel.accumulator import parse_arguments, run
     args = parse_arguments(argv)
     return run(args)
 
 
 def finalize_cli(argv=None):
-    """CLI entry point for healpyxel_finalize."""
+    """CLI entry point for healpyxel_finalize.
+
+    Defines the ``healpyxel_finalize`` command to produce final HEALPix
+    statistical maps and optional GeoTIFF exports from an accumulator
+    state parquet.  Invokes :func:`healpyxel.finalize.parse_arguments`
+    then :func:`healpyxel.finalize.run`.
+
+    Parameters
+    ----------
+    argv : list[str] or None
+        Argument list (defaults to ``sys.argv[1:]`` when ``None``).
+    """
     from healpyxel.finalize import parse_arguments, run
     args = parse_arguments(argv)
     return run(args)
 
 
 def to_geoparquet_cli(argv=None):
-    """CLI entry point for healpyxel_to_geoparquet."""
+    """CLI entry point for healpyxel_to_geoparquet.
+
+    Defines the ``healpyxel_to_geoparquet`` command to convert an
+    aggregate parquet into a GeoParquet with HEALPix cell geometries
+    and densification.  Invokes :func:`healpyxel.geospatial.parse_arguments`
+    then :func:`healpyxel.geospatial.run`.
+
+    Parameters
+    ----------
+    argv : list[str] or None
+        Argument list (defaults to ``sys.argv[1:]`` when ``None``).
+    """
     from healpyxel.geospatial import parse_arguments, run
+    args = parse_arguments(argv)
+    return run(args)
+
+
+def inspect_cli(argv=None):
+    """CLI entry point for healpyxel_inspect.
+
+    Defines the ``healpyxel_inspect`` command for inspecting and
+    visualising pipeline results.  Invokes
+    :func:`healpyxel.inspect.parse_arguments` then
+    :func:`healpyxel.inspect.run`.
+
+    Parameters
+    ----------
+    argv : list[str] or None
+        Argument list (defaults to ``sys.argv[1:]`` when ``None``).
+    """
+    from healpyxel.inspect import parse_arguments, run
     args = parse_arguments(argv)
     return run(args)
 
 
 # %% ../nbs/05_cli.ipynb #a77cb0a9
 def validate_lon_lat_columns(df, lon_col, lat_col, mode, input_file):
-    """
-    Validate or auto-detect lon/lat columns. Fail fast with context.
-    Returns (lon_col, lat_col) or raises ValueError.
+    """Validate or auto-detect longitude/latitude columns.
+
+    Used by the sidecar and aggregate pipelines to resolve which
+    DataFrame columns contain the geographic coordinates required for
+    the HEALPix spatial join.  Supports explicit user-provided names or
+    auto-detection from a common-name list.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Input parquet content loaded into a DataFrame.
+    lon_col : str or None
+        User-provided longitude column name (``None`` triggers auto-detect).
+    lat_col : str or None
+        User-provided latitude column name (``None`` triggers auto-detect).
+    mode : str
+        Processing mode string (``'strict'`` or ``'fuzzy'``).  Used in
+        error messages only.
+    input_file : str or Path
+        Source file path for error-reporting context.
+
+    Returns
+    -------
+    tuple[str, str]
+        ``(lon_col, lat_col)`` for the resolved column names.
+
+    Raises
+    ------
+    ValueError
+        * If the user-provided columns are not in ``df.columns``.
+        * If auto-detection fails (no common names found).
     """
     import logging
     logger = logging.getLogger(__name__)
@@ -86,7 +198,19 @@ def validate_lon_lat_columns(df, lon_col, lat_col, mode, input_file):
 
 # %% ../nbs/05_cli.ipynb #5c802a26
 def cache_cli():
-    """CLI entry point for healpyxel-cache command."""
+    """CLI entry point for the ``healpyxel-cache`` command.
+
+    Manages the HEALPix grid cache through a Click interface.  Supports
+    listing cached grids, generating new ones, verifying integrity,
+    cleaning cache files, and inspecting/setting configuration.
+
+    Precedence for cache and config directories:
+
+    1. CLI ``--cache-dir`` / ``--config-dir`` arguments
+    2. ``HEALPYXEL_CACHE`` / ``HEALPYXEL_CONFIG`` environment variables
+    3. ``XDG_CACHE_HOME`` / ``XDG_CONFIG_HOME`` specifications
+    4. Home-directory fallback (``~/.cache/healpyxel/...``)
+    """
     import click
     import os
     from healpyxel.geospatial import manage_healpix_cache

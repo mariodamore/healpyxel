@@ -38,3 +38,22 @@ healpyxel_accumulator = "healpyxel.cli:accumulator_cli"
 healpyxel_finalize = "healpyxel.cli:finalize_cli"
 healpyxel_to_geoparquet = "healpyxel.cli:to_geoparquet_cli"
 healpyxel_cache = "healpyxel.cli:cache_cli"
+healpyxel_inspect = "healpyxel.cli:inspect_cli"
+healpyxel_pipeline = "healpyxel.workflow:pipeline_cli"
+# shorter alias for all comnmand line interfaces
+hp_sidecar = "healpyxel.cli:sidecar_cli"
+hp_aggregate = "healpyxel.cli:aggregate_cli"
+hp_accumulator = "healpyxel.cli:accumulator_cli"
+hp_finalize = "healpyxel.cli:finalize_cli"
+hp_to_geoparquet = "healpyxel.cli:to_geoparquet_cli"
+hp_cache = "healpyxel.cli:cache_cli"
+hp_inspect = "healpyxel.cli:inspect_cli"
+hp_pipeline = "healpyxel.workflow:pipeline_cli"
+
+[tool.coverage.run]
+source = ["healpyxel"]
+omit = ["*/tests/*", "*/notebooks/*", "*/nbs/*", "*/docs/*"]
+
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "def __repr__", "raise NotImplementedError", "if TYPE_CHECKING:"]
+fail_under = 45

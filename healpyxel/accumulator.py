@@ -1,4 +1,34 @@
-"""Streaming accumulation into HEALPix cells."""
+"""Streaming accumulation into HEALPix cells.
+
+This module implements the **accumulator** stage of the healpyxel pipeline.
+It provides streaming (incremental) statistics computation for HEALPix cells,
+enabling mission-day-by-mission-day processing without loading all data at once.
+
+**Core concepts:**
+
+* **StreamingStats** — Welford's algorithm for running mean, std, min, max.
+  No raw data storage required; just count, sum, sum-of-squares.
+* **CellAccumulator** — Per-cell container holding ``StreamingStats`` for
+  multiple value columns plus optional TDigest for approximate percentile
+  computation.
+* **TDigest** — Streaming quantile data structure. Provides ~1e-3 accuracy
+  vs exact batch computation. Used for streaming median, percentile, and
+  interquartile range estimation.
+* **State serialization** — Accumulator state is serialized to parquet with
+  embedded metadata and companion ``.meta.json``. Supports round-trip
+  serialization/deserialization with idempotent input fingerprinting.
+
+**Workflow:**
+
+1. Initialize or load existing state.
+2. For each batch: merge with sidecar, group by HEALPix cell, update
+   ``CellAccumulator`` instances.
+3. Optionally track progress for visualization.
+4. Save state to parquet with metadata.
+
+The state file can be passed to finalize for map production, or loaded
+for continued accumulation of subsequent batches.
+"""
 
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
@@ -40,7 +70,23 @@ logger = logging.getLogger(__name__)
 class StreamingStats:
     """Container for streaming statistics using Welford's algorithm.
 
-    Maintains running statistics (mean, std, min, max) without storing raw data.
+    Maintains running statistics — count, sum, sum of squares, min, max —
+    without storing raw data. Supports merge for parallel/reduce workflows
+    and serialization to/from dictionaries.
+
+    The mean and standard deviation are computed on-the-fly from the
+    accumulated state, giving numerically stable one-pass computation.
+
+    Examples
+    --------
+    >>> stats = StreamingStats()
+    >>> stats.update([1.0, 2.0, 3.0])
+    >>> stats.n
+    3
+    >>> stats.mean
+    2.0
+    >>> stats.std
+    0.816496580927726
     """
 
     def __init__(self):
@@ -166,8 +212,16 @@ def _serialize_tdigest_raw(digest) -> dict:
 class CellAccumulator:
     """Accumulator for a single HEALPix cell.
 
-    Maintains streaming statistics for multiple columns plus optional T-Digest
-    for approximate percentile computation.
+    Maintains streaming statistics (:class:`StreamingStats`) for multiple
+    value columns plus optional TDigest for approximate percentile computation.
+
+    One ``CellAccumulator`` instance is created per HEALPix cell that receives
+    observations. The accumulate loop creates/updates these in a dict keyed
+    by ``healpix_id``.
+
+    Serialization is handled via :meth:`to_dict` (in-memory) and the
+    :func:`save_state` / :func:`load_state` pipeline for disk persistence.
+    Supports round-trip through TDigest's centroid-based merge.
     """
 
     def __init__(self, use_tdigest: bool = True):
@@ -453,24 +507,37 @@ def accumulate_batch(
     use_tdigest: bool = True,
     filter_expr: Optional[str] = None,
 ) -> Dict[int, CellAccumulator]:
-    """
-    Process one batch of data and update accumulator state.
+    """Process one batch of data and update the accumulator state.
 
-    Args:
-        new_data: DataFrame with observations (index = source_id, implicit or explicit)
-        sidecar: HEALPix mapping with columns ['source_id', 'healpix_id']
-                 (source_id may be duplicated in fuzzy mode—one row per cell)
-        value_columns: Columns to accumulate
-        existing_state: Previous accumulator state (None for first batch)
-        use_tdigest: Enable T-Digest for approximate percentiles
-        filter_expr: Optional pandas query expression to filter data
+    Merges observation data with the sidecar mapping, groups by HEALPix cell,
+    and updates each cell's ``CellAccumulator`` with the new values. Handles
+    both strict mode (one cell per source) and fuzzy mode (multiple cells
+    per source via many-to-one relationship).
 
-    Returns:
-        Updated state dictionary {healpix_id: CellAccumulator}
+    Parameters
+    ----------
+    new_data : pd.DataFrame
+        DataFrame with observations. Index may be implicit or explicit
+        ``source_id`` column.
+    sidecar : pd.DataFrame
+        HEALPix mapping with columns ``['source_id', 'healpix_id']``.
+        In fuzzy mode, ``source_id`` may appear multiple times (one row
+        per touched HEALPix cell).
+    value_columns : List[str]
+        Column names to accumulate statistics for.
+    existing_state : dict or None
+        Previous accumulator state dict ``{healpix_id: CellAccumulator}``.
+        Pass ``None`` for the first batch.
+    use_tdigest : bool
+        Enable TDigest for approximate percentile tracking.
+    filter_expr : str or None
+        Optional pandas query expression to filter ``new_data`` before
+        accumulation (e.g., ``"quality_flag > 0.8"``).
 
-    Note:
-        In fuzzy mode, sidecar has multiple rows per source_id (one per touched HEALPix cell).
-        This function handles the many-to-one relationship correctly by grouping on healpix_id.
+    Returns
+    -------
+    dict[int, CellAccumulator]
+        Updated state dictionary mapping ``healpix_id`` to its accumulator.
     """
     if existing_state is None:
         state = {}
@@ -560,27 +627,36 @@ def state_to_dataframe(
     state: Dict[int, CellAccumulator],
     use_tdigest: bool = True
 ) -> pd.DataFrame:
-    """Convert accumulated state dict → DataFrame with explicit healpix_id column.
+    """Convert accumulated state dict to a DataFrame with explicit healpix_id column.
 
-    Pure function (no I/O). Ensures healpix_id is preserved as an explicit COLUMN,
-    never as index. Safe for round-trip serialization + deserialization.
+    Pure function (no I/O). Serializes each ``CellAccumulator`` to JSON strings
+    and constructs a DataFrame where ``healpix_id`` is an explicit COLUMN,
+    never the index. This ensures safe round-trip serialization and
+    deserialization without losing the cell identifiers.
 
-    Args:
-        state: Dict[int, CellAccumulator] from accumulate_batch()
-        use_tdigest: Include serialized TDigest data
+    Parameters
+    ----------
+    state : dict[int, CellAccumulator]
+        Accumulator state from :func:`accumulate_batch`.
+    use_tdigest : bool
+        Include serialized TDigest data in the output.
 
-    Returns:
-        DataFrame with healpix_id as COLUMN (not index):
-            - healpix_id (int): HEALPix cell ID
-            - stats_json (str): JSON-serialized StreamingStats per column
-            - tdigests_json (str, optional): JSON-serialized TDigest data
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with columns:
+        * ``healpix_id`` (int) — HEALPix cell ID as explicit column
+        * ``stats_json`` (str) — JSON-serialized StreamingStats per column
+        * ``tdigests_json`` (str, optional) — JSON-serialized TDigest data
 
-    Example:
-        >>> state = {32: CellAccumulator(), 64: CellAccumulator()}
-        >>> df = state_to_dataframe(state)
-        >>> assert 'healpix_id' in df.columns
-        >>> assert list(df['healpix_id']) == [32, 64]
-        >>> assert df.index.name is None  # Index is positional, not healpix_id
+    Examples
+    --------
+    >>> state = {32: CellAccumulator(), 64: CellAccumulator()}
+    >>> df = state_to_dataframe(state)
+    >>> 'healpix_id' in df.columns
+    True
+    >>> df.index.name is None
+    True
     """
     rows = []
     for healpix_id, accumulator in state.items():
@@ -650,9 +726,27 @@ def input_fingerprint(path: str | Path) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 def ensure_not_processed(meta: Dict[str, Any], input_path: str | Path, *, on_duplicate: str = "error") -> Dict[str, Any]:
-    """
-    Check/add input fingerprint in state metadata.
-    on_duplicate: 'error' | 'skip'
+    """Check/add input fingerprint in state metadata for idempotency.
+
+    Computes a SHA-256 fingerprint from the input file's path, size, and
+    mtime. If the fingerprint is already in the ``processed_inputs`` list,
+    either raises an error or records the skip, depending on ``on_duplicate``.
+
+    Parameters
+    ----------
+    meta : dict
+        State metadata dict (modified in-place).
+    input_path : str or Path
+        Path to input data file.
+    on_duplicate : str
+        ``'error'`` — raise ``ValueError`` if already processed.
+        ``'skip'`` — record in ``skipped_duplicate`` and continue.
+
+    Returns
+    -------
+    dict
+        Updated metadata dict with new fingerprint added to
+        ``processed_inputs``.
     """
     fp = input_fingerprint(input_path)
     processed = set(meta.get("processed_inputs", []))
@@ -677,19 +771,38 @@ def save_state(
 ) -> None:
     """Serialize accumulated state to Parquet with metadata.
 
-    Includes idempotency checks via input fingerprinting to prevent
-    accidental double-accumulation of the same batch.
+    Converts the state dict to a DataFrame via :func:`state_to_dataframe`,
+    then writes it to Parquet with an Arrow schema that embeds HEALPix
+    metadata. Also writes a companion ``.meta.json`` sidecar with full
+    processing history.
 
-    Args:
-        state: Dict[int, CellAccumulator] from accumulate_batch()
-        output_path: Path to write parquet file
-        meta: HEALPyxelxMetadata instance
-        processing_metadata: Optional batch info dict
-        input_path: Path to input data file (for fingerprint tracking)
-        on_duplicate: 'error' | 'skip' — action if input already processed
+    Includes idempotency checks via input fingerprinting (SHA-256 of path
+    + size + mtime) to prevent accidental double-accumulation of the
+    same batch.
 
-    Raises:
-        ValueError: If input_path already in processed_inputs and on_duplicate='error'
+    Parameters
+    ----------
+    state : dict[int, CellAccumulator]
+        Accumulator state from :func:`accumulate_batch`.
+    output_path : Path
+        Path to write the parquet state file.
+    meta : HEALPyxelxMetadata
+        HEALPix metadata instance (nside, mode, order, etc.).
+    processing_metadata : dict or None
+        Optional batch info dict with keys like ``batch_id``, ``columns``,
+        ``n_cells``, ``total_observations``, etc.
+    input_path : Path or None
+        Path to input data file. Used for fingerprint tracking to detect
+        duplicate accumulation.
+    on_duplicate : str
+        Action if input was already processed: ``'error'`` (raise) or
+        ``'skip'`` (silently record).
+
+    Raises
+    ------
+    ValueError
+        If ``input_path`` already in ``processed_inputs`` and
+        ``on_duplicate='error'``.
     """
     import pyarrow as pa
 
@@ -743,24 +856,32 @@ def load_state(
     input_path: Path,
     use_tdigest: bool = True
 ) -> Tuple[Dict[int, CellAccumulator], Optional[HEALPyxelxMetadata], Dict[str, Any]]:
-    """Load accumulator state, HEALPix metadata, AND processing history from parquet file.
+    """Load accumulator state, HEALPix metadata, and processing history from parquet.
 
-    Reads both embedded Arrow metadata and companion .meta.json sidecar to reconstruct
-    full state including processed input fingerprints for idempotency checks.
+    Reads both embedded Arrow metadata and companion ``.meta.json`` sidecar
+    to reconstruct the full state including processed input fingerprints for
+    idempotency checks.
 
-    Args:
-        input_path: Path to state parquet file
-        use_tdigest: Whether to restore T-Digest data
+    Parameters
+    ----------
+    input_path : Path
+        Path to state parquet file.
+    use_tdigest : bool
+        Whether to restore TDigest data for percentile tracking.
 
-    Returns:
-        Tuple of (state dict, metadata, processing_metadata) where:
-            - state: Dict[int, CellAccumulator] deserialized from parquet
-            - metadata: HEALPyxelxMetadata (or None if not found)
-            - processing_metadata: Dict with 'processed_inputs', 'last_updated', etc.
-                                   (empty dict if sidecar not found)
+    Returns
+    -------
+    tuple[dict[int, CellAccumulator], HEALPyxelxMetadata or None, dict]
+        ``(state, metadata, processing_metadata)`` where:
+        * ``state`` — deserialized accumulator dict
+        * ``metadata`` — HEALPyxelxMetadata or None if not found
+        * ``processing_metadata`` — dict with ``processed_inputs``,
+          ``last_updated``, etc. (empty dict if sidecar not found)
 
-    Raises:
-        FileNotFoundError: If state file does not exist
+    Raises
+    ------
+    FileNotFoundError
+        If state file does not exist.
     """
     logger.info(f"Loading state from {input_path}")
 
@@ -820,18 +941,26 @@ def validate_accumulator_sidecar_compatibility(
 ) -> dict:
     """Validate that accumulator state is compatible with sidecar file.
 
-    Checks that nside, mode, and order match to prevent silent corruption
-    from mixing incompatible files.
+    Checks that nside, mode, and order match between the accumulated state
+    and the sidecar file. Prevents silent corruption from mixing
+    incompatible files (e.g., different HEALPix resolutions).
 
-    Args:
-        state_meta: Metadata from loaded state file
-        sidecar_meta: Metadata from sidecar file
+    Parameters
+    ----------
+    state_meta : HEALPyxelxMetadata
+        Metadata from the loaded accumulator state file.
+    sidecar_meta : HEALPyxelxMetadata
+        Metadata from the sidecar file.
 
-    Returns:
-        dict with validation results
+    Returns
+    -------
+    dict
+        Validation results with keys: ``valid``, ``errors``, ``warnings``.
 
-    Raises:
-        AssertionError: If critical parameters mismatch
+    Raises
+    ------
+    AssertionError
+        If critical parameters (nside, mode, order) mismatch.
     """
     results = {
         'valid': True,

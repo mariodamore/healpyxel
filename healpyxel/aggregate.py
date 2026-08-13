@@ -1,4 +1,27 @@
-"""Split-apply-combine aggregation for HEALPix tessellated data."""
+"""Split-apply-combine aggregation for HEALPix tessellated data.
+
+This module implements the **aggregation** stage of the healpyxel pipeline.
+It reads observation data together with a sidecar file (source → HEALPix
+cell mapping), groups observations by cell, and computes summary statistics
+(mean, median, std, MAD, robust std, min, max) per cell.
+
+**Key capabilities:**
+
+* **Flexible backends** — DuckDB for efficient column-projection loading,
+  Dask for parallel aggregation, or plain pandas as fallback.
+* **Quality filtering** — pandas query expressions to filter observations
+  before aggregation.
+* **Min-count thresholding** — cells with fewer than N observations
+  output NaN for all statistics, preventing unreliable values from sparse
+  cells.
+* **Densification** — optionally expand sparse output to the full HEALPix
+  grid (all ``12 * nside²`` cells), filling unobserved cells with NaN.
+* **Batch processing** — process multiple sidecars in batch with
+  per-sidecar error tolerance and overwrite prompts.
+
+The public API is the :func:`aggregate_by_sidecar` function; everything else
+supports it or wraps it for CLI/pipe usage.
+"""
 
 import argparse
 import logging
@@ -84,25 +107,36 @@ def generate_output_filename(
     output_dir: Optional[Path] = None,
     densified: bool = False
 ) -> Path:
-    """
-    Generate output filename that matches the parseable structure of the sidecar.
+    """Generate output filename that matches the parseable structure of the sidecar.
 
-    Pattern: <stem>-aggregated[-densified].<sidecar_suffix>.parquet
+    Constructs a descriptive output filename by combining the input file stem
+    with the sidecar suffix and an optional densification marker.
 
-    Args:
-        input_file: Original input parquet file
-        sidecar_file: Sidecar file being used
-        output_dir: Optional output directory (default: same as sidecar_file)
-        densified: If True, append '-densified' marker to filename
+    Parameters
+    ----------
+    input_file : Path
+        Original input parquet file.
+    sidecar_file : Path
+        Sidecar file being used (suffix is extracted from this).
+    output_dir : Path or None
+        Output directory. Defaults to the same directory as ``sidecar_file``.
+    densified : bool
+        If True, append ``-densified`` marker to the output filename.
 
-    Returns:
-        Path to output file
+    Returns
+    -------
+    Path
+        Output file path with format::
 
-    Example:
-        input: mascs_data_MeSS.parquet
-        sidecar: mascs_data_MeSS.cell-healpix_assignment-strict_nside-64_order-nested.parquet
-        sparse output: mascs_data_MeSS-aggregated.cell-healpix_assignment-strict_nside-64_order-nested.parquet
-        densified output: mascs_data_MeSS-aggregated-densified.cell-healpix_assignment-strict_nside-64_order-nested.parquet
+            <stem>-aggregated[-densified].<sidecar_suffix>.parquet
+
+    Examples
+    --------
+    For ``input=mascs_data.parquet`` and
+    ``sidecar=mascs_data.cell-healpix_assignment-strict_nside-64_order-nested.parquet``:
+
+    * Sparse: ``mascs_data-aggregated.cell-healpix_assignment-strict_nside-64_order-nested.parquet``
+    * Densified: ``mascs_data-aggregated-densified.cell-healpix_assignment-strict_nside-64_order-nested.parquet``
     """
     input_stem = input_file.stem
     sidecar_name = sidecar_file.name
@@ -167,20 +201,35 @@ def validate_sidecar_metadata(
     input_file: Path,
     require_metadata: bool = False
 ) -> Dict:
-    """
-    Validate sidecar metadata file and check source_file match.
+    """Validate sidecar metadata file and check source file match.
 
-    Args:
-        sidecar_path: Path to sidecar parquet file
-        input_file: Expected source input file path
-        require_metadata: If True, raise error when metadata missing
+    Reads the ``.meta.json`` companion file for a sidecar parquet and
+    verifies that the recorded ``source_file`` matches the expected input
+    file. This prevents accidentally using a sidecar derived from a
+    different observation file.
 
-    Returns:
-        Dictionary with metadata (empty dict if not found and not required)
+    Parameters
+    ----------
+    sidecar_path : Path
+        Path to sidecar parquet file.
+    input_file : Path
+        Expected source input file path (matched by filename).
+    require_metadata : bool
+        If True, raise ``FileNotFoundError`` when ``.meta.json`` is missing.
+        If False (default), log a warning and return an empty dict.
 
-    Raises:
-        FileNotFoundError: If require_metadata=True and .meta.json not found
-        ValueError: If source_file mismatch detected
+    Returns
+    -------
+    dict
+        Metadata dictionary from ``.meta.json``. Empty dict if not found
+        and ``require_metadata=False``.
+
+    Raises
+    ------
+    FileNotFoundError
+        If ``require_metadata=True`` and ``.meta.json`` not found.
+    ValueError
+        If ``source_file`` in metadata doesn't match ``input_file`` name.
     """
     metadata_path = sidecar_path.with_suffix('.meta.json')
 
@@ -223,19 +272,29 @@ def collect_sidecar_outputs(
     output_dir: Path,
     read_stats: bool = False
 ) -> pd.DataFrame:
-    """
-    Scan output_dir for sidecar parquet files that match the input file stem.
+    """Scan ``output_dir`` for sidecar parquet files matching the input stem.
 
-    Prefer metadata from .meta.json; fall back to filename parsing if metadata
-    is missing or incomplete.
+    Searches the output directory for sidecar files that belong to the given
+    input parquet file. Validates via ``.meta.json`` metadata when available,
+    falling back to filename pattern matching.
 
-    Args:
-        input_parquet: Path to the original parquet file
-        output_dir: Directory containing sidecar files
-        read_stats: If True, read files to compute row counts and unique healpix counts
+    Parameters
+    ----------
+    input_parquet : Path
+        Path to the original input parquet file. Used for stem matching
+        and source_file validation.
+    output_dir : Path
+        Directory containing sidecar parquet files.
+    read_stats : bool
+        If True, read each sidecar to compute row counts and unique HEALPix
+        counts. Slower but provides richer metadata.
 
-    Returns:
-        DataFrame with columns: file, coalesced, mode, nside, order, n_rows, n_unique_healpix
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with columns: ``file``, ``coalesced``, ``mode``, ``nside``,
+        ``order``, ``n_rows``, ``n_unique_healpix``, and optionally
+        ``derived_from_parent``.
     """
     from healpyxel.metadata import HEALPyxelxMetadata
 
@@ -373,6 +432,13 @@ def collect_sidecar_outputs(
             out_row["n_rows"] = n_rows
             out_row["n_unique_healpix"] = n_unique
 
+        # ADR-015 provenance: bit-shift derivation info
+        if meta_json:
+            pp = meta_json.get("processing_params", {})
+            derived = pp.get("derived_from_parent")
+            if derived is not None:
+                out_row["derived_from_parent"] = int(derived)
+
         rows.append(out_row)
 
     if not rows:
@@ -426,71 +492,6 @@ def get_numeric_columns(file_path: Path) -> List[str]:
         logger.error(f"Failed to read schema from {file_path}: {e}")
         return []
 
-def print_parquet_schema(file_path: Path, show_metadata: bool = True) -> None:
-    """
-    Print the schema of a parquet file.
-
-    Args:
-        file_path: Path to the parquet file
-        show_metadata: Whether to display file metadata
-    """
-    try:
-        pf = pq.ParquetFile(file_path)
-        schema = pf.schema_arrow
-
-        print(f"\nSchema for: {file_path.name}")
-        print("-" * 80)
-        print(schema)
-
-        if show_metadata:
-            metadata = pf.schema_arrow.metadata
-            if metadata:
-                print("\nFile Metadata:")
-                print("-" * 80)
-                for k, v in metadata.items():
-                    key_str = k.decode('utf-8') if isinstance(k, bytes) else str(k)
-                    val_str = v.decode('utf-8') if isinstance(v, bytes) else str(v)
-                    print(f"  {key_str}: {val_str}")
-    except Exception as e:
-        logger.error(f"Failed to read schema from {file_path}: {e}")
-
-def print_sidecar_summary(sidecars_df: pd.DataFrame, input_file: Path) -> None:
-    """
-    Print a formatted summary table of available sidecar files.
-
-    Args:
-        sidecars_df: DataFrame from collect_sidecar_outputs()
-        input_file: Original input parquet file path
-    """
-    print(f"\nAvailable Sidecar Files for: {input_file.name}")
-    print("=" * 100)
-
-    if len(sidecars_df) == 0:
-        print("  (none found)")
-        return
-
-    # Display columns
-    display_cols = ['mode', 'nside', 'order']
-    if 'n_rows' in sidecars_df.columns:
-        display_cols.extend(['n_rows', 'n_unique_healpix'])
-
-    # Format output
-    for idx, row in sidecars_df.iterrows():
-        filename = Path(row['file']).name
-        print(f"\n[{idx}] {filename}")
-        for col in display_cols:
-            if col in row:
-                val = row[col]
-                if pd.notna(val):
-                    if col in ('n_rows', 'n_unique_healpix'):
-                        print(f"    {col:20s}: {int(val):,}")
-                    else:
-                        print(f"    {col:20s}: {val}")
-
-    print("\n" + "=" * 100)
-    print(f"Use --sidecar-index <INDEX> to select a specific sidecar (0-{len(sidecars_df)-1})")
-    print(f"Or use --sidecar-index all to process all sidecars in batch mode")
-    print()
 
 def print_dry_run_summary(
     input_file: Path,
@@ -529,18 +530,27 @@ def densify_healpix_aggregates(
     nside: int,
     healpix_col: str = "healpix_id"
 ) -> pd.DataFrame:
-    """
-    Densify aggregated DataFrame to include all HEALPix cells.
+    """Densify aggregated DataFrame to include all HEALPix cells.
 
-    Fills missing cells with NaN for numeric columns and None for others.
+    Expands a sparse aggregation result (only observed cells) to the full
+    HEALPix grid (all ``12 * nside²`` cells). Missing cells are filled with
+    NaN for numeric columns and None for others.
 
-    Args:
-        agg_df: Aggregated DataFrame with healpix_id as index
-        nside: HEALPix nside parameter
-        healpix_col: Name of the HEALPix ID column (used as index)
+    Parameters
+    ----------
+    agg_sparse_df : pd.DataFrame
+        Aggregated DataFrame with ``healpix_id`` as index (sparse —
+        only observed cells).
+    nside : int
+        HEALPix nside parameter.
+    healpix_col : str
+        Name of the HEALPix ID column. Default: ``'healpix_id'``.
 
-    Returns:
-        Densified DataFrame with all HEALPix cells (0 to 12*nside**2 - 1)
+    Returns
+    -------
+    pd.DataFrame
+        Densified DataFrame with RangeIndex ``[0, 12*nside²)`` as index,
+        containing all HEALPix cells.
     """
     import healpy as hp
 
@@ -563,21 +573,50 @@ def aggregate_by_sidecar(
     healpix_col: str = "healpix_id",
     sentinel_threshold: float = 1e30,
 ) -> pd.DataFrame:
-    """
-    Aggregate original DataFrame by HEALPix cells using a sidecar mapping.
+    """Aggregate observation data by HEALPix cells using a sidecar mapping.
 
-    Args:
-        original: DataFrame with data to aggregate
-        sidecar: DataFrame with source_id -> healpix_id mapping
-        value_columns: Column names to aggregate
-        aggs: Aggregation functions to apply (default: mean, median, std, robust_std)
-        min_count: Minimum sources per cell (cells below threshold set to NaN)
-        source_id_col: Name of source ID column
-        healpix_col: Name of HEALPix ID column
-        sentinel_threshold: Absolute value threshold for masking sentinel values
+    This is the core aggregation function. It merges the original observation
+    DataFrame with the sidecar mapping, groups by ``healpix_id``, and computes
+    the requested summary statistics for each value column.
 
-    Returns:
-        Aggregated DataFrame with healpix_id as index
+    Features:
+    * Automatically masks extreme sentinel values (configurable threshold).
+    * Warns when ``min_count=0`` is used (rarely correct).
+    * Reports source_id overlap between sidecar and original data.
+    * Uses robust statistics (MAD, robust_std) alongside classical ones.
+
+    Parameters
+    ----------
+    original : pd.DataFrame
+        DataFrame with observation data. Must contain ``source_id`` column
+        (implicit index or explicit column) and the ``value_columns``.
+    sidecar : pd.DataFrame
+        DataFrame with ``source_id`` → ``healpix_id`` mapping. In fuzzy mode,
+        one source may map to multiple cells (multiple rows per source_id).
+    value_columns : Sequence[str]
+        Column names in ``original`` to aggregate.
+    aggs : Sequence[str] or None
+        Aggregation function names. Default: ``['mean', 'median', 'std',
+        'robust_std']``. Valid options: ``mean``, ``median``, ``std``,
+        ``min``, ``max``, ``mad``, ``robust_std``.
+    min_count : int
+        Minimum number of observations per HEALPix cell for valid
+        aggregation. Cells with fewer observations output NaN for all
+        statistics. Default is 1.
+    source_id_col : str
+        Name of the source ID column. Default: ``'source_id'``.
+    healpix_col : str
+        Name of the HEALPix ID column. Default: ``'healpix_id'``.
+    sentinel_threshold : float
+        Absolute value threshold for masking sentinel/extreme values.
+        Values with ``|value| >= threshold`` are replaced with NaN.
+        Default: ``1e30``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Aggregated DataFrame with ``healpix_id`` as index and columns
+        named ``{value_column}_{aggregation}`` (e.g., ``r1050_mean``).
     """
 
     if min_count == 0:
@@ -821,42 +860,6 @@ EXAMPLES:
     )
 
     # =========================================================================
-    # SCHEMA INSPECTION (Read-only queries; no aggregation performed)
-    # =========================================================================
-    parser.add_argument(
-        '--schema',
-        action='store_true',
-        help='Display schema of input parquet file (column names, types, metadata) and exit. '
-             'Use this to verify columns exist before running --aggregate. '
-             'Shows Arrow schema and file-level metadata (e.g., pandas index info).'
-    )
-
-    parser.add_argument(
-        '--list-sidecars',
-        action='store_true',
-        help='Scan sidecar directory and display available sidecars with metadata. '
-             'Shows: mode (e.g., "strict"), nside (HEALPix resolution), order ("nested"/"ring"). '
-             'Optionally read row counts with --stats. Use to choose sidecar via --sidecar-index.'
-    )
-
-    parser.add_argument(
-        '--sidecar-schema',
-        type=int,
-        metavar='INDEX',
-        help='Display schema of specific sidecar file by index (0-based). '
-             'First run --list-sidecars to see available indices and metadata. '
-             'Useful for verifying sidecar structure before aggregation.'
-    )
-
-    parser.add_argument(
-        '--stats',
-        action='store_true',
-        help='When used with --list-sidecars, compute and display row counts and '
-             'unique HEALPix cell counts for each sidecar (slower, requires reading files). '
-             'Helps estimate output size and coverage before aggregation.'
-    )
-
-    # =========================================================================
     # AGGREGATION CONTROL
     # =========================================================================
     parser.add_argument(
@@ -1082,20 +1085,36 @@ def process_single_sidecar(
     args: argparse.Namespace,
     use_duckdb: bool
 ) -> Dict:
-    """
-    Process a single sidecar file (aggregation workflow).
+    """Process a single sidecar file through the full aggregation workflow.
 
-    Args:
-        input_file: Original input parquet file
-        sidecar_path: Path to sidecar parquet file
-        sidecar_metadata_json: Loaded metadata from .meta.json
-        sidecars_df: DataFrame with all sidecar metadata
-        sidecar_index: Index of this sidecar in sidecars_df
-        args: Parsed command-line arguments
-        use_duckdb: Whether DuckDB is available and enabled
+    This function orchestrates one sidecar through the complete aggregation
+    pipeline: load data, merge with sidecar, compute aggregations,
+    optionally densify, and write output with metadata.
 
-    Returns:
-        Dictionary with processing summary (status, output_path, etc.)
+    Parameters
+    ----------
+    input_file : Path
+        Original input parquet file.
+    sidecar_path : Path
+        Path to sidecar parquet file.
+    sidecar_metadata_json : dict
+        Loaded metadata from ``.meta.json`` companion file.
+    sidecars_df : pd.DataFrame
+        DataFrame collected by :func:`collect_sidecar_outputs` with all
+        available sidecar metadata.
+    sidecar_index : int
+        Index of this sidecar in ``sidecars_df``.
+    args : argparse.Namespace
+        Parsed command-line arguments controlling aggregation behavior.
+    use_duckdb : bool
+        Whether DuckDB is available and enabled for data loading.
+
+    Returns
+    -------
+    dict
+        Processing summary with keys: ``status`` (``'success'``,
+        ``'skip'``, ``'error'``), ``output_path``, ``metadata_path``,
+        ``n_cells``, ``error`` (if any).
     """
     result = {
         'sidecar_index': sidecar_index,
@@ -1382,32 +1401,6 @@ def run(config):
     if not input_file.is_file():
         raise RuntimeError(f"Not a file: {input_file}")
 
-    # Show schema if requested
-    if _get_config(config, 'schema'):
-        print_parquet_schema(input_file)
-
-    # List sidecars if requested
-    sidecar_dir = _get_config(config, 'sidecar_dir', input_file.parent)
-    if _get_config(config, 'list_sidecars') or _get_config(config, 'sidecar_index') is not None or _get_config(config, 'sidecar_schema') is not None:
-        if not sidecar_dir.exists():
-            raise RuntimeError(f"Sidecar directory not found: {sidecar_dir}")
-
-        sidecars_df = collect_sidecar_outputs(
-            input_file,
-            sidecar_dir,
-            read_stats=_get_config(config, 'stats')
-        )
-
-        if _get_config(config, 'list_sidecars'):
-            print_sidecar_summary(sidecars_df, input_file)
-
-        sidecar_schema = _get_config(config, 'sidecar_schema')
-        if sidecar_schema is not None:
-            if sidecar_schema < 0 or sidecar_schema >= len(sidecars_df):
-                raise RuntimeError(f"Invalid sidecar index: {sidecar_schema}. Valid range: 0-{len(sidecars_df)-1}")
-            sidecar_path = Path(sidecars_df.iloc[sidecar_schema]['file'])
-            print_parquet_schema(sidecar_path)
-
     # Aggregation (single or batch mode)
     sidecar_index = _get_config(config, 'sidecar_index')
     columns = _get_config(config, 'columns')
@@ -1423,6 +1416,7 @@ def run(config):
         elif not columns:
             raise RuntimeError("--columns is required when using --aggregate")
 
+        sidecar_dir = args.sidecar_dir
         if not sidecar_dir.exists():
             raise RuntimeError(f"Sidecar directory not found: {sidecar_dir}")
 
@@ -1511,13 +1505,6 @@ def run(config):
             logger.info("="*80)
 
         logger.info("Aggregation complete!")
-        return 0
-
-    # If no action specified, show help
-    if not (_get_config(config, 'schema') or _get_config(config, 'list_sidecars') or
-            _get_config(config, 'aggregate') or _get_config(config, 'sidecar_schema') is not None):
-        print_parquet_schema(input_file)  # show at least something
-        logger.info("No action specified. Use --schema, --list-sidecars, or --aggregate.")
         return 0
 
     logger.info("Done!")

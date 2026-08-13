@@ -1,4 +1,18 @@
-"""Finalize HEALPix maps from accumulator state."""
+"""Finalize HEALPix maps from accumulator state.
+
+This module implements the **finalization** stage of the healpyxel pipeline.
+It converts the streaming accumulator state (incremental per-cell statistics)
+into final HEALPix statistical maps, optionally densified to the full grid
+and exported as GeoTIFF for visualization or archival.
+
+**Workflow:**
+
+1. Load the accumulator state parquet (with embedded metadata).
+2. Compute final statistics per cell: count, mean, std, min, max, percentiles.
+3. Optionally densify the sparse output to the full HEALPix grid.
+4. Optionally export a column to GeoTIFF (equirectangular projection).
+5. Write output parquet with metadata sidecar.
+"""
 
 from pathlib import Path
 from typing import Optional, List, Dict, Any, Tuple
@@ -38,22 +52,34 @@ def finalize_statistics(
     percentiles: Optional[List[float]] = None,
     min_count: int = 1,
 ) -> pd.DataFrame:
-    """
-    Convert accumulator state to final statistics DataFrame.
+    """Convert accumulator state to final statistics DataFrame.
 
-    Args:
-        state: Accumulator state dictionary {healpix_id: CellAccumulator}
-        percentiles: List of percentiles to compute (e.g., [25, 50, 75])
-        min_count: Minimum observations required per cell (cells below this are NaN)
+    Iterates over all HEALPix cells in the state and computes summary
+    statistics from the accumulated streaming data. Cells with fewer
+    observations than ``min_count`` output NaN for all statistics.
 
-    Returns:
-        DataFrame indexed by healpix_id with statistics columns:
-        - {col}_n: observation count
-        - {col}_mean: mean value
-        - {col}_std: standard deviation
-        - {col}_min: minimum value
-        - {col}_max: maximum value
-        - {col}_p{N}: percentile (if T-Digest available)
+    Percentiles are computed from TDigest data when available. If no
+    TDigest data is present in the state, percentile columns are omitted
+    (set to NaN).
+
+    Parameters
+    ----------
+    state : dict[int, CellAccumulator]
+        Accumulator state from :func:`healpyxel.accumulator.load_state`
+        or :func:`healpyxel.accumulator.accumulate_batch`.
+    percentiles : list[float] or None
+        List of percentiles to compute (e.g., ``[25, 50, 75]``). Default
+        is empty list.
+    min_count : int
+        Minimum observations required per cell. Cells below this
+        threshold get NaN for all statistics (not just percentiles).
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame indexed by ``healpix_id`` with columns:
+        ``{col}_n``, ``{col}_mean``, ``{col}_std``, ``{col}_min``,
+        ``{col}_max``, and ``{col}_p{N}`` (if TDigest available).
     """
     if percentiles is None:
         percentiles = []
@@ -133,16 +159,26 @@ def densify_healpix_map(
     nside: int,
     fill_value: float = np.nan
 ) -> pd.DataFrame:
-    """
-    Create a complete HEALPix grid by filling empty cells with fill_value.
+    """Create a complete HEALPix grid by filling empty cells with fill_value.
 
-    Args:
-        sparse_df: DataFrame with healpix_id index (sparse)
-        nside: HEALPix nside parameter
-        fill_value: Value for empty cells (default: NaN)
+    Expands a sparse DataFrame (only observed cells) to the full HEALPix
+    grid with all ``12 * nside²`` cells. Unobserved cells are filled with
+    ``fill_value`` (NaN by default).
 
-    Returns:
-        Dense DataFrame with all 12*nside**2 cells
+    Parameters
+    ----------
+    sparse_df : pd.DataFrame
+        DataFrame with ``healpix_id`` index (sparse — only observed cells).
+    nside : int
+        HEALPix nside parameter.
+    fill_value : float
+        Value for empty cells. Default: ``NaN``.
+
+    Returns
+    -------
+    pd.DataFrame
+        Dense DataFrame with RangeIndex ``[0, 12*nside²)`` as index,
+        containing all HEALPix cells.
     """
     if not HEALPY_AVAILABLE:
         logger.error("healpy required for densification (pip install healpy)")
@@ -168,10 +204,30 @@ def export_to_geotiff(
     nside: int,
     crs: str = 'IAU:19900',  # Mercury IAU CRS
 ):
-    """
-    Export a column to GeoTIFF format (requires rasterio and healpy).
+    """Export a HEALPix column to GeoTIFF format.
 
-    Note: This creates an equirectangular projection from HEALPix data.
+    Creates an equirectangular projection raster from the HEALPix-gridded
+    data using ``healpy.ang2pix`` for the reprojection. Default output
+    resolution is 1440×720 (0.25° per pixel).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        DataFrame with ``healpix_id`` as index or column.
+    column : str
+        Data column to export.
+    output_path : Path
+        Output GeoTIFF file path.
+    nside : int
+        HEALPix nside parameter of the source data.
+    crs : str
+        CRS string for the output GeoTIFF. Default: ``'IAU:19900'``
+        (Mercury IAU body-fixed frame).
+
+    Raises
+    ------
+    ImportError
+        If ``rasterio`` or ``healpy`` is not available.
     """
     try:
         import rasterio

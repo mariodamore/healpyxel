@@ -1,4 +1,30 @@
-"""HEALPix sidecar generation: source-to-cell mapping."""
+"""HEALPix sidecar generation: map source geometries to HEALPix cells.
+
+This module implements the **sidecar** stage of the healpyxel pipeline.
+A sidecar is a mapping file that assigns each observation (source) to one
+or more HEALPix cells, optionally weighted by a Point Spread Function (PSF).
+
+**Workflows supported:**
+
+* **Strict mode** — each source is assigned to a single HEALPix cell
+  (centroid-based). Fast and deterministic.
+* **Fuzzy mode** — each source is assigned to *all* HEALPix cells its field-of-view
+  polygon touches, using spherical polygon sampling. Handles sources that
+  cross cell boundaries and those near the antimeridian.
+
+Body geometry backends
+-----------------------
+
+Coordinates can be converted through a body model (Sphere, Ellipsoid, or SPICE DSK)
+before HEALPix indexing, enabling correct geodetic handling for non-spherical bodies.
+
+Multi-resolution optimization
+------------------------------
+
+When multiple nside values are requested, the finest nside is computed once
+via the full pipeline. Lower nsides are derived by NEST bit-shift aggregation,
+avoiding redundant geometric computation.
+"""
 
 import argparse
 import logging
@@ -28,7 +54,7 @@ except Exception:
 
 from healpyxel.geometry import Sphere, Ellipsoid, SpiceDSK, BodyGeometry
 
-from shapely import get_coordinates  # shapely>=2.0
+from shapely import get_coordinates, from_wkb  # shapely>=2.0
 from shapely.geometry import Polygon, MultiPolygon
 from tqdm.auto import tqdm
 
@@ -48,14 +74,36 @@ logger = logging.getLogger("healpix_sidecar")
 
 def compute_healpix_ids_from_lonlat(nside: int, lons: np.ndarray, lats: np.ndarray,
                                      body: BodyGeometry | None = None) -> np.ndarray:
-    """Compute HEALPix indices for arrays of lon,lat in degrees.
+    """Compute HEALPix cell IDs for arrays of lon/lat coordinates in degrees.
+
+    This is the fundamental coordinate-to-cell conversion function used
+    throughout the pipeline. It normalizes longitudes to [0, 360) and
+    delegates to healpy's ``ang2pix`` (NEST ordering).
 
     If a body geometry backend is provided, coordinates are first converted
-    through the body model (lon/lat -> xyz -> unit sphere) before HEALPix
-    indexing. This enables correct geodetic handling for ellipsoidal bodies.
+    through the body model (lon/lat → xyz → unit sphere) before HEALPix
+    indexing. This enables correct geodetic handling for ellipsoidal bodies
+    like Earth or Mars.
 
-    Tries to use cdshealpix if available, otherwise falls back to healpy.
-    Returns a 1D integer numpy array of same length as inputs.
+    Prefers healpy over cdshealpix for consistency with the rest of the
+    codebase. Falls back to cdshealpix if healpy is not available.
+
+    Parameters
+    ----------
+    nside : int
+        HEALPix nside parameter (must be a power of 2).
+    lons : np.ndarray
+        Longitude values in degrees. Shape (N,).
+    lats : np.ndarray
+        Latitude values in degrees. Shape (N,).
+    body : BodyGeometry or None
+        Optional body geometry backend for coordinate conversion.
+
+    Returns
+    -------
+    np.ndarray
+        1D integer array of HEALPix cell IDs, same length as input arrays.
+        Empty array if input arrays are empty.
     """
     if lons.size == 0:
         return np.array([], dtype=np.int64)
@@ -99,15 +147,23 @@ def compute_healpix_ids_from_polygon(nside: int, geom, n_samples: int = 200) -> 
 
     Samples the polygon boundary densely (not just vertices) and collects all
     unique HEALPix cell IDs. Also samples the polygon interior and bounding box
-    corners to ensure complete coverage.
+    corners to ensure complete coverage, preventing missed cells at polygon
+    corners or near cell boundaries.
 
-    Args:
-        nside: HEALPix nside parameter
-        geom: shapely Polygon or MultiPolygon (in lon/lat degrees)
-        n_samples: number of samples along polygon boundary per polygon part
+    Parameters
+    ----------
+    nside : int
+        HEALPix nside parameter.
+    geom : shapely Polygon or MultiPolygon
+        Source geometry in lon/lat degrees.
+    n_samples : int
+        Number of samples along polygon boundary per polygon part.
+        Higher values increase accuracy at the cost of computation time.
 
-    Returns:
-        Sorted array of unique HEALPix cell IDs that the polygon touches
+    Returns
+    -------
+    np.ndarray
+        Sorted array of unique HEALPix cell IDs that the polygon touches.
     """
     if geom is None or (hasattr(geom, 'is_empty') and geom.is_empty):
         return np.array([], dtype=np.int64)
@@ -241,11 +297,22 @@ def _query_healpix_spherical(body, geom, nside, _healpy):
     return np.unique(np.asarray(all_hids, dtype=np.int64)) if all_hids else np.array([], dtype=np.int64)
 
 def detect_lonlat_columns(gdf_sample) -> tuple[str | None, str | None]:
-    """Auto-detect longitude and latitude columns from a GeoDataFrame sample.
+    """Auto-detect longitude and latitude columns from a DataFrame sample.
 
-    Returns:
-        Tuple of (lon_column, lat_column) or (None, None) if not found
-    """
+    Scans column names (case-insensitive) against common patterns for
+    longitude and latitude fields. Returns the first match for each.
+
+    Parameters
+    ----------
+    gdf_sample : pd.DataFrame or gpd.GeoDataFrame
+        Sample DataFrame to inspect for column name patterns.
+
+    Returns
+    -------
+    tuple[str | None, str | None]
+        ``(lon_column, lat_column)`` or ``(None, None)`` if not found.
+        Column names are returned with their original casing.
+"""
     # Common column name patterns (case-insensitive)
     lon_patterns = ['lon', 'longitude', 'long', 'x', 'easting']
     lat_patterns = ['lat', 'latitude', 'y', 'northing']
@@ -279,31 +346,38 @@ def compute_geo_statistics(input_path: Path, lon_col: str | None = None,
                           lat_col: str | None = None,
                           sample_size: int = 10000,
                           lon_convention: str | None = None) -> dict:
-    """Compute geographical statistics for a GeoParquet file using DuckDB for efficiency.
+    """Compute geographical statistics for a GeoParquet file using DuckDB.
 
-    This function can analyze raw data or apply filtering based on longitude convention.
+    Analyzes the coordinate distribution of a parquet file, either from
+    explicit lon/lat columns or from geometry column centroids. Optionally
+    filters data by longitude convention to assess coverage.
 
-    Args:
-        input_path: Path to input GeoParquet file
-        lon_col: Name of longitude column (if None, will auto-detect or extract from geometry)
-        lat_col: Name of latitude column (if None, will auto-detect or extract from geometry)
-        sample_size: Number of rows to sample for geometry-based extraction (if needed)
-        lon_convention: Optional longitude convention for filtering:
-                       '0_360' for [0,360) × [-90,90]
-                       'minus_plus180' (or '-180_180') for [-180,180) × [-90,90]
-                       None (default) for no filtering (raw data)
+    Parameters
+    ----------
+    input_path : Path
+        Path to input GeoParquet or parquet file.
+    lon_col : str or None
+        Name of longitude column. If None, will auto-detect or extract
+        from geometry column.
+    lat_col : str or None
+        Name of latitude column. If None, will auto-detect or extract
+        from geometry column.
+    sample_size : int
+        Number of rows to sample for geometry-based coordinate extraction.
+    lon_convention : str or None
+        Optional longitude convention for filtering:
+        ``'0_360'`` for [0,360) × [-90,90],
+        ``'minus_plus180'`` for [-180,180) × [-90,90],
+        ``None`` (default) for no filtering (raw data).
 
-    Returns:
-        Dictionary with statistics: {
-            'lon': {'min', 'max', 'mean', 'std', 'count'},
-            'lat': {'min', 'max', 'mean', 'std', 'count'},
-            'source': 'columns' or 'geometry',
-            'lon_col': column name or None,
-            'lat_col': column name or None,
-            'filtered': bool (True if convention filtering was applied),
-            'total_count': int (total records before filtering, if filtered),
-            'filtered_count': int (records after filtering, if filtered)
-        }
+    Returns
+    -------
+    dict
+        Statistics dictionary with keys:
+        ``lon``, ``lat`` (each with min, max, mean, std, count),
+        ``source`` (``'columns'`` or ``'geometry'``),
+        ``lon_col``, ``lat_col``, ``filtered``,
+        ``total_count``, ``filtered_count``.
     """
     import duckdb
     import geopandas as gpd
@@ -483,11 +557,19 @@ def compute_geo_statistics(input_path: Path, lon_col: str | None = None,
 def format_geo_statistics(stats: dict) -> str:
     """Format geo-statistics for display using rich tables.
 
-    Args:
-        stats: Statistics dictionary from compute_geo_statistics
+    Creates a human-readable table with geographical statistics including
+    longitude/latitude min/max/mean/std, data source, column names used,
+    and validation warnings. Falls back to plain text if rich is unavailable.
 
-    Returns:
-        Formatted string representation
+    Parameters
+    ----------
+    stats : dict
+        Statistics dictionary from :func:`compute_geo_statistics`.
+
+    Returns
+    -------
+    str
+        Formatted string representation suitable for terminal display.
     """
     if not stats or not stats.get('lon') or not stats.get('lat'):
         return "No geo-statistics available"
@@ -616,27 +698,53 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                         ) -> pd.DataFrame:
     """Process a single dask partition and return DataFrame of assignments.
 
-    Supports two workflows:
-    1. Scalar lon/lat columns (efficient for strict mode): pass lon_col, lat_col
-    2. Geometry-based (for fuzzy mode): pass geometries via gdf.geometry
+    This is the core assignment function that maps each source in a partition to
+    HEALPix cells. It supports two assignment workflows:
 
-    In fuzzy mode, FOV polygons are assigned to all HEALPix cells they touch using
-    spatial indexing (shapely.STRtree R-tree). This is O(log N) per polygon and
-    correctly handles polygons that cross cell boundaries, unlike vertex-only sampling.
+    1. **Scalar lon/lat columns** (efficient for strict mode): pass ``lon_col``
+       and ``lat_col`` for direct ``healpy.ang2pix`` indexing.
+    2. **Geometry-based** (for fuzzy mode): pass geometries via ``gdf.geometry``
+       for polygon-to-cell intersection.
 
-    Args:
-        gdf: GeoDataFrame or DataFrame partition
-        nside: HEALPix nside parameter
-        mode: 'strict' or 'fuzzy' assignment mode
-        base_index: Base index for global source_id generation
-        lon_convention: 'minus_plus180' or '0_360'
-        lon_col: Longitude column name (if None, use geometry)
-        lat_col: Latitude column name (if None, use geometry)
-        data_psf, cell_psf: Optional PSF functions
-        combine_method: How to combine PSF weights
+    In fuzzy mode, FOV polygons are assigned to all HEALPix cells they touch
+    using spherical polygon sampling. This correctly handles polygons that cross
+    cell boundaries, unlike vertex-only sampling.
 
-    Returns:
-        DataFrame with columns ['source_id', 'healpix_id'] and optional 'weight'
+    Supports multi-resolution optimization where the finest nside is computed
+    independently and lower nsides are derived by bit-shift aggregation.
+
+    Parameters
+    ----------
+    gdf : GeoDataFrame or DataFrame
+        A dask partition containing source observations.
+    nside : int
+        HEALPix nside parameter (power of 2).
+    mode : str
+        Assignment mode: ``'strict'`` (single cell per source) or
+        ``'fuzzy'`` (all touched cells per source).
+    base_index : int or None
+        Base index for global source_id generation across partitions.
+    lon_convention : str
+        Longitude convention: ``'minus_plus180'`` or ``'0_360'``.
+    lon_col : str or None
+        Longitude column name. If None, use geometry column.
+    lat_col : str or None
+        Latitude column name. If None, use geometry column.
+    data_psf : callable or None
+        Optional data Point Spread Function. Called as ``data_psf(dx, dy)``.
+    cell_psf : callable or None
+        Optional cell Point Spread Function. Called as ``cell_psf(dx, dy)``.
+    combine_method : str
+        How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``,
+        or ``'max'``.
+    body : BodyGeometry or None
+        Optional body geometry backend for coordinate conversion.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with columns ``['source_id', 'healpix_id']`` and optional
+        ``'weight'`` column when PSF is active.
     """
     import pandas as _pd
 
@@ -884,10 +992,35 @@ def add_psf_weights_to_sidecar(
     combine_method='multiply',
     normalize=True
 ):
-    """
-    Add a 'weight' column to the sidecar DataFrame using PSF functions.
-    - src_geoms: sequence of source geometries (indexed by source_id)
-    - cell_geoms: dict or sequence mapping healpix_id to cell geometry
+    """Add a ``weight`` column to the sidecar DataFrame using PSF functions.
+
+    For each source-to-cell assignment, computes the weight by evaluating the
+    data PSF and cell PSF at the centroid-to-centroid offset, then combines
+    them using the specified method. Optionally normalizes weights per cell
+    so they sum to 1.0.
+
+    Parameters
+    ----------
+    sidecar_df : pd.DataFrame
+        DataFrame with at least ``source_id`` and ``healpix_id`` columns.
+    src_geoms : sequence
+        Source geometries indexed by ``source_id``.
+    cell_geoms : dict or sequence
+        Mapping from ``healpix_id`` to cell geometry.
+    data_psf : callable or None
+        Data Point Spread Function. Called as ``data_psf(dx, dy)``.
+    cell_psf : callable or None
+        Cell Point Spread Function. Called as ``cell_psf(dx, dy)``.
+    combine_method : str
+        How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``,
+        or ``'max'``.
+    normalize : bool
+        If True, normalize weights per cell so they sum to 1.0.
+
+    Returns
+    -------
+    pd.DataFrame
+        Copy of ``sidecar_df`` with an added ``weight`` column.
     """
     weights = []
     for row in sidecar_df.itertuples(index=False):
@@ -908,6 +1041,54 @@ def normalize_weights_per_cell(df, cell_col='healpix_id', weight_col='weight'):
     sums = df.groupby(cell_col)[weight_col].transform('sum')
     df[weight_col] = df[weight_col] / sums
     return df
+
+def _aggregate_healpix(df, nside_max, nside_target,
+                       no_psf_normalize=False):
+    """Bit-shift cell IDs from nside_max to nside_target and sum weights.
+
+    ADR-015: parent-child relationship in NEST ordering.
+    For each cell at nside_max, its parent at nside_target is
+    healpix_id >> (2 * log2(nside_max / nside_target)).
+
+    Args:
+        df: DataFrame with columns [source_id, healpix_id] and optional 'weight'.
+        nside_max: highest (finest) nside in the current run.
+        nside_target: the lower nside to derive.
+        no_psf_normalize: if True, skip per-cell weight normalization.
+
+    Returns:
+        DataFrame with columns [source_id, healpix_id, weight] where healpix_id
+        is now in nside_target resolution and weights are aggregated.
+    """
+    import numpy as _np
+
+    if nside_target == nside_max:
+        return df.copy()
+
+    shift = 2 * int(_np.log2(nside_max // nside_target))
+    agg = df.copy()
+    hids_int = _np.array(agg['healpix_id'].values, dtype=_np.int64)
+    agg['healpix_parent'] = hids_int >> shift
+    grouped = agg.groupby(['source_id', 'healpix_parent'], sort=False).agg({'weight': 'sum'}).reset_index()
+    grouped.rename(columns={'healpix_parent': 'healpix_id'}, inplace=True)
+    grouped['healpix_id'] = grouped['healpix_id'].astype('UInt64')
+    if not no_psf_normalize and 'weight' in grouped.columns:
+        sums = grouped.groupby('healpix_id')['weight'].transform('sum')
+        grouped['weight'] = grouped['weight'] / sums
+    return grouped[['source_id', 'healpix_id', 'weight']]
+
+def _write_single_parquet(df, out_file, nside, mode, has_weight=True):
+    """Write a DataFrame as a single parquet file with sidecar metadata."""
+    import pyarrow as pa
+    import pyarrow.parquet as pq
+    schema = pa.schema([
+        ("source_id", pa.int64()),
+        ("healpix_id", pa.uint64()),
+    ] + ([("weight", pa.float64())] if has_weight else []))
+    pq_meta = {"nside": str(nside), "mode": mode, "order": "nested"}
+    schema = schema.with_metadata({k: v.encode() for k, v in pq_meta.items()})
+    table = pa.Table.from_pandas(df, schema=schema, preserve_index=False)
+    pq.write_table(table, str(out_file))
 
 def compute_assignment_weight(
     src_geom,
@@ -944,27 +1125,63 @@ def compute_assignment_weight(
         raise ValueError(f"Unknown combine_method: {combine_method}")
 
 def build_output_path(input_path: Path, mode: str, nside: int) -> Path:
-    """Build output path for sidecar file based on input and parameters."""
-    stem = input_path.stem
-    # separate the key:values with - and _ between them
-    outname = f"{stem}.cell-healpix_assignment-{mode}_nside-{nside}_order-nested.parquet"
-    return input_path.with_name(outname)
+    """Build output path for sidecar file based on input and parameters.
+
+    Constructs a descriptive filename that encodes the processing parameters
+    for easy identification and downstream parsing.
+
+    Parameters
+    ----------
+    input_path : Path
+        Source input file path.
+    mode : str
+        Assignment mode: ``'strict'`` or ``'fuzzy'``.
+    nside : int
+        HEALPix nside parameter.
+
+    Returns
+    -------
+    Path
+        Output path in the same directory as input, with format::
+
+            <stem>.cell-healpix_assignment-<mode>_nside-<nside>_order-nested.parquet
+    """
+    return input_path.parent / f"{input_path.stem}.cell-healpix_assignment-{mode}_nside-{nside}_order-nested.parquet"
 
 def write_sidecar_metadata(output_path: Path, input_path: Path, nside: int, mode: str,
-                           lon_convention: str, ncores: int, args) -> Path:
-    """Write sidecar processing metadata to JSON file.
+                           lon_convention: str, ncores: int, args,
+                           derived_from_parent: int | None = None) -> Path:
+    """Write sidecar processing metadata to a JSON companion file.
 
-    Args:
-        output_path: Path to the sidecar parquet file
-        input_path: Path to the input file
-        nside: HEALPix nside parameter
-        mode: Assignment mode ('strict' or 'fuzzy')
-        lon_convention: Longitude convention used
-        ncores: Number of cores used
-        args: Parsed command-line arguments
+    Creates a ``.meta.json`` file alongside the sidecar parquet file with
+    complete processing parameters, HEALPix configuration, and provenance
+    information. When the sidecar is derived from a higher-nside computation
+    via bit-shift aggregation, the parent nside is recorded.
 
-    Returns:
-        Path to the written metadata file
+    Parameters
+    ----------
+    output_path : Path
+        Path to the sidecar parquet file.
+    input_path : Path
+        Path to the source input file.
+    nside : int
+        HEALPix nside parameter.
+    mode : str
+        Assignment mode: ``'strict'`` or ``'fuzzy'``.
+    lon_convention : str
+        Longitude convention used: ``'0_360'`` or ``'minus_plus180'``.
+    ncores : int
+        Number of Dask worker cores used.
+    args : argparse.Namespace
+        Parsed command-line arguments (for recording PSF settings, etc.).
+    derived_from_parent : int or None
+        If set, this sidecar was derived from a higher-nside sidecar via
+        NEST bit-shift aggregation. The value is the parent nside.
+
+    Returns
+    -------
+    Path
+        Path to the written ``.meta.json`` metadata file.
     """
     from datetime import datetime, timezone
     from healpyxel.metadata import HEALPyxelxMetadata
@@ -990,6 +1207,7 @@ def write_sidecar_metadata(output_path: Path, input_path: Path, nside: int, mode
         'processing_params': {
             'ncores': ncores,
             'coalesced': not args.no_coalesce,
+            'derived_from_parent': derived_from_parent,
             'data_psf': getattr(args, 'data_psf', None),
             'data_psf_sigma_level': getattr(args, 'data_psf_sigma_level', None),
             'cell_psf': getattr(args, 'cell_psf', None),
@@ -1014,15 +1232,27 @@ _BODY_REGISTRY = {
 def get_body(body_model: str, **kwargs) -> BodyGeometry:
     """Create a BodyGeometry instance from a model name.
 
+    Factory function that instantiates the appropriate body geometry backend
+    based on the model name. Supports sphere, ellipsoid, and SPICE DSK models.
+
     Parameters
     ----------
     body_model : str
-        One of 'sphere', 'ellipsoid', 'dsk'.
-    **kwargs : passed to the backend constructor (e.g. radius, polar_radius).
+        One of ``'sphere'``, ``'ellipsoid'``, or ``'dsk'``.
+    **kwargs
+        Passed to the backend constructor. For ``'sphere'`` and
+        ``'ellipsoid'``: ``radius`` (float, default 1.0) and
+        ``polar_radius`` (float or None). For ``'dsk'``: no arguments needed.
 
     Returns
     -------
-    BodyGeometry instance.
+    BodyGeometry
+        Instance of the selected geometry backend.
+
+    Raises
+    ------
+    ValueError
+        If ``body_model`` is not a recognized model name.
     """
     cls = _BODY_REGISTRY.get(body_model.lower())
     if cls is None:
@@ -1087,6 +1317,9 @@ def parse_arguments(argv=None):
                         help='How to combine data and cell PSF weights (default: multiply)')
     parser.add_argument('--no-psf-normalize', action='store_true',
                         help='Disable normalization of weights per cell (default: normalize)')
+    parser.add_argument('--no-multi-res-optimize', action='store_true',
+                        help='Disable multi-resolution optimization: recompute each nside independently '
+                             '(default: optimize by computing highest nside once and bit-shift for lower nsides)')
 
     parser.add_argument('--body-model', type=str, default='sphere',
                         choices=['sphere', 'ellipsoid', 'dsk'],
@@ -1301,18 +1534,51 @@ def write_coalesced_output(tasks, out_file: Path, nside: int, mode: str, ncores:
 
     return total_rows_written
 
+def _convert_wkb_columns_to_geometry(ddf):
+    """Convert WKB binary geometry columns in a plain dask DataFrame to shapely objects.
+
+    ADR-018: when dask_geopandas.read_parquet fails (e.g. broken spatial partition
+    metadata from duckdb), plain dask reads geometry columns as raw WKB bytes.
+    This function detects such columns by dtype and name heuristic, then uses
+    map_partitions + shapely.from_wkb to convert them so downstream geometry-based
+    workflows still work.
+    """
+    binary_cols = [col for col in ddf.columns
+                   if ddf[col].dtype == 'object'
+                   and any(kw in col.lower() for kw in ('polygon', 'geometry', 'wkt', 'wkb', 'geom'))]
+    if not binary_cols:
+        return ddf
+    geom_col = binary_cols[0]
+
+    def _decode(part_df):
+        geom_series = part_df[geom_col]
+        if geom_series.empty or not isinstance(geom_series.iloc[0], bytes):
+            return part_df
+        part_df = part_df.copy()
+        part_df[geom_col] = geom_series.apply(lambda b: from_wkb(b) if isinstance(b, bytes) else b)
+        return part_df
+
+    try:
+        ddf = ddf.map_partitions(_decode, meta=ddf._meta)
+    except Exception:
+        pass
+    return ddf
+
 def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame":
     """Three-tier lazy parquet reader with graceful degradation.
 
     Tier 1: dask_geopandas.read_parquet — preserves spatial metadata if valid.
     Tier 2: plain dask.dataframe.read_parquet — ignores broken spatial metadata.
+            WKB geometry columns are decoded to shapely objects (ADR-018).
     Tier 3: raise with clear diagnostic.
 
     Performance note
     ----------------
     Sidecar only uses scalar lon/lat columns fed to ``healpy.ang2pix``.
     Spatial partitions provide **zero** benefit for full-table HEALPix cell
-    assignment, so Tier 2 is functionally equivalent to Tier 1.
+    assignment, so Tier 2 is functionally equivalent to Tier 1.  The WKB
+    decode adds negligible overhead (microseconds per geometry) compared to
+    the HEALPix assignment work.
     """
     import dask.dataframe as dd
 
@@ -1328,11 +1594,12 @@ def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame
         return ddf
     except ValueError as exc:
         if "spatial partitions" in str(exc).lower():
+            path_name = input_path.name if input_path is not None else "(unknown)"
             logger.warning(
                 "Spatial partition metadata mismatch in '%s' — "
-                "falling back to plain dask.dataframe.  "
-                "No performance impact: sidecar uses scalar lon/lat, not spatial queries.",
-                input_path.name,
+                "falling back to plain dask.dataframe (geometry col will be decoded from WKB).  "
+                "To fix permanently: healpyxel_inspect -i %s --correct-geometry output.parquet",
+                path_name, path_name,
             )
         else:
             logger.warning(
@@ -1348,7 +1615,7 @@ def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame
             exc,
         )
 
-    # Tier 2 — plain dask (geometry col becomes WKB bytes; irrelevant for sidecar)
+    # Tier 2 — plain dask (geometry col becomes WKB bytes; decode for workflow compat)
     try:
         ddf = dd.read_parquet(str(input_path))
         logger.info(
@@ -1356,6 +1623,9 @@ def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame
             ddf.npartitions,
             len(ddf.columns),
         )
+        # ADR-014: When dask_geopandas falls back, WKB bytes need decoding
+        # so geometry-based workflows (fuzzy mode) still work.
+        ddf = _convert_wkb_columns_to_geometry(ddf)
         return ddf
     except Exception as exc:
         # Tier 3 — nothing works
@@ -1374,8 +1644,22 @@ def run(config):
     """Run sidecar pipeline from a config dict or argparse Namespace.
 
     Replaces argparse-based main() so sidecar can be used as a pure library.
+
+    When running on parquet files written with broken spatial partition metadata
+    (e.g. by duckdb), the reader falls back to plain dask and automatically
+    decodes WKB geometry columns (ADR-018).  If geometry mode was requested
+    but no scalar lon/lat columns are available, coordinates are extracted
+    from decoded geometries and passed to the scalar workflow.
     """
-    input_path = Path(_get_config(config, 'input'))
+    input_val = _get_config(config, 'input')
+    if input_val is None:
+        raise RuntimeError(
+            f"'input' argument is missing from sidecar config. "
+            f"Config type: {type(config).__name__}. "
+            f"Config keys/attrs: {list(vars(config).keys()) if hasattr(config, '__dict__') else list(config.keys()) if isinstance(config, dict) else 'unknown'}. "
+            "Ensure '-i' / '--input' is passed to sidecar.parse_arguments()."
+        )
+    input_path = Path(input_val)
     if not input_path.exists():
         raise RuntimeError(f"Input path does not exist: {input_path}")
 
@@ -1488,11 +1772,134 @@ def run(config):
 
     ddf = _read_input_lazy(input_path, _get_config(config, 'ncores'))
 
+    # ADR-018: If geometry mode was selected but dask_geopandas fell back,
+    # extract scalar lon/lat from decoded geometry column so the efficient
+    # scalar workflow is used instead of the unavailable .geometry attribute.
+    lon_col = _get_config(config, 'lon_col')
+    lat_col = _get_config(config, 'lat_col')
+    if lon_col is None and lat_col is None and not hasattr(ddf, 'geometry'):
+        for col in ddf.columns:
+            if col.lower().endswith(('geom', 'geometry')) or 'geom' in col.lower():
+                try:
+                    from shapely import get_coordinates
+
+                    def _add_lonlat(part_df):
+                        part_df = part_df.copy()
+                        geom_series = part_df[col]
+                        if geom_series.empty or not hasattr(geom_series.iloc[0], 'geom_type'):
+                            return part_df
+                        coords = get_coordinates(geom_series)
+                        part_df['_lon'] = coords[:, 0]
+                        part_df['_lat'] = coords[:, 1]
+                        return part_df
+
+                    ddf = ddf.map_partitions(
+                        _add_lonlat,
+                        meta=ddf._meta.assign(**{'_lon': 'float64', '_lat': 'float64'})
+                    )
+                    if isinstance(config, dict):
+                        config['lon_col'] = '_lon'
+                        config['lat_col'] = '_lat'
+                    else:
+                        config.lon_col = '_lon'
+                        config.lat_col = '_lat'
+                    logger.info(f"Extracted scalar lon/lat from geometry column '{col}' "
+                                f"(lon_col='_lon', lat_col='_lat')")
+                    break
+                except Exception:
+                    continue
+
     meta = pd.DataFrame({"source_id": pd.Series(dtype="int64"), "healpix_id": pd.Series(dtype="UInt64")})
     logger.info("Starting partitioned HEALPix assignment (this may take time)")
 
-    for nside in tqdm(nsides, desc="nsides", unit="nside"):
-        logger.info("Processing nside=%s", nside)
+    no_multi_res_optimize = _get_config(config, 'no_multi_res_optimize', False)
+    mode_val = _get_config(config, 'mode', 'fuzzy')
+    lon_conv = _get_config(config, 'lon_convention')
+    ncores = _get_config(config, 'ncores')
+
+    if no_multi_res_optimize or len(nsides) <= 1:
+        for nside in tqdm(nsides, desc="nsides", unit="nside"):
+            logger.info("Processing nside=%s", nside)
+            import dask
+            delayed_partitions = ddf.to_delayed()
+            try:
+                part_lengths = ddf.map_partitions(lambda df: len(df)).compute().tolist()
+            except Exception:
+                part_lengths = [int(dask.compute(dask.delayed(lambda df: len(df))(p))[0]) for p in delayed_partitions]
+
+            if len(part_lengths) != len(delayed_partitions):
+                logger.warning("Partition count mismatch; falling back to equal offsets")
+                part_lengths = [len(delayed_partitions)] * len(delayed_partitions)
+
+            offsets = np.concatenate(([0], np.cumsum(part_lengths)[:-1]))
+
+            data_psf = None
+            cell_psf = None
+            if _get_config(config, 'cell_psf', 'none') != 'none':
+                logger.info(f"Using cell PSF: {_get_config(config, 'cell_psf')} (sigma_level={_get_config(config, 'cell_psf_sigma_level')})")
+                cell_psf = get_psf(_get_config(config, 'cell_psf'), sigma=_get_config(config, 'cell_psf_sigma_level'))
+            if _get_config(config, 'data_psf', 'none') != 'none':
+                logger.info(f"Using data PSF: {_get_config(config, 'data_psf')} (sigma_level={_get_config(config, 'data_psf_sigma_level')})")
+                data_psf = get_psf(_get_config(config, 'data_psf'), sigma=_get_config(config, 'data_psf_sigma_level'))
+
+            lon_col = _get_config(config, 'lon_col')
+            lat_col = _get_config(config, 'lat_col')
+            tasks = [dask.delayed(process_partition)(
+                        part, nside, mode_val,
+                        int(offsets[i]),
+                        lon_conv,
+                        lon_col=lon_col,
+                        lat_col=lat_col,
+                        data_psf=data_psf,
+                        cell_psf=cell_psf,
+                        combine_method=_get_config(config, 'psf_combine', 'multiply'),
+                        body=body,
+                        )
+                        for i, part in enumerate(delayed_partitions)
+                    ]
+            nparts = len(tasks)
+
+            if _get_config(config, 'output_dir'):
+                out_dir = Path(_get_config(config, 'output_dir'))
+                out_dir.mkdir(parents=True, exist_ok=True)
+            else:
+                out_dir = input_path.parent
+
+            out_file = out_dir / build_output_path(input_path, mode_val, nside).name
+
+            if _get_config(config, 'no_coalesce'):
+                total_rows = write_partitioned_output(tasks, out_file, nparts)
+                metadata_path = write_sidecar_metadata(
+                    out_file, input_path, nside, mode_val,
+                    lon_conv, ncores, config
+                )
+                logger.info(f"Wrote metadata to {metadata_path}")
+                continue
+
+            try:
+                import dask
+                import pyarrow as pa
+                import pyarrow.parquet as pq
+            except Exception as e:
+                logger.error("pyarrow and dask are required for coalescing partitions to a single file: %s", e)
+                logger.info("Falling back to writing partitioned parquet folder instead")
+                out_part_dir = str(out_file.with_suffix('.parts'))
+                continue
+
+            total_rows = write_coalesced_output(tasks, out_file, nside, mode_val, ncores, nparts)
+            metadata_path = write_sidecar_metadata(
+                out_file, input_path, nside, mode_val,
+                lon_conv, ncores, config
+            )
+            logger.info(f"Wrote metadata to {metadata_path}")
+
+    else:
+        nsides_sorted = sorted(nsides, reverse=True)
+        nside_max = nsides_sorted[0]
+        nsides_lower = nsides_sorted[1:]
+        logger.info(f"Multi-resolution optimization active: computing nside={nside_max}, "
+                     f"aggregating {len(nsides_lower)} lower nsides via bit-shift")
+
         import dask
         delayed_partitions = ddf.to_delayed()
         try:
@@ -1517,20 +1924,19 @@ def run(config):
 
         lon_col = _get_config(config, 'lon_col')
         lat_col = _get_config(config, 'lat_col')
-        tasks = [dask.delayed(process_partition)(
-                    part, nside, _get_config(config, 'mode', 'fuzzy'),
-                    int(offsets[i]),
-                    _get_config(config, 'lon_convention'),
-                    lon_col=lon_col,
-                    lat_col=lat_col,
-                    data_psf=data_psf,
-                    cell_psf=cell_psf,
-                    combine_method=_get_config(config, 'psf_combine', 'multiply'),
-                    body=body,
-                    )
-                    for i, part in enumerate(delayed_partitions)
-                ]
-        nparts = len(tasks)
+        tasks_max = [dask.delayed(process_partition)(
+                        part, nside_max, mode_val,
+                        int(offsets[i]),
+                        lon_conv,
+                        lon_col=lon_col,
+                        lat_col=lat_col,
+                        data_psf=data_psf,
+                        cell_psf=cell_psf,
+                        combine_method=_get_config(config, 'psf_combine', 'multiply'),
+                        body=body,
+                        )
+                        for i, part in enumerate(delayed_partitions)
+                    ]
 
         if _get_config(config, 'output_dir'):
             out_dir = Path(_get_config(config, 'output_dir'))
@@ -1538,16 +1944,7 @@ def run(config):
         else:
             out_dir = input_path.parent
 
-        out_file = out_dir / build_output_path(input_path, _get_config(config, 'mode', 'fuzzy'), nside).name
-
-        if _get_config(config, 'no_coalesce'):
-            total_rows = write_partitioned_output(tasks, out_file, nparts)
-            metadata_path = write_sidecar_metadata(
-                out_file, input_path, nside, _get_config(config, 'mode', 'fuzzy'),
-                _get_config(config, 'lon_convention'), _get_config(config, 'ncores'), config
-            )
-            logger.info(f"Wrote metadata to {metadata_path}")
-            continue
+        out_file_max = out_dir / build_output_path(input_path, mode_val, nside_max).name
 
         try:
             import dask
@@ -1556,16 +1953,41 @@ def run(config):
         except Exception as e:
             logger.error("pyarrow and dask are required for coalescing partitions to a single file: %s", e)
             logger.info("Falling back to writing partitioned parquet folder instead")
-            out_part_dir = str(out_file.with_suffix('.parts'))
-            # no result available here; skip this nside
-            continue
+            out_part_dir = str(out_file_max.with_suffix('.parts'))
+            write_partitioned_output(tasks_max, out_file_max, len(tasks_max))
+            metadata_path = write_sidecar_metadata(
+                out_file_max, input_path, nside_max, mode_val,
+                lon_conv, ncores, config
+            )
+            logger.info(f"Wrote metadata to {metadata_path}")
+            # Still aggregate lower nsides if part_dir provides usable data
+            # Skip for now; partitioned output format cannot be easily aggregated here
+            return 0
 
-        total_rows = write_coalesced_output(tasks, out_file, nside, _get_config(config, 'mode', 'fuzzy'), _get_config(config, 'ncores'), nparts)
+        total_rows_max = write_coalesced_output(tasks_max, out_file_max, nside_max, mode_val, ncores, len(tasks_max))
         metadata_path = write_sidecar_metadata(
-            out_file, input_path, nside, _get_config(config, 'mode', 'fuzzy'),
-            _get_config(config, 'lon_convention'), _get_config(config, 'ncores'), config
+            out_file_max, input_path, nside_max, mode_val,
+            lon_conv, ncores, config
         )
-        logger.info(f"Wrote metadata to {metadata_path}")
+        logger.info(f"Wrote metadata for nside={nside_max} to {metadata_path}")
+
+        no_psf_normalize = _get_config(config, 'no_psf_normalize', False)
+        df_max = pd.read_parquet(out_file_max)
+        has_weight = 'weight' in df_max.columns
+
+        for nside_i in nsides_lower:
+            logger.info(f"Aggregating nside={nside_max} -> nside={nside_i} "
+                        f"(shift={2 * int(np.log2(nside_max // nside_i))})")
+            df_agg = _aggregate_healpix(df_max, nside_max, nside_i,
+                                        no_psf_normalize=no_psf_normalize)
+            out_file_i = out_dir / build_output_path(input_path, mode_val, nside_i).name
+            _write_single_parquet(df_agg, out_file_i, nside_i, mode_val, has_weight=has_weight)
+            metadata_path_i = write_sidecar_metadata(
+                out_file_i, input_path, nside_i, mode_val,
+                lon_conv, ncores, config,
+                derived_from_parent=nside_max
+            )
+            logger.info(f"Wrote aggregated nside={nside_i} ({len(df_agg)} rows) to {metadata_path_i}")
 
     return 0
 

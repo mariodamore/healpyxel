@@ -12,7 +12,21 @@ from enum import Enum
 class FileType(str, Enum):
     """Pipeline file type discriminator.
 
-    Used to identify which stage of the HEALPix pipeline produced a parquet file.
+    Identifies which stage of the healpyxel pipeline produced a parquet file.
+    Used for validation and auto-detection of file types.
+
+    Values
+    -------
+    SIDECAR : ``'sidecar'``
+        Source-to-cell mapping file.
+    AGGREGATE : ``'aggregate'``
+        Aggregated HEALPix statistics.
+    ACCUMULATOR : ``'accumulator'``
+        Streaming accumulator state (intermediate).
+    FINALIZE : ``'finalize'``
+        Final HEALPix statistical map.
+    GEOSPATIAL : ``'geospatial'``
+        GeoParquet with HEALPix geometry.
     """
     SIDECAR = 'sidecar'
     AGGREGATE = 'aggregate'
@@ -24,23 +38,37 @@ class FileType(str, Enum):
 class HEALPyxelxMetadata:
     """Validated HEALPix grid metadata with embedded parquet I/O.
 
-    All aggregate/sidecar parquet files should embed this in their schema
-    to ensure metadata/data consistency.
+    Central metadata class for all healpyxel pipeline files. Encodes the
+    HEALPix configuration (nside, order, mode, lon_convention) and provides
+    serialization to/from parquet schema metadata and companion JSON files.
 
-    Attributes:
-        nside: HEALPix resolution parameter (must be power of 2)
-        order: Pixel ordering scheme ('nested' or 'ring')
-        npix: Total number of pixels (auto-computed from nside if None)
-        mode: Cell assignment mode ('strict' or 'fuzzy')
-        lon_convention: Longitude convention ('0_360' or '-180_180'). Value 'minus_plus180' is accepted and normalized to '-180_180'.
-        file_type: Pipeline stage that produced this file (optional)
+    All aggregate/sidecar parquet files embed this metadata in their Arrow
+    schema to ensure metadata/data consistency across the pipeline.
 
-    Examples:
-        >>> meta = HEALPyxelxMetadata(nside=32, order='nested')
-        >>> meta.npix
-        12288
-        >>> meta.nest
-        True
+    Attributes
+    ----------
+    nside : int
+        HEALPix resolution parameter (must be a power of 2).
+    order : str
+        Pixel ordering scheme: ``'nested'`` or ``'ring'``.
+    npix : int or None
+        Total number of pixels. Auto-computed from ``nside`` if None.
+    mode : str
+        Cell assignment mode: ``'strict'`` or ``'fuzzy'``.
+    lon_convention : str
+        Longitude convention: ``'0_360'`` or ``'-180_180'``.
+        Value ``'minus_plus180'`` is accepted and normalized to
+        ``'-180_180'``.
+    file_type : FileType or None
+        Pipeline stage that produced this file.
+
+    Examples
+    --------
+    >>> meta = HEALPyxelxMetadata(nside=32, order='nested')
+    >>> meta.npix
+    12288
+    >>> meta.nest
+    True
     """
     nside: int
     order: Literal['nested', 'ring'] = 'nested'
@@ -73,15 +101,22 @@ class HEALPyxelxMetadata:
 
     @classmethod
     def from_dict(cls, d: dict) -> 'HEALPyxelxMetadata':
-        """Parse from nested or flat metadata dict.
+        """Parse from nested or flat metadata dictionary.
 
-        Supports both nested structure (from JSON sidecars) and flat dicts.
+        Supports both nested structure (from JSON sidecars with
+        ``{'sidecar_metadata': {'healpix': {...}}}``) and flat dicts
+        (direct HEALPix keys at the top level).
 
-        Args:
-            d: Dictionary with HEALPix parameters
+        Parameters
+        ----------
+        d : dict
+            Dictionary with HEAPix parameters. May be nested (JSON sidecar
+            metadata) or flat (parquet-embedded metadata).
 
-        Returns:
-            Validated HEALPyxelxMetadata instance
+        Returns
+        -------
+        HEALPyxelxMetadata
+            Validated instance with all fields populated.
         """
         if 'healpix' in d or 'sidecar_metadata' in d:
             # Nested structure: {'sidecar_metadata': {'healpix': {...}}}
@@ -222,36 +257,32 @@ def validate_sidecar(
 ) -> dict:
     """Validate sidecar structure and return diagnostic metrics.
 
-    Checks:
-    - Required columns (source_id, healpix_id)
-    - healpix_id range [0, npix)
-    - Unique cells ≤ npix
-    - Weight validity [0, 1] for fuzzy mode
-    - Weight sum ≈ 1.0 per source for fuzzy mode
-    - 1:1 mapping for strict mode
+    Performs comprehensive validation of the sidecar DataFrame against
+    expected HEALPix metadata: required columns, cell ID ranges, weight
+    validity in fuzzy mode, and source-to-cell mapping integrity.
 
-    Args:
-        df: Sidecar DataFrame (source_id, healpix_id, [weight])
-        meta: Expected HEALPix metadata
-        strict: If True, raise on violations; if False, return warnings
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Sidecar DataFrame with columns ``source_id``, ``healpix_id``,
+        and optionally ``weight``.
+    meta : HEALPyxelxMetadata
+        Expected HEALPix metadata for validation.
+    strict : bool
+        If True, raise ``AssertionError`` on validation failures.
+        If False, return results with warnings.
 
-    Returns:
-        dict with validation results and metrics
+    Returns
+    -------
+    dict
+        Validation results with keys: ``valid``, ``errors``, ``warnings``,
+        ``n_rows``, ``n_unique_sources``, ``n_unique_cells``, and
+        optionally ``weight_sum_min``, ``weight_sum_max``.
 
-    Raises:
-        AssertionError: If strict=True and validation fails
-
-    Examples:
-        >>> import pandas as pd
-        >>> meta = HEALPyxelxMetadata(nside=32, mode='fuzzy')
-        >>> sidecar = pd.DataFrame({
-        ...     'source_id': [0, 0, 1],
-        ...     'healpix_id': [100, 101, 100],
-        ...     'weight': [0.6, 0.4, 1.0]
-        ... })
-        >>> result = validate_sidecar(sidecar, meta, strict=False)
-        >>> result['n_unique_cells']
-        2
+    Raises
+    ------
+    AssertionError
+        If ``strict=True`` and validation fails.
     """
     results = {
         'valid': True,
@@ -345,38 +376,33 @@ def validate_aggregate(
 ) -> dict:
     """Validate aggregate DataFrame structure.
 
-    Checks:
-    - Index must be 'healpix_id'
-    - Row count ≤ npix
-    - healpix_id range [0, npix)
-    - No duplicate healpix_id
-    - Dense maps have sequential index [0..npix-1]
-    - Expected columns present
-    - n_sources column sanity
-    - Finite values in stat columns
+    Comprehensive validation of the aggregate DataFrame: index name,
+    row count vs npix, cell ID range, no duplicates, sequential index
+    for dense maps, expected columns, ``n_sources`` sanity, and finite
+    values in statistic columns.
 
-    Args:
-        df: Aggregate DataFrame (index: healpix_id)
-        meta: Expected HEALPix metadata
-        expected_columns: Optional list of expected stat columns
-        strict: If True, raise on violations
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Aggregate DataFrame with ``healpix_id`` as index.
+    meta : HEALPyxelxMetadata
+        Expected HEALPix metadata for validation.
+    expected_columns : list[str] or None
+        Optional list of expected statistic column names to check for.
+    strict : bool
+        If True, raise ``AssertionError`` on validation failures.
 
-    Returns:
-        dict with validation results
+    Returns
+    -------
+    dict
+        Validation results with keys: ``valid``, ``errors``, ``warnings``,
+        ``n_rows``, ``is_sparse``, ``is_dense``, and optionally
+        ``n_sources_min``, ``n_sources_max``, ``n_sources_mean``.
 
-    Raises:
-        AssertionError: If strict=True and validation fails
-
-    Examples:
-        >>> import pandas as pd
-        >>> meta = HEALPyxelxMetadata(nside=32)
-        >>> agg = pd.DataFrame({
-        ...     'r1050_median': [0.5, 0.6],
-        ...     'n_sources': [10, 15]
-        ... }, index=pd.Index([0, 1], name='healpix_id'))
-        >>> result = validate_aggregate(agg, meta, strict=False)
-        >>> result['is_sparse']
-        True
+    Raises
+    ------
+    AssertionError
+        If ``strict=True`` and validation fails.
     """
     results = {
         'valid': True,

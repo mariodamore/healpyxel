@@ -18,6 +18,9 @@ from healpyxel.accumulator import (
     ensure_not_processed,
     validate_accumulator_sidecar_compatibility,
     find_sidecar,
+    extract_accumulation_progress,
+    persist_accumulation_progress,
+    snapshot_state_as_dataframe,
     TDIGEST_AVAILABLE,
 )
 from healpyxel.metadata import HEALPyxelxMetadata, FileType
@@ -279,9 +282,29 @@ class TestAccumulateBatch:
         total_filtered = sum(acc.stats_by_column["r750"].n for acc in state_filtered.values())
         assert total_filtered <= total_all
 
+    def test_empty_sidecar_returns_unchanged_state(self):
+        """When sidecar has no matching source_ids, state is returned unchanged (merge is empty)."""
+        data = self._make_data(n_rows=5)
+        # Sidecar with source_ids that don't exist in data
+        empty_sidecar = pd.DataFrame({
+            "source_id": [99999, 99998],
+            "healpix_id": [0, 1],
+        })
+        existing_state = {}
+        state = accumulate_batch(data, empty_sidecar, ["r750"],
+                                 existing_state=existing_state, use_tdigest=False)
+        assert state == {}
+
+    def test_missing_value_column_raises_keyerror(self):
+        """accumulate_batch raises KeyError if a value_column is absent from data."""
+        data = self._make_data(n_rows=3, cols=["r750"])
+        sidecar = self._make_sidecar(data)
+        with pytest.raises(KeyError, match="nonexistent_col"):
+            accumulate_batch(data, sidecar, ["r750", "nonexistent_col"],
+                             use_tdigest=False)
+
 
 # ---------------------------------------------------------------------------
-# state_to_dataframe tests
 # ---------------------------------------------------------------------------
 
 class TestStateToDataframe:
@@ -481,3 +504,159 @@ class TestValidateCompatibility:
         result = validate_accumulator_sidecar_compatibility(a, b)
         assert result["valid"] is True  # lon mismatch doesn't invalidate
         assert any("lon_convention" in w for w in result["warnings"])
+
+
+# ---------------------------------------------------------------------------
+# extract_accumulation_progress tests
+# ---------------------------------------------------------------------------
+
+class TestExtractAccumulationProgress:
+    """Tests for the progress extraction helper."""
+
+    def _make_state(self, hp_ids, col_vals):
+        """Build a dict[int, CellAccumulator] from hp_ids and column values."""
+        state = {}
+        for hp_id in hp_ids:
+            acc = CellAccumulator(use_tdigest=False)
+            for col, vals in col_vals.items():
+                acc.update(col, np.array(vals, dtype=float))
+            state[hp_id] = acc
+        return state
+
+    def test_basic_output_shape(self):
+        state = self._make_state([0, 1, 2], {"r750": [1.0, 2.0, 3.0]})
+        df = extract_accumulation_progress(state, ["r750"], batch_id=1,
+                                            state_path=Path("/tmp/s.parquet"))
+        assert len(df) == 3
+        assert list(df.columns) == ["healpix_id", "batch_id", "state_file",
+                                     "r750_n", "r750_mean", "r750_std",
+                                     "r750_min", "r750_max"]
+
+    def test_healpix_id_is_explicit_column(self):
+        state = self._make_state([5, 10], {"r750": [1.0]})
+        df = extract_accumulation_progress(state, ["r750"], 1, Path("/tmp/s.parquet"))
+        assert "healpix_id" in df.columns
+        assert set(df["healpix_id"]) == {5, 10}
+
+    def test_stats_values(self):
+        state = self._make_state([0], {"r750": [1.0, 2.0, 3.0, 4.0, 5.0]})
+        df = extract_accumulation_progress(state, ["r750"], 1, Path("/tmp/s.parquet"))
+        row = df[df["healpix_id"] == 0].iloc[0]
+        assert row["r750_n"] == 5
+        assert np.isclose(row["r750_mean"], 3.0)
+        assert np.isclose(row["r750_min"], 1.0)
+        assert np.isclose(row["r750_max"], 5.0)
+
+    def test_missing_column_gives_nan(self):
+        acc = CellAccumulator(use_tdigest=False)
+        acc.update("r750", np.array([1.0, 2.0]))
+        state = {0: acc}
+        df = extract_accumulation_progress(state, ["r750", "r950"], 1,
+                                            Path("/tmp/s.parquet"))
+        assert df["r950_n"].iloc[0] == 0
+        assert np.isnan(df["r950_mean"].iloc[0])
+
+    def test_batch_id_and_state_file(self):
+        state = self._make_state([0], {"r750": [1.0]})
+        sp = Path("/tmp/progress_b003.parquet")
+        df = extract_accumulation_progress(state, ["r750"], 3, sp)
+        assert df["batch_id"].iloc[0] == 3
+        assert df["state_file"].iloc[0] == "progress_b003.parquet"
+
+
+# ---------------------------------------------------------------------------
+# persist_accumulation_progress tests
+# ---------------------------------------------------------------------------
+
+class TestPersistAccumulationProgress:
+    """Tests for progress persistence to TSV."""
+
+    def _make_progress_df(self):
+        return pd.DataFrame({
+            "healpix_id": [0, 1, 2],
+            "batch_id": [1, 1, 1],
+            "r750_n": [10, 20, 15],
+            "r750_mean": [1.0, 2.0, 1.5],
+        })
+
+    def test_creates_tsv_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            result = persist_accumulation_progress(self._make_progress_df(), out_dir, 1)
+            assert result.exists()
+            assert result.suffix == ".tsv"
+            loaded = pd.read_csv(result, sep='\t')
+            assert len(loaded) == 3
+
+    def test_creates_cumulative_log(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            persist_accumulation_progress(self._make_progress_df(), out_dir, 1)
+            log = out_dir / "accumulation_progress.log"
+            assert log.exists()
+            content = log.read_text()
+            assert "Batch 001" in content
+
+    def test_returns_expected_path(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out_dir = Path(tmp)
+            result = persist_accumulation_progress(self._make_progress_df(), out_dir, 5)
+            assert result.name == "progress_v005.tsv"
+
+
+# ---------------------------------------------------------------------------
+# snapshot_state_as_dataframe tests
+# ---------------------------------------------------------------------------
+
+class TestSnapshotStateAsDataframe:
+    """Tests for the live state snapshot helper."""
+
+    def _make_state(self, hp_ids, cols):
+        state = {}
+        for hp_id in hp_ids:
+            acc = CellAccumulator(use_tdigest=False)
+            for col, vals in cols.items():
+                acc.update(col, np.array(vals, dtype=float))
+            state[hp_id] = acc
+        return state
+
+    def test_basic_output(self):
+        state = self._make_state([0, 1], {"r750": [1.0, 2.0, 3.0]})
+        df = snapshot_state_as_dataframe(state)
+        assert len(df) == 2
+        assert "healpix_id" in df.columns
+        assert "r750_n" in df.columns
+        assert "r750_mean" in df.columns
+
+    def test_healpix_id_values(self):
+        state = self._make_state([10, 20, 30], {"r750": [1.0]})
+        df = snapshot_state_as_dataframe(state)
+        assert set(df["healpix_id"]) == {10, 20, 30}
+
+    def test_column_filter(self):
+        state = self._make_state([0], {"r750": [1.0, 2.0], "r950": [10.0, 20.0]})
+        df = snapshot_state_as_dataframe(state, columns=["r750"])
+        assert "r750_n" in df.columns
+        assert "r950_n" not in df.columns
+        assert df["r750_mean"].iloc[0] == 1.5
+
+    def test_empty_state(self):
+        df = snapshot_state_as_dataframe({})
+        assert len(df) == 0
+        # Empty state produces an empty DataFrame with no columns
+
+    def test_correct_stats(self):
+        state = self._make_state([5], {"r750": [2.0, 4.0, 6.0]})
+        df = snapshot_state_as_dataframe(state)
+        row = df[df["healpix_id"] == 5].iloc[0]
+        assert row["r750_n"] == 3
+        assert np.isclose(row["r750_mean"], 4.0)
+        assert np.isclose(row["r750_min"], 2.0)
+        assert np.isclose(row["r750_max"], 6.0)
+
+    def test_missing_column_in_filter_skipped(self):
+        """Requesting columns not in any accumulator should not raise."""
+        state = self._make_state([0], {"r750": [1.0]})
+        df = snapshot_state_as_dataframe(state, columns=["nonexistent_col"])
+        assert len(df) == 1
+        assert "nonexistent_col" not in df.columns

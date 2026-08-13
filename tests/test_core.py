@@ -185,3 +185,50 @@ class TestSetupLogger:
         # Just verify logger has StreamHandler that can format messages
         assert any(isinstance(h, logging.StreamHandler) for h in logger.handlers)
         assert all(h.formatter is not None for h in logger.handlers)
+
+
+class TestHealpixCellSizes:
+    """Test HEALPix cell size utility."""
+
+    def test_default_nside(self):
+        """Default call returns 14 standard nside values."""
+        from healpyxel.core import healpix_cell_sizes
+        df = healpix_cell_sizes()
+        assert len(df) == 14
+        assert list(df.columns) == [
+            'nside', 'Number of Cells', 'Cell Angular Size (deg)'
+        ]
+
+    def test_no_radii(self):
+        """Explicit None radii returns no extra columns."""
+        from healpyxel.core import healpix_cell_sizes
+        df = healpix_cell_sizes(radii=None)
+        assert len(df.columns) == 3
+
+    def test_single_radius(self):
+        """Single radius adds one column."""
+        from healpyxel.core import healpix_cell_sizes
+        df = healpix_cell_sizes(radii=[("Moon", 1737.4)])
+        assert "Moon" in df.columns
+        assert len(df.columns) == 4
+
+    def test_multiple_radii(self):
+        """Multiple radii add corresponding columns."""
+        from healpyxel.core import healpix_cell_sizes
+        df = healpix_cell_sizes(radii=[("Mercury", 2439.7), ("Moon", 1737.4)])
+        assert "Mercury" in df.columns
+        assert "Moon" in df.columns
+        assert len(df.columns) == 5
+
+    def test_custom_nside(self):
+        """Custom nside list is respected."""
+        from healpyxel.core import healpix_cell_sizes
+        df = healpix_cell_sizes(radii=[("Moon", 1737.4)], nside=(4, 8, 16))
+        assert len(df) == 3
+        assert list(df["nside"]) == [4, 8, 16]
+
+    def test_cell_size_values_positive(self):
+        """All cell sizes should be positive (no degenerate geometries)."""
+        from healpyxel.core import healpix_cell_sizes
+        df = healpix_cell_sizes(radii=[("Moon", 1737.4)])
+        assert (df["Moon"] > 0).all()

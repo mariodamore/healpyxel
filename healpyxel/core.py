@@ -1,3 +1,14 @@
+"""Utility functions for HEALPix indexing and statistical analysis.
+
+Provides helpers shared across the healpyxel pipeline:
+
+* :func:`validate_nside` — ensure nside is a power of two
+* :func:`mad` — Median Absolute Deviation estimator
+* :func:`robust_std` — MAD-based robust standard deviation
+* :func:`setup_logger` — standardised logging configuration
+* :func:`healpix_cell_sizes` — tabulate cell angular and linear sizes
+"""
+
 import logging
 from pathlib import Path
 from typing import Optional, Sequence, Union
@@ -70,14 +81,24 @@ def robust_std(arr: np.ndarray) -> float:
     return mad(arr) * 1.4826
 
 def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
-    """Setup a logger with standard formatting.
+    """Create a logger with the standard healpyxel output format.
 
-    Args:
-        name: Logger name
-        level: Logging level (default: INFO)
+    Only adds a handler when the logger has no handlers yet, so repeated
+    calls with the same name do not produce duplicate output.
 
-    Returns:
-        Configured logger
+    Parameters
+    ----------
+    name : str
+        Logger name (typically the calling module, e.g.
+        ``"healpyxel.sidecar"``).
+    level : int
+        Logging level threshold (default: ``logging.INFO``).
+
+    Returns
+    -------
+    logging.Logger
+        Configured logger with a ``StreamHandler`` using
+        ``"%(asctime)s %(levelname)s %(message)s"`` format.
     """
     logger = logging.getLogger(name)
     logger.setLevel(level)
@@ -92,7 +113,6 @@ def setup_logger(name: str, level: int = logging.INFO) -> logging.Logger:
     return logger
 
 
-# ADR-size-recovery: HEALPix cell size utility
 def healpix_cell_sizes(
     radii: Sequence[tuple[str, float]] | None = None,
     nside: Sequence[int] = (1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192),
