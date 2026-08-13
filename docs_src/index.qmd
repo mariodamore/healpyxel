@@ -207,7 +207,7 @@ core steps:
 2.  and 3. *Apply+Combine*: Aggregate values per HEALPix cell
     `healpyxel_aggregate`
 
-![Pipeline_End-to-End](diagrams/svg/Pipeline_End-to-End.svg)
+![Pipeline_End-to-End](diagrams/svg/Pipeline_End-to-End.svg){ height=500px }
 
 ### 1. **Split**: Map observations to HEALPix cells
 
@@ -823,6 +823,47 @@ ax.set_title("Orginal Data Geopandas Plot over nside=32 HEALPix  grid")
 ax.set_xlabel("Longitude")
 ax.set_ylabel("Latitude")
 ```
+
+## Python workflow API
+
+`healpyxel.workflow.run_pipeline()` wraps the three CLI stages into a
+single Python call and (optionally) prints/logs the equivalent CLI
+commands. It uses `.meta.json` files to avoid redundant work and
+auto-discovers numeric columns via `pyarrow`.
+
+``` python
+from pathlib import Path
+from healpyxel.workflow import run_pipeline
+
+# Run full pipeline — columns auto-discovered, verbose shows CLI commands
+results = run_pipeline(
+    input=Path("test_data/samples/sample_50k.parquet"),
+    output_dir=Path("test_data/derived/cli_quickstart"),
+    nsides=(32, 64, 128),
+    aggs=("mean", "median", "std", "robust_std"),
+    verbose=True,
+)
+
+# Partial override: change aggregations for this run only
+results = run_pipeline(
+    input=Path("test_data/samples/sample_50k.parquet"),
+    output_dir=Path("healpix/"),
+    nsides=(32, 64),
+    # sidecar_kwargs: forwarded to healpyxel_sidecar
+    sidecar_kwargs={"mode": "strict", "lon_col": "lon_center"},
+    # aggregate_kwargs: forwarded to healpyxel_aggregate
+    aggregate_kwargs={
+        "aggs": ("median", "mad"),
+        "min_count": 2,
+        "columns": ("r1050", "thermal"),
+    },
+    log=open("pipeline.log", "w"),
+    verbose=True,
+)
+```
+
+See [API reference → workflow.run_pipeline](reference/workflow.run_pipeline.qmd)
+for the full parameter list.
 
 ## Python API
 

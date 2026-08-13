@@ -13,35 +13,39 @@ metadata.HEALPyxelxMetadata(
 
 Validated HEALPix grid metadata with embedded parquet I/O.
 
-All aggregate/sidecar parquet files should embed this in their schema
-to ensure metadata/data consistency.
+Central metadata class for all healpyxel pipeline files. Encodes the
+HEALPix configuration (nside, order, mode, lon_convention) and provides
+serialization to/from parquet schema metadata and companion JSON files.
 
-Attributes:
-    nside: HEALPix resolution parameter (must be power of 2)
-    order: Pixel ordering scheme ('nested' or 'ring')
-    npix: Total number of pixels (auto-computed from nside if None)
-    mode: Cell assignment mode ('strict' or 'fuzzy')
-    lon_convention: Longitude convention ('0_360' or '-180_180'). Value 'minus_plus180' is accepted and normalized to '-180_180'.
-    file_type: Pipeline stage that produced this file (optional)
+All aggregate/sidecar parquet files embed this metadata in their Arrow
+schema to ensure metadata/data consistency across the pipeline.
 
-Examples:
-    >>> meta = HEALPyxelxMetadata(nside=32, order='nested')
-    >>> meta.npix
-    12288
-    >>> meta.nest
-    True
+## Attributes {.doc-section .doc-section-attributes}
 
-## Attributes
+| Name           | Type             | Description                                                                                                                  |
+|----------------|------------------|------------------------------------------------------------------------------------------------------------------------------|
+| nside          | int              | HEALPix resolution parameter (must be a power of 2).                                                                         |
+| order          | str              | Pixel ordering scheme: ``'nested'`` or ``'ring'``.                                                                           |
+| npix           | int or None      | Total number of pixels. Auto-computed from ``nside`` if None.                                                                |
+| mode           | str              | Cell assignment mode: ``'strict'`` or ``'fuzzy'``.                                                                           |
+| lon_convention | str              | Longitude convention: ``'0_360'`` or ``'-180_180'``. Value ``'minus_plus180'`` is accepted and normalized to ``'-180_180'``. |
+| file_type      | FileType or None | Pipeline stage that produced this file.                                                                                      |
 
-| Name | Description |
-| --- | --- |
-| [nest](#healpyxel.metadata.HEALPyxelxMetadata.nest) | Convenience flag for healpy calls. |
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> meta = HEALPyxelxMetadata(nside=32, order='nested')
+>>> meta.npix
+12288
+>>> meta.nest
+True
+```
 
 ## Methods
 
 | Name | Description |
 | --- | --- |
-| [from_dict](#healpyxel.metadata.HEALPyxelxMetadata.from_dict) | Parse from nested or flat metadata dict. |
+| [from_dict](#healpyxel.metadata.HEALPyxelxMetadata.from_dict) | Parse from nested or flat metadata dictionary. |
 | [from_parquet](#healpyxel.metadata.HEALPyxelxMetadata.from_parquet) | Extract metadata from parquet schema or companion JSON. |
 | [to_dict](#healpyxel.metadata.HEALPyxelxMetadata.to_dict) | Serialize to dictionary, converting Enum to string. |
 | [to_parquet_metadata](#healpyxel.metadata.HEALPyxelxMetadata.to_parquet_metadata) | Serialize for embedding in parquet schema. |
@@ -53,15 +57,23 @@ Examples:
 metadata.HEALPyxelxMetadata.from_dict(d)
 ```
 
-Parse from nested or flat metadata dict.
+Parse from nested or flat metadata dictionary.
 
-Supports both nested structure (from JSON sidecars) and flat dicts.
+Supports both nested structure (from JSON sidecars with
+``{'sidecar_metadata': {'healpix': {...}}}``) and flat dicts
+(direct HEALPix keys at the top level).
 
-Args:
-    d: Dictionary with HEALPix parameters
+#### Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    Validated HEALPyxelxMetadata instance
+| Name   | Type   | Description                                                                                                   | Default    |
+|--------|--------|---------------------------------------------------------------------------------------------------------------|------------|
+| d      | dict   | Dictionary with HEAPix parameters. May be nested (JSON sidecar metadata) or flat (parquet-embedded metadata). | _required_ |
+
+#### Returns {.doc-section .doc-section-returns}
+
+| Name   | Type               | Description                                   |
+|--------|--------------------|-----------------------------------------------|
+|        | HEALPyxelxMetadata | Validated instance with all fields populated. |
 
 ### from_parquet { #healpyxel.metadata.HEALPyxelxMetadata.from_parquet }
 

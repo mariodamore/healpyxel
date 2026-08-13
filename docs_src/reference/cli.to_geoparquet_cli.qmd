@@ -5,3 +5,14 @@ cli.to_geoparquet_cli(argv=None)
 ```
 
 CLI entry point for healpyxel_to_geoparquet.
+
+Defines the ``healpyxel_to_geoparquet`` command to convert an
+aggregate parquet into a GeoParquet with HEALPix cell geometries
+and densification.  Invokes :func:`healpyxel.geospatial.parse_arguments`
+then :func:`healpyxel.geospatial.run`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                | Description                                                 | Default   |
+|--------|---------------------|-------------------------------------------------------------|-----------|
+| argv   | list\[str\] or None | Argument list (defaults to ``sys.argv[1:]`` when ``None``). | `None`    |

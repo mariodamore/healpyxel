@@ -6,35 +6,28 @@ metadata.validate_aggregate(df, meta, expected_columns=None, strict=True)
 
 Validate aggregate DataFrame structure.
 
-Checks:
-- Index must be 'healpix_id'
-- Row count ≤ npix
-- healpix_id range [0, npix)
-- No duplicate healpix_id
-- Dense maps have sequential index [0..npix-1]
-- Expected columns present
-- n_sources column sanity
-- Finite values in stat columns
+Comprehensive validation of the aggregate DataFrame: index name,
+row count vs npix, cell ID range, no duplicates, sequential index
+for dense maps, expected columns, ``n_sources`` sanity, and finite
+values in statistic columns.
 
-Args:
-    df: Aggregate DataFrame (index: healpix_id)
-    meta: Expected HEALPix metadata
-    expected_columns: Optional list of expected stat columns
-    strict: If True, raise on violations
+## Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    dict with validation results
+| Name             | Type                | Description                                                    | Default    |
+|------------------|---------------------|----------------------------------------------------------------|------------|
+| df               | pd.DataFrame        | Aggregate DataFrame with ``healpix_id`` as index.              | _required_ |
+| meta             | HEALPyxelxMetadata  | Expected HEALPix metadata for validation.                      | _required_ |
+| expected_columns | list\[str\] or None | Optional list of expected statistic column names to check for. | `None`     |
+| strict           | bool                | If True, raise ``AssertionError`` on validation failures.      | `True`     |
 
-Raises:
-    AssertionError: If strict=True and validation fails
+## Returns {.doc-section .doc-section-returns}
 
-Examples:
-    >>> import pandas as pd
-    >>> meta = HEALPyxelxMetadata(nside=32)
-    >>> agg = pd.DataFrame({
-    ...     'r1050_median': [0.5, 0.6],
-    ...     'n_sources': [10, 15]
-    ... }, index=pd.Index([0, 1], name='healpix_id'))
-    >>> result = validate_aggregate(agg, meta, strict=False)
-    >>> result['is_sparse']
-    True
+| Name   | Type   | Description                                                                                                                                                                          |
+|--------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | dict   | Validation results with keys: ``valid``, ``errors``, ``warnings``, ``n_rows``, ``is_sparse``, ``is_dense``, and optionally ``n_sources_min``, ``n_sources_max``, ``n_sources_mean``. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type           | Description                              |
+|--------|----------------|------------------------------------------|
+|        | AssertionError | If ``strict=True`` and validation fails. |

@@ -4,7 +4,19 @@
 sidecar.detect_lonlat_columns(gdf_sample)
 ```
 
-Auto-detect longitude and latitude columns from a GeoDataFrame sample.
+Auto-detect longitude and latitude columns from a DataFrame sample.
 
-Returns:
-    Tuple of (lon_column, lat_column) or (None, None) if not found
+Scans column names (case-insensitive) against common patterns for
+longitude and latitude fields. Returns the first match for each.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type                             | Description                                           | Default    |
+|------------|----------------------------------|-------------------------------------------------------|------------|
+| gdf_sample | pd.DataFrame or gpd.GeoDataFrame | Sample DataFrame to inspect for column name patterns. | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                              | Description                                                                                                          |
+|--------|-----------------------------------|----------------------------------------------------------------------------------------------------------------------|
+|        | tuple\[str \| None, str \| None\] | ``(lon_column, lat_column)`` or ``(None, None)`` if not found. Column names are returned with their original casing. |

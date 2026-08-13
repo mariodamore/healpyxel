@@ -11,19 +11,28 @@ aggregate.generate_output_filename(
 
 Generate output filename that matches the parseable structure of the sidecar.
 
-Pattern: <stem>-aggregated[-densified].<sidecar_suffix>.parquet
+Constructs a descriptive output filename by combining the input file stem
+with the sidecar suffix and an optional densification marker.
 
-Args:
-    input_file: Original input parquet file
-    sidecar_file: Sidecar file being used
-    output_dir: Optional output directory (default: same as sidecar_file)
-    densified: If True, append '-densified' marker to filename
+## Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    Path to output file
+| Name         | Type         | Description                                                           | Default    |
+|--------------|--------------|-----------------------------------------------------------------------|------------|
+| input_file   | Path         | Original input parquet file.                                          | _required_ |
+| sidecar_file | Path         | Sidecar file being used (suffix is extracted from this).              | _required_ |
+| output_dir   | Path or None | Output directory. Defaults to the same directory as ``sidecar_file``. | `None`     |
+| densified    | bool         | If True, append ``-densified`` marker to the output filename.         | `False`    |
 
-Example:
-    input: mascs_data_MeSS.parquet
-    sidecar: mascs_data_MeSS.cell-healpix_assignment-strict_nside-64_order-nested.parquet
-    sparse output: mascs_data_MeSS-aggregated.cell-healpix_assignment-strict_nside-64_order-nested.parquet
-    densified output: mascs_data_MeSS-aggregated-densified.cell-healpix_assignment-strict_nside-64_order-nested.parquet
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                                                |
+|--------|--------|--------------------------------------------------------------------------------------------|
+|        | Path   | Output file path with format::      <stem>-aggregated[-densified].<sidecar_suffix>.parquet |
+
+## Examples {.doc-section .doc-section-examples}
+
+For ``input=mascs_data.parquet`` and
+``sidecar=mascs_data.cell-healpix_assignment-strict_nside-64_order-nested.parquet``:
+
+* Sparse: ``mascs_data-aggregated.cell-healpix_assignment-strict_nside-64_order-nested.parquet``
+* Densified: ``mascs_data-aggregated-densified.cell-healpix_assignment-strict_nside-64_order-nested.parquet``

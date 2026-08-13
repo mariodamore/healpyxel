@@ -5,3 +5,14 @@ cli.sidecar_cli(argv=None)
 ```
 
 CLI entry point for healpyxel_sidecar.
+
+Defines the ``healpyxel_sidecar`` command used to project input
+parquet observations onto HEALPix cells.  Invokes
+:func:`healpyxel.sidecar.parse_arguments` then
+:func:`healpyxel.sidecar.run`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                | Description                                                 | Default   |
+|--------|---------------------|-------------------------------------------------------------|-----------|
+| argv   | list\[str\] or None | Argument list (defaults to ``sys.argv[1:]`` when ``None``). | `None`    |

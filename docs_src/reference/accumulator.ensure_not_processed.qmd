@@ -4,5 +4,22 @@
 accumulator.ensure_not_processed(meta, input_path, *, on_duplicate='error')
 ```
 
-Check/add input fingerprint in state metadata.
-on_duplicate: 'error' | 'skip'
+Check/add input fingerprint in state metadata for idempotency.
+
+Computes a SHA-256 fingerprint from the input file's path, size, and
+mtime. If the fingerprint is already in the ``processed_inputs`` list,
+either raises an error or records the skip, depending on ``on_duplicate``.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name         | Type        | Description                                                                                                         | Default    |
+|--------------|-------------|---------------------------------------------------------------------------------------------------------------------|------------|
+| meta         | dict        | State metadata dict (modified in-place).                                                                            | _required_ |
+| input_path   | str or Path | Path to input data file.                                                                                            | _required_ |
+| on_duplicate | str         | ``'error'`` — raise ``ValueError`` if already processed. ``'skip'`` — record in ``skipped_duplicate`` and continue. | `'error'`  |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                               |
+|--------|--------|---------------------------------------------------------------------------|
+|        | dict   | Updated metadata dict with new fingerprint added to ``processed_inputs``. |

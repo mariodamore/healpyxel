@@ -17,6 +17,7 @@
 # # Core Concepts
 
 # %%
+#| echo: false
 import healpyxel
 from healpyxel import core
 import pandas as pd
@@ -30,6 +31,7 @@ print(f"healpyxel version: {healpyxel.__version__}")
 # Test the core utility functions:
 
 # %%
+#| echo: false
 # Validate nside parameter
 try:
     core.validate_nside(64)  # Valid power of 2
@@ -43,12 +45,14 @@ except ValueError as e:
     print(f"✓ Caught invalid nside: {e}")
 
 # %%
+#| echo: false
 # Test MAD (Median Absolute Deviation)
 data = np.array([1, 2, 3, 4, 5, 100])  # Outlier at 100
 mad_value = core.mad(data)
 print(f"MAD of {data}: {mad_value:.2f}")
 
 # %%
+#| echo: false
 # Test robust standard deviation
 robust_std = core.robust_std(data)
 normal_std = np.std(data)
@@ -62,6 +66,7 @@ print(f"Robust std is less affected by the outlier (100)")
 # Check available test data in the package:
 
 # %%
+#| echo: false
 from pathlib import Path
 
 # Look for test data
@@ -92,6 +97,7 @@ else:
 # Check if commands are available:
 
 # %%
+#| echo: false
 import subprocess
 
 commands = ['healpix_sidecar', 'healpix_aggregate', 'healpix_accumulator', 'healpix_finalize']
@@ -109,6 +115,7 @@ for cmd in commands:
 # If test data is available, let's try a quick aggregation:
 
 # %%
+#| echo: false
 # Check for sample data
 sample_file = test_data_dir / 'sample_001.parquet'
 
@@ -187,6 +194,7 @@ else:
 # ```
 
 # %%
+#| echo: false
 from pathlib import Path
 from healpyxel.sidecar import build_output_path
 
@@ -226,6 +234,7 @@ assert build_output_path(
 # ## Package Information
 
 # %%
+#| echo: false
 # Show available modules
 print("Available modules:")
 for attr in dir(healpyxel):

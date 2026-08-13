@@ -4,21 +4,27 @@
 accumulator.load_state(input_path, use_tdigest=True)
 ```
 
-Load accumulator state, HEALPix metadata, AND processing history from parquet file.
+Load accumulator state, HEALPix metadata, and processing history from parquet.
 
-Reads both embedded Arrow metadata and companion .meta.json sidecar to reconstruct
-full state including processed input fingerprints for idempotency checks.
+Reads both embedded Arrow metadata and companion ``.meta.json`` sidecar
+to reconstruct the full state including processed input fingerprints for
+idempotency checks.
 
-Args:
-    input_path: Path to state parquet file
-    use_tdigest: Whether to restore T-Digest data
+## Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    Tuple of (state dict, metadata, processing_metadata) where:
-        - state: Dict[int, CellAccumulator] deserialized from parquet
-        - metadata: HEALPyxelxMetadata (or None if not found)
-        - processing_metadata: Dict with 'processed_inputs', 'last_updated', etc.
-                               (empty dict if sidecar not found)
+| Name        | Type   | Description                                              | Default    |
+|-------------|--------|----------------------------------------------------------|------------|
+| input_path  | Path   | Path to state parquet file.                              | _required_ |
+| use_tdigest | bool   | Whether to restore TDigest data for percentile tracking. | `True`     |
 
-Raises:
-    FileNotFoundError: If state file does not exist
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                                                                    | Description                                                                                                                                                                                                                                                                   |
+|--------|-------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | tuple\[dict\[int, CellAccumulator\], HEALPyxelxMetadata or None, dict\] | ``(state, metadata, processing_metadata)`` where: * ``state`` — deserialized accumulator dict * ``metadata`` — HEALPyxelxMetadata or None if not found * ``processing_metadata`` — dict with ``processed_inputs``,   ``last_updated``, etc. (empty dict if sidecar not found) |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type              | Description                   |
+|--------|-------------------|-------------------------------|
+|        | FileNotFoundError | If state file does not exist. |

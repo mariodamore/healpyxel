@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.1
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: python3
 #     language: python
@@ -28,7 +29,7 @@ import numpy as np
 # Check available test data in the package
 
 # %%
-#| code-fold: true
+#| echo: false
 from pathlib import Path
 
 # Look for test data
@@ -142,6 +143,7 @@ ax.set_xlabel("Longitude");
 ax.set_ylabel("Latitude");
 
 # %%
+#| echo: false
 # #| hide
 # # convert to geopandas creating a polygon box with lat_min	lat_max	lon_min	lon_max per file
 # ax = gdf_stats[~gdf_stats.filename.str.contains('sample')].plot(column='filename', legend=False, figsize=(20, 6), aspect=0.25)
@@ -156,7 +158,7 @@ ax.set_ylabel("Latitude");
 # Now let's create a HEALPix sidecar for the sample data. We can do this in memory without writing to a file.
 
 # %%
-#| code-fold: true
+#| echo: false
 
 # Load the 50k sample
 import geopandas as gpd
@@ -187,7 +189,7 @@ gdf.head(3).iloc[:,-10:]
 # Create sidecar in memory using the process_partition function
 
 # %%
-#| code-fold: true
+#| echo: false
 
 # Create sidecar in memory using the process_partition function
 from healpyxel.sidecar import process_partition
@@ -236,7 +238,7 @@ print(assignments_per_geom.value_counts().sort_index().head(10))
 # Optional: Save sidecar to file for later use
 
 # %%
-#| code-fold: true
+#| echo: false
 sidecar_output = pathlib.Path(f'/tmp/sample_50k_sidecar_nside{nside}_{mode}.parquet')
 sidecar_df.to_parquet(sidecar_output, index=False)
 print(f"Saved sidecar to: {sidecar_output}")
@@ -419,7 +421,7 @@ aggregated_dense.head(10)
 # Import visualization utilities from healpyxel and prepare the HEALPix map for visualization
 
 # %%
-#| code-fold: true
+#| echo: false
 # Import visualization utilities from healpyxel
 from healpyxel.visualization import prepare_healpix_map
 import numpy as np

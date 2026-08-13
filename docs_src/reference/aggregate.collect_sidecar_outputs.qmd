@@ -4,15 +4,22 @@
 aggregate.collect_sidecar_outputs(input_parquet, output_dir, read_stats=False)
 ```
 
-Scan output_dir for sidecar parquet files that match the input file stem.
+Scan ``output_dir`` for sidecar parquet files matching the input stem.
 
-Prefer metadata from .meta.json; fall back to filename parsing if metadata
-is missing or incomplete.
+Searches the output directory for sidecar files that belong to the given
+input parquet file. Validates via ``.meta.json`` metadata when available,
+falling back to filename pattern matching.
 
-Args:
-    input_parquet: Path to the original parquet file
-    output_dir: Directory containing sidecar files
-    read_stats: If True, read files to compute row counts and unique healpix counts
+## Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    DataFrame with columns: file, coalesced, mode, nside, order, n_rows, n_unique_healpix
+| Name          | Type   | Description                                                                                                      | Default    |
+|---------------|--------|------------------------------------------------------------------------------------------------------------------|------------|
+| input_parquet | Path   | Path to the original input parquet file. Used for stem matching and source_file validation.                      | _required_ |
+| output_dir    | Path   | Directory containing sidecar parquet files.                                                                      | _required_ |
+| read_stats    | bool   | If True, read each sidecar to compute row counts and unique HEALPix counts. Slower but provides richer metadata. | `False`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                                                                                                                                |
+|--------|--------------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | pd.DataFrame | DataFrame with columns: ``file``, ``coalesced``, ``mode``, ``nside``, ``order``, ``n_rows``, ``n_unique_healpix``, and optionally ``derived_from_parent``. |

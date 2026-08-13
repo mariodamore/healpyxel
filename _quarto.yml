@@ -10,6 +10,7 @@ project:
     - notebooks/82_example_visualization_psf.py
     - notebooks/03_sphere_native_sidecar.py
     - notebooks/90_example_streaming.py
+    - notebooks/91_example_inspect.py
 
 website:
   navbar:
@@ -48,6 +49,9 @@ website:
           - section: "Streaming"
             contents:
               - notebooks/90_example_streaming.py
+          - section: "Inspection"
+            contents:
+              - notebooks/91_example_inspect.py
       - section: "API Reference"
         contents:
           - docs_src/reference/index.qmd
@@ -112,6 +116,7 @@ website:
               - docs_src/reference/cli.finalize_cli
               - docs_src/reference/cli.to_geoparquet_cli
               - docs_src/reference/cli.cache_cli
+              - docs_src/reference/cli.inspect_cli
               - docs_src/reference/cli.validate_lon_lat_columns
   reader-mode: true
   page-navigation: true
@@ -216,4 +221,5 @@ quartodoc:
         - cli.finalize_cli
         - cli.to_geoparquet_cli
         - cli.cache_cli
+        - cli.inspect_cli
         - cli.validate_lon_lat_columns

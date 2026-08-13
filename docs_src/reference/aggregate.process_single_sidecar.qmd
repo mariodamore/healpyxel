@@ -12,16 +12,26 @@ aggregate.process_single_sidecar(
 )
 ```
 
-Process a single sidecar file (aggregation workflow).
+Process a single sidecar file through the full aggregation workflow.
 
-Args:
-    input_file: Original input parquet file
-    sidecar_path: Path to sidecar parquet file
-    sidecar_metadata_json: Loaded metadata from .meta.json
-    sidecars_df: DataFrame with all sidecar metadata
-    sidecar_index: Index of this sidecar in sidecars_df
-    args: Parsed command-line arguments
-    use_duckdb: Whether DuckDB is available and enabled
+This function orchestrates one sidecar through the complete aggregation
+pipeline: load data, merge with sidecar, compute aggregations,
+optionally densify, and write output with metadata.
 
-Returns:
-    Dictionary with processing summary (status, output_path, etc.)
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                  | Type               | Description                                                                                 | Default    |
+|-----------------------|--------------------|---------------------------------------------------------------------------------------------|------------|
+| input_file            | Path               | Original input parquet file.                                                                | _required_ |
+| sidecar_path          | Path               | Path to sidecar parquet file.                                                               | _required_ |
+| sidecar_metadata_json | dict               | Loaded metadata from ``.meta.json`` companion file.                                         | _required_ |
+| sidecars_df           | pd.DataFrame       | DataFrame collected by :func:`collect_sidecar_outputs` with all available sidecar metadata. | _required_ |
+| sidecar_index         | int                | Index of this sidecar in ``sidecars_df``.                                                   | _required_ |
+| args                  | argparse.Namespace | Parsed command-line arguments controlling aggregation behavior.                             | _required_ |
+| use_duckdb            | bool               | Whether DuckDB is available and enabled for data loading.                                   | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                                                                                                             |
+|--------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | dict   | Processing summary with keys: ``status`` (``'success'``, ``'skip'``, ``'error'``), ``output_path``, ``metadata_path``, ``n_cells``, ``error`` (if any). |

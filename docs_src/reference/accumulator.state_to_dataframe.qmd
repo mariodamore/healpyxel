@@ -4,24 +4,33 @@
 accumulator.state_to_dataframe(state, use_tdigest=True)
 ```
 
-Convert accumulated state dict → DataFrame with explicit healpix_id column.
+Convert accumulated state dict to a DataFrame with explicit healpix_id column.
 
-Pure function (no I/O). Ensures healpix_id is preserved as an explicit COLUMN,
-never as index. Safe for round-trip serialization + deserialization.
+Pure function (no I/O). Serializes each ``CellAccumulator`` to JSON strings
+and constructs a DataFrame where ``healpix_id`` is an explicit COLUMN,
+never the index. This ensures safe round-trip serialization and
+deserialization without losing the cell identifiers.
 
-Args:
-    state: Dict[int, CellAccumulator] from accumulate_batch()
-    use_tdigest: Include serialized TDigest data
+## Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    DataFrame with healpix_id as COLUMN (not index):
-        - healpix_id (int): HEALPix cell ID
-        - stats_json (str): JSON-serialized StreamingStats per column
-        - tdigests_json (str, optional): JSON-serialized TDigest data
+| Name        | Type                         | Description                                      | Default    |
+|-------------|------------------------------|--------------------------------------------------|------------|
+| state       | dict\[int, CellAccumulator\] | Accumulator state from :func:`accumulate_batch`. | _required_ |
+| use_tdigest | bool                         | Include serialized TDigest data in the output.   | `True`     |
 
-Example:
-    >>> state = {32: CellAccumulator(), 64: CellAccumulator()}
-    >>> df = state_to_dataframe(state)
-    >>> assert 'healpix_id' in df.columns
-    >>> assert list(df['healpix_id']) == [32, 64]
-    >>> assert df.index.name is None  # Index is positional, not healpix_id
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                                                                                                                                                                                               |
+|--------|--------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | pd.DataFrame | DataFrame with columns: * ``healpix_id`` (int) — HEALPix cell ID as explicit column * ``stats_json`` (str) — JSON-serialized StreamingStats per column * ``tdigests_json`` (str, optional) — JSON-serialized TDigest data |
+
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> state = {32: CellAccumulator(), 64: CellAccumulator()}
+>>> df = state_to_dataframe(state)
+>>> 'healpix_id' in df.columns
+True
+>>> df.index.name is None
+True
+```

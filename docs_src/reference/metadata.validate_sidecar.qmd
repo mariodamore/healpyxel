@@ -6,33 +6,26 @@ metadata.validate_sidecar(df, meta, strict=True)
 
 Validate sidecar structure and return diagnostic metrics.
 
-Checks:
-- Required columns (source_id, healpix_id)
-- healpix_id range [0, npix)
-- Unique cells ≤ npix
-- Weight validity [0, 1] for fuzzy mode
-- Weight sum ≈ 1.0 per source for fuzzy mode
-- 1:1 mapping for strict mode
+Performs comprehensive validation of the sidecar DataFrame against
+expected HEALPix metadata: required columns, cell ID ranges, weight
+validity in fuzzy mode, and source-to-cell mapping integrity.
 
-Args:
-    df: Sidecar DataFrame (source_id, healpix_id, [weight])
-    meta: Expected HEALPix metadata
-    strict: If True, raise on violations; if False, return warnings
+## Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    dict with validation results and metrics
+| Name   | Type               | Description                                                                                       | Default    |
+|--------|--------------------|---------------------------------------------------------------------------------------------------|------------|
+| df     | pd.DataFrame       | Sidecar DataFrame with columns ``source_id``, ``healpix_id``, and optionally ``weight``.          | _required_ |
+| meta   | HEALPyxelxMetadata | Expected HEALPix metadata for validation.                                                         | _required_ |
+| strict | bool               | If True, raise ``AssertionError`` on validation failures. If False, return results with warnings. | `True`     |
 
-Raises:
-    AssertionError: If strict=True and validation fails
+## Returns {.doc-section .doc-section-returns}
 
-Examples:
-    >>> import pandas as pd
-    >>> meta = HEALPyxelxMetadata(nside=32, mode='fuzzy')
-    >>> sidecar = pd.DataFrame({
-    ...     'source_id': [0, 0, 1],
-    ...     'healpix_id': [100, 101, 100],
-    ...     'weight': [0.6, 0.4, 1.0]
-    ... })
-    >>> result = validate_sidecar(sidecar, meta, strict=False)
-    >>> result['n_unique_cells']
-    2
+| Name   | Type   | Description                                                                                                                                                                     |
+|--------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|        | dict   | Validation results with keys: ``valid``, ``errors``, ``warnings``, ``n_rows``, ``n_unique_sources``, ``n_unique_cells``, and optionally ``weight_sum_min``, ``weight_sum_max``. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type           | Description                              |
+|--------|----------------|------------------------------------------|
+|        | AssertionError | If ``strict=True`` and validation fails. |

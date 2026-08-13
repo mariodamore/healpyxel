@@ -4,4 +4,15 @@
 cli.cache_cli()
 ```
 
-CLI entry point for healpyxel-cache command.
+CLI entry point for the ``healpyxel-cache`` command.
+
+Manages the HEALPix grid cache through a Click interface.  Supports
+listing cached grids, generating new ones, verifying integrity,
+cleaning cache files, and inspecting/setting configuration.
+
+Precedence for cache and config directories:
+
+1. CLI ``--cache-dir`` / ``--config-dir`` arguments
+2. ``HEALPYXEL_CACHE`` / ``HEALPYXEL_CONFIG`` environment variables
+3. ``XDG_CACHE_HOME`` / ``XDG_CONFIG_HOME`` specifications
+4. Home-directory fallback (``~/.cache/healpyxel/...``)

@@ -1,0 +1,2123 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>example_inspect – Healpyxel</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../docs_src/reference/index.html" rel="next">
+<link href="../notebooks/90_example_streaming.html" rel="prev">
+<link href="../docs_src/favicon.ico" rel="icon">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-0a6b7249c26820e032cb0bd839ff02b1.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" class="quarto-color-scheme-extra" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-4f7210a01128827e17b2825bab7455c5.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<link href="../site_libs/bootstrap/bootstrap-00e03b0f2d558878e0a82fb9ba06d70f.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme-extra" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar docked nav-fixed quarto-light"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = false;
+    const queryPrefersDark = window.matchMedia('(prefers-color-scheme: dark)');
+    const darkModeDefault = queryPrefersDark.matches;
+      document.querySelector('link#quarto-text-highlighting-styles.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+      document.querySelector('link#quarto-bootstrap.quarto-color-scheme-extra').rel = 'disabled-stylesheet';
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    queryPrefersDark.addEventListener("change", e => {
+      if(window.localStorage.getItem("quarto-color-scheme") !== null)
+        return;
+      const alternate = e.matches
+      toggleColorMode(alternate);
+      localAlternateSentinel = e.matches ? 'alternate' : 'default'; // this is used alongside local storage!
+      toggleGiscusIfUsed(alternate, darkModeDefault);
+    });
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="../index.html" class="navbar-brand navbar-brand-logo">
+    <img src="../docs_src/logo_cutout_128.png" alt="" class="navbar-logo light-content">
+    <img src="../docs_src/logo_cutout_128.png" alt="" class="navbar-logo dark-content">
+    </a>
+    <a class="navbar-brand" href="../index.html">
+    <span class="navbar-title">Healpyxel</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="../docs_src/index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../notebooks/01_core_concepts.py.html"> 
+<span class="menu-text">Tutorials</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../notebooks/03_sphere_native_sidecar.py.html"> 
+<span class="menu-text">Sphere-Native Sidecar</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../docs_src/reference/index.html"> 
+<span class="menu-text">Reference</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+  <a href="" class="quarto-reader-toggle quarto-navigation-tool px-1" onclick="window.quartoToggleReader(); return false;" title="Toggle reader mode">
+  <div class="quarto-reader-toggle-btn">
+  <i class="bi"></i>
+  </div>
+</a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/01_core_concepts.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../notebooks/91_example_inspect.html">Inspection</a></li><li class="breadcrumb-item"><a href="../notebooks/91_example_inspect.html">Inspect Pipeline: Schema Display and Sidecar Discovery</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Home</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs_src/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Healpyxel</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Tutorials</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/01_core_concepts.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Core Concepts</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/02_full_workflow.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Full Workflow</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Visualization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/82_example_visualization_psf.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Gaussian PSF - WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Geometry Engine</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/03_sphere_native_sidecar.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sphere-Native Sidecar Generation</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Streaming</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/90_example_streaming.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Streaming WIP!</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inspection</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../notebooks/91_example_inspect.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Inspect Pipeline: Schema Display and Sidecar Discovery</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">API Reference</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../docs_src/reference/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Function reference</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false">
+ <span class="menu-text">Core</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.mad</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.robust_std</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/core.setup_logger</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false">
+ <span class="menu-text">Sidecar</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-9" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-9" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.compute_healpix_ids_from_lonlat</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.detect_lonlat_columns</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.process_partition</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.add_psf_weights_to_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.normalize_weights_per_cell</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.build_output_path</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.write_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.validate_nside</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_healpix_cell_geometry</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.get_psf</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/sidecar.GaussianPSF</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false">
+ <span class="menu-text">Aggregate</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-10" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-10" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.aggregate_by_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.collect_sidecar_outputs</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.densify_healpix_aggregates</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.generate_output_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.extract_nside_from_filename</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.validate_sidecar_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/aggregate.process_single_sidecar</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false">
+ <span class="menu-text">Accumulator</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-11" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-11" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.StreamingStats</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.CellAccumulator</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.accumulate_batch</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.save_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.load_state</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.state_to_dataframe</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.find_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/accumulator.ensure_not_processed</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false">
+ <span class="menu-text">Finalize</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-12" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-12" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.finalize_statistics</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.densify_healpix_map</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.export_to_geotiff</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/finalize.load_state</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false">
+ <span class="menu-text">Metadata</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-13" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-13" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.HEALPyxelxMetadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.FileType</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.read_metadata_from_file</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.save_with_metadata</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_sidecar</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/metadata.validate_aggregate</span>
+  </li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false">
+ <span class="menu-text">CLI</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-14" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-14" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.sidecar_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.aggregate_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.accumulator_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.finalize_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.to_geoparquet_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.cache_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.inspect_cli</span>
+  </li>
+          <li class="sidebar-item">
+ <span class="menu-text">docs_src/reference/cli.validate_lon_lat_columns</span>
+  </li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#setup-locate-test-data" id="toc-setup-locate-test-data" class="nav-link active" data-scroll-target="#setup-locate-test-data">Setup: Locate Test Data</a></li>
+  <li><a href="#display-input-file-schema" id="toc-display-input-file-schema" class="nav-link" data-scroll-target="#display-input-file-schema">1. Display Input File Schema</a></li>
+  <li><a href="#verbose-schema-inspection" id="toc-verbose-schema-inspection" class="nav-link" data-scroll-target="#verbose-schema-inspection">2. Verbose Schema Inspection</a></li>
+  <li><a href="#list-available-sidecars" id="toc-list-available-sidecars" class="nav-link" data-scroll-target="#list-available-sidecars">3. List Available Sidecars</a></li>
+  <li><a href="#inspect-a-specific-sidecar" id="toc-inspect-a-specific-sidecar" class="nav-link" data-scroll-target="#inspect-a-specific-sidecar">4. Inspect a Specific Sidecar</a></li>
+  <li><a href="#using-the-cli-directly" id="toc-using-the-cli-directly" class="nav-link" data-scroll-target="#using-the-cli-directly">5. Using the CLI Directly</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../notebooks/01_core_concepts.html">Tutorials</a></li><li class="breadcrumb-item"><a href="../notebooks/91_example_inspect.html">Inspection</a></li><li class="breadcrumb-item"><a href="../notebooks/91_example_inspect.html">Inspect Pipeline: Schema Display and Sidecar Discovery</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Inspect Pipeline: Schema Display and Sidecar Discovery</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The <code>healpyxel_inspect</code> command provides read-only investigation of parquet files and HEALPix sidecars. It is extracted from aggregate.py per ADR-017.</p>
+<p>Features: - Display parquet schemas (column names, types, metadata) - List available sidecars with row counts and file sizes - Inspect individual sidecar schemas by index</p>
+<div id="80b43988" class="cell" data-execution_count="1">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Paths relative to notebooks/ execution context (cwd = notebooks/ when .py notebook runs)</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">str</span>(Path(<span class="st">'.'</span>).resolve()) <span class="kw">not</span> <span class="kw">in</span> sys.path:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    sys.path.insert(<span class="dv">0</span>, <span class="bu">str</span>(Path(<span class="st">'.'</span>).resolve()))</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.inspect <span class="im">import</span> (</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    print_parquet_schema,</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    print_sidecar_summary,</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> healpyxel.aggregate <span class="im">import</span> collect_sidecar_outputs</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="setup-locate-test-data" class="level2">
+<h2 class="anchored" data-anchor-id="setup-locate-test-data">Setup: Locate Test Data</h2>
+<p>Use the sample input file and sidecar outputs from the test data directory.</p>
+<div id="2de30965" class="cell" data-execution_count="2">
+<div class="cell-output cell-output-stdout">
+<pre><code>Input file: sample_50k.parquet
+Sidecar dir: ../test_data/derived/cli_quickstart
+Input exists: True</code></pre>
+</div>
+</div>
+</section>
+<section id="display-input-file-schema" class="level2">
+<h2 class="anchored" data-anchor-id="display-input-file-schema">1. Display Input File Schema</h2>
+<p>Show the schema of the input parquet file: column names, types, row count, and file size.</p>
+<div id="c94acce5" class="cell" data-execution_count="3">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>print_parquet_schema(input_file, show_metadata<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="va">False</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Schema for: sample_50k.parquet
+--------------------------------------------------------------------------------
+  File size : 18.9 MB
+  Row count : 50,000
+  Columns   : 61  (1 int, 41 float, 18 string, 1 binary)
+
+ref_id: string
+a: string
+b: string
+c: string
+d: string
+e: string
+f: string
+g: string
+h: string
+i: string
+j: string
+k: string
+l: string
+m: string
+n: string
+o: string
+p: string
+q1: double
+q2: double
+q3: double
+q4: double
+obs_id: string
+vis_slope: double
+nir_slope: double
+visnir_slope: double
+norm_vis_slope: double
+norm_nir_slope: double
+norm_visnir_slope: double
+curvature: double
+norm_curvature: double
+uv_downturn: double
+color_index_310_390: double
+color_index_415_750: double
+color_index_750_415: double
+color_index_750_950: double
+r310: double
+r390: double
+r750: double
+r950: double
+r1050: double
+r1400: double
+r415: double
+r433_2: double
+r479_9: double
+r556_9: double
+r628_8: double
+r748_7: double
+r828_4: double
+r898_8: double
+r996_2: double
+spot_number: int64
+lat_center: double
+lon_center: double
+surface: double
+width: double
+length: double
+ang_incidence: double
+ang_emission: double
+ang_phase: double
+azimuth: double
+geometry: binary
+-- schema metadata --
+geo: '{"version":"1.0.0","primary_column":"geometry","columns":{"geometry' + 92
+
+File Metadata:
+--------------------------------------------------------------------------------
+  geo: {"version":"1.0.0","primary_column":"geometry","columns":{"geometry":{"encoding":"WKB","geometry_types":["Polygon"],"bbox":[0.012436919,-75.05096,1e32,1e32]}}}</code></pre>
+</div>
+</div>
+</section>
+<section id="verbose-schema-inspection" class="level2">
+<h2 class="anchored" data-anchor-id="verbose-schema-inspection">2. Verbose Schema Inspection</h2>
+<p>With <code>--verbose</code>, the inspect command also shows per-column statistics: non-null counts, min/max for numeric columns, and unique values for strings.</p>
+<div id="8e3beb9c" class="cell" data-execution_count="4">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>print_parquet_schema(input_file, show_metadata<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="va">True</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Schema for: sample_50k.parquet
+--------------------------------------------------------------------------------
+  File size : 18.9 MB
+  Row count : 50,000
+  Columns   : 61  (1 int, 41 float, 18 string, 1 binary)
+
+ref_id: string
+a: string
+b: string
+c: string
+d: string
+e: string
+f: string
+g: string
+h: string
+i: string
+j: string
+k: string
+l: string
+m: string
+n: string
+o: string
+p: string
+q1: double
+q2: double
+q3: double
+q4: double
+obs_id: string
+vis_slope: double
+nir_slope: double
+visnir_slope: double
+norm_vis_slope: double
+norm_nir_slope: double
+norm_visnir_slope: double
+curvature: double
+norm_curvature: double
+uv_downturn: double
+color_index_310_390: double
+color_index_415_750: double
+color_index_750_415: double
+color_index_750_950: double
+r310: double
+r390: double
+r750: double
+r950: double
+r1050: double
+r1400: double
+r415: double
+r433_2: double
+r479_9: double
+r556_9: double
+r628_8: double
+r748_7: double
+r828_4: double
+r898_8: double
+r996_2: double
+spot_number: int64
+lat_center: double
+lon_center: double
+surface: double
+width: double
+length: double
+ang_incidence: double
+ang_emission: double
+ang_phase: double
+azimuth: double
+geometry: binary
+-- schema metadata --
+geo: '{"version":"1.0.0","primary_column":"geometry","columns":{"geometry' + 92
+
+File Metadata:
+--------------------------------------------------------------------------------
+  geo: {"version":"1.0.0","primary_column":"geometry","columns":{"geometry":{"encoding":"WKB","geometry_types":["Polygon"],"bbox":[0.012436919,-75.05096,1e32,1e32]}}}
+
+Column Statistics  (sample ≤ 100,000 rows from 50,000 total):
+--------------------------------------------------------------------------------
+  ref_id:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 50000  (showing first 10: 1310408274001158, 1335313413800913, 1224306405800836, 1421301274400732, 1310308273500668, 1128105542500615, 1413815343400295, 1412809443300462, 1118804420600412, 1211523084300234)
+
+  a:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0
+
+  b:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 1, 0, 2, 3
+
+  c:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 1, 0, 2, 3
+
+  d:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 1, 0, 2, 3
+
+  e:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 9, 0
+
+  f:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 1
+
+  g:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 1, 0
+
+  h:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0
+
+  i:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0
+
+  j:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0
+
+  k:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0, 1
+
+  l:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 1, 0
+
+  m:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 2
+
+  n:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0, 1
+
+  o:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0
+
+  p:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 0
+
+  q1:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -20266.81
+    max        : 44803.617
+
+  q2:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 6.4553045e-05
+    max        : 135.4909
+
+  q3:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 22.44898
+    max        : 82.88854
+
+  q4:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 2.7559056
+    max        : 100.0
+
+  obs_id:
+    type       : str
+    non-null   : 50,000 / 50,000
+    unique     : 8792  (showing first 10: ob3_13104_082740, ob3_13353_134138, ob2_12243_064058, ob4_14213_012744, ob3_13103_082735, orb_11281_055425, ob4_14138_153434, ob4_14128_094433, orb_11188_044206, ob2_12115_230843)
+
+  vis_slope:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 7.5753005e-06
+    max        : 0.00018637907
+
+  nir_slope:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.00040052616
+    max        : 0.0017497214
+
+  visnir_slope:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -9.042534e-05
+    max        : 0.0005168172
+
+  norm_vis_slope:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.120884925
+    max        : 2.9741948
+
+  norm_nir_slope:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -11.497799
+    max        : 50.22879
+
+  norm_visnir_slope:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -2.2458212
+    max        : 12.835772
+
+  curvature:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -7.371202e-07
+    max        : 4.0767304e-07
+
+  norm_curvature:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -9.905929
+    max        : 17.91107
+
+  uv_downturn:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -6.6964345
+    max        : 11.910001
+
+  color_index_310_390:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.5854993
+    max        : 1.2877373
+
+  color_index_415_750:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.45412076
+    max        : 0.8540308
+
+  color_index_750_415:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 1.170918
+    max        : 2.2020576
+
+  color_index_750_950:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -4.1659775
+    max        : 16.533722
+
+  r310:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.008597918
+    max        : 0.04206059
+
+  r390:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.004821122
+    max        : 0.07437446
+
+  r750:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.010066154
+    max        : 0.14367378
+
+  r950:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.012135452
+    max        : 0.18606234
+
+  r1050:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.05015647
+    max        : 0.32509136
+
+  r1400:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.11750144
+    max        : 1.2280836
+
+  r415:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.005165081
+    max        : 0.080763794
+
+  r433_2:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.005504178
+    max        : 0.087373376
+
+  r479_9:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.0058187596
+    max        : 0.092342384
+
+  r556_9:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.0074198316
+    max        : 0.11039857
+
+  r628_8:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.00836651
+    max        : 0.12361133
+
+  r748_7:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.010066154
+    max        : 0.14367378
+
+  r828_4:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.048658703
+    max        : 0.14531104
+
+  r898_8:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -0.1490125
+    max        : 0.30974597
+
+  r996_2:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.0020768088
+    max        : 0.17987773
+
+  spot_number:
+    type       : int64
+    non-null   : 50,000 / 50,000
+    min        : 1
+    max        : 4261
+
+  lat_center:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : -74.98644
+    max        : 74.946884
+
+  lon_center:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.020273183
+    max        : 359.96555
+
+  surface:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 29473.893
+    max        : 4312103000.0
+
+  width:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 9.751255
+    max        : 39276.62
+
+  length:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 340.39682
+    max        : 369266.6
+
+  ang_incidence:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 0.2253606
+    max        : 74.99984
+
+  ang_emission:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 2.8784714
+    max        : 87.95255
+
+  ang_phase:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 77.169624
+    max        : 102.23488
+
+  azimuth:
+    type       : float64
+    non-null   : 50,000 / 50,000
+    min        : 7.511384
+    max        : 170.39056
+
+  geometry:
+    type       : object
+    non-null   : 50,000 / 50,000
+    unique     : 50000  (showing first 10: b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\xb3\x98\xd8|\\\x06q@6#\x83\xdcE\xa8\x14@"\xab[=\xa7\x06q@\xdb\x8d\x99\x9fv\xbb\x14@C\x04\x1cB\x95\x06q@\x84\x9e\xcd\xaa\xcf\xd5\x14@\x87\xe1#bJ\x06q@\xf5\'\x96\x00\xa1\xc2\x14@\xb3\x98\xd8|\\\x06q@6#\x83\xdcE\xa8\x14@', b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\x11\x8d\xee v\xeeQ@Q\xa5f\x0f\xb4rN\xc0GZ*oG\xecQ@%\x06\x81\x95C{N\xc07\xc3\r\xf8\xfc\xf4Q@\x92\xe8e\x14\xcb}N\xc0\x10]P\xdf2\xf7Q@!\xc8A\t3uN\xc0\x11\x8d\xee v\xeeQ@Q\xa5f\x0f\xb4rN\xc0', b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\xc3\x109}=\x1fK@H\xcaq\x02.\x8b\x16@\xd5x\xe9&amp;1\x1cK@\xf1\xaf/#\x06{\x16@9\x80~\xdf\xbf\x1bK@u\xc8\xcdp\x03^\x16@\xbba\xdb\xa2\xcc\x1eK@E\xa1e\xdd?n\x16@\xc3\x109}=\x1fK@H\xcaq\x02.\x8b\x16@', b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\x9f\xb0\xc4\x03\xcaHt@\n\x84\x9db\xd5\xdaD\xc0\x81\t\xdc\xba\x1bIt@\xd3\xf7\x1a\x82\xe3\xceD\xc0~\xc6\x85\x03!Gt@\x93\xe3N\xe9`\xd1D\xc0\x14\x96x@\xd9Ft@\xdb\xc4\xc9\xfd\x0e\xddD\xc0\x9f\xb0\xc4\x03\xcaHt@\n\x84\x9db\xd5\xdaD\xc0', b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00m\xe2\xe4~\x07\xcdq@\xd4\x0f\xea"\x85\xf2:@Z\r\x89{,\xcdq@y\x93\xdf\xa2\x93\xf9:@\xb5\x89\x93\xfb\x1d\xcdq@\x0e\xf6&amp;\x86\xe4\x00;@{Nz\xdf\xf8\xccq@\xf3u\x19\xfe\xd3\xf9:@m\xe2\xe4~\x07\xcdq@\xd4\x0f\xea"\x85\xf2:@', b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\xa2b\x9c\xbf\x89Mr@sK\xab!q\xf1L@\x8f\xe4\xf2\x1fRMr@\xf7\xab\x00\xdfm\xecL@.\xe7R\\UMr@:\xaf\xb1KT\xe7L@Ae\xfc\xfb\x8cMr@\xcdv\x85&gt;X\xecL@\xa2b\x9c\xbf\x89Mr@sK\xab!q\xf1L@', b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00`\xe5\xd0"\xdb"d@Z\x82\x8c\x80\n\rJ\xc0H\xbf}\x1d8#d@\x11\xc6O\xe3\xde\x02J\xc0\xdcF\x03x\x0b\x1fd@s0\x9b\x00\xc3\x02J\xc0VH\xf9I\xb5\x1ed@\x14\xed*\xa4\xfc\x0cJ\xc0`\xe5\xd0"\xdb"d@Z\x82\x8c\x80\n\rJ\xc0', b'\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00\xb8;k\xb7]\nj@}uU\xa0\x16\xab9\xc0\xb6\xb91=a\tj@\x04\xab\xea\xe5w\xae9\xc0 A\xf1c\xcc\tj@9\x80~\xdf\xbf\xb59\xc0\x1d \x98\xa3\xc7\nj@J\x98i\xfbW\xb29\xc0\xb8;k\xb7]\nj@}uU\xa0\x16\xab9\xc0', b"\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00]\xc4wb\xd6\xdaa@\xe2\x1eK\x1f\xba\xa4K@\\\x03[%X\xdaa@3\x16Mg'\x9fK@\x95H\xa2\x97Q\xdaa@\xe1\xee\xac\xddv\x99K@\rT\xc6\xbf\xcf\xdaa@\xdd`\xa8\xc3\n\x9fK@]\xc4wb\xd6\xdaa@\xe2\x1eK\x1f\xba\xa4K@", b"\x01\x03\x00\x00\x00\x01\x00\x00\x00\x05\x00\x00\x00R'\xa0\x89\xb0\xb1r@\x14\xe7\xa8\xa3\xe3\x1cJ@\xad\x86\xc4=\x96\xb1r@2\x8f\xfc\xc1\xc0!J@\x0eO\xaf\x94e\xb1r@\xa0S\x90\x9f\x8d&amp;J@\x00\x00\x00\x00\x80\xb1r@\xc3\x9a\xca\xa2\xb0!J@R'\xa0\x89\xb0\xb1r@\x14\xe7\xa8\xa3\xe3\x1cJ@")
+</code></pre>
+</div>
+</div>
+</section>
+<section id="list-available-sidecars" class="level2">
+<h2 class="anchored" data-anchor-id="list-available-sidecars">3. List Available Sidecars</h2>
+<p>Scan the sidecar directory and display all available sidecar files with metadata.</p>
+<p>Shows: mode (nside), order, row counts, file sizes, and derived-from-parent flags.</p>
+<div id="aee7ca5c" class="cell" data-execution_count="5">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sidecars_df <span class="op">=</span> collect_sidecar_outputs(input_file, sidecar_dir, read_stats<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>print_sidecar_summary(sidecars_df, input_file)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Available Sidecar Files for: sample_50k.parquet
+====================================================================================================
+
+[0] sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet  (441.4 KB)
+    mode                : fuzzy
+    nside               : 32
+    order               : nested
+    n_rows              : 55,113
+    n_unique_healpix    : 10,870
+
+[1] sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet  (541.8 KB)
+    mode                : fuzzy
+    nside               : 64
+    order               : nested
+    n_rows              : 60,278
+    n_unique_healpix    : 28,161
+
+====================================================================================================
+Use --sidecar-index &lt;INDEX&gt; to select a specific sidecar (0-1)
+Or use --sidecar-index all to process all sidecars in batch mode
+</code></pre>
+</div>
+</div>
+</section>
+<section id="inspect-a-specific-sidecar" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-a-specific-sidecar">4. Inspect a Specific Sidecar</h2>
+<p>Display the schema of a specific sidecar by index. First use <code>--list-sidecars</code> to see available indices.</p>
+<div id="68b09afe" class="cell" data-execution_count="6">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">len</span>(sidecars_df) <span class="op">&gt;</span> <span class="dv">0</span>:</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    idx <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    sidecar_path <span class="op">=</span> Path(sidecars_df.iloc[idx][<span class="st">"file"</span>])</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Sidecar index </span><span class="sc">{</span>idx<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>sidecar_path<span class="sc">.</span>name<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">80</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    print_parquet_schema(sidecar_path, show_metadata<span class="op">=</span><span class="va">True</span>, verbose<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"No sidecars found in sidecar_dir."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Sidecar index 0: sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet
+================================================================================
+
+Schema for: sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet
+--------------------------------------------------------------------------------
+  File size : 441.4 KB
+  Row count : 55,113
+  Columns   : 3  (2 int, 1 float, 0 string, 0 binary)
+
+source_id: int64
+healpix_id: uint64
+weight: double
+-- schema metadata --
+nside: '32'
+mode: 'fuzzy'
+order: 'nested'
+
+File Metadata:
+--------------------------------------------------------------------------------
+  nside: 32
+  mode: fuzzy
+  order: nested</code></pre>
+</div>
+</div>
+</section>
+<section id="using-the-cli-directly" class="level2">
+<h2 class="anchored" data-anchor-id="using-the-cli-directly">5. Using the CLI Directly</h2>
+<p>The <code>healpyxel_inspect</code> command can also be invoked from the shell:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Show schema</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_inspect</span> <span class="at">-i</span> test_data/samples/sample_50k.parquet <span class="at">--schema</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># List sidecars with stats</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_inspect</span> <span class="at">-i</span> test_data/samples/sample_50k.parquet <span class="at">--list-sidecars</span> <span class="at">--stats</span> <span class="at">--sidecar-dir</span> test_data/derived/cli_quickstart</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Inspect sidecar index 0</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_inspect</span> <span class="at">-i</span> test_data/samples/sample_50k.parquet <span class="at">--sidecar-schema</span> 0 <span class="at">--sidecar-dir</span> test_data/derived/cli_quickstart</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Verbose output</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="ex">healpyxel_inspect</span> <span class="at">-i</span> test_data/samples/sample_50k.parquet <span class="at">--schema</span> <span class="at">-v</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="d06dc2d3" class="cell" data-execution_count="7">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Schema for: sample_50k.parquet
+--------------------------------------------------------------------------------
+  File size : 18.9 MB
+  Row count : 50,000
+  Columns   : 61  (1 int, 41 float, 18 string, 1 binary)
+
+ref_id: string
+a: string
+b: string
+c: string
+d: string
+e: string
+f: string
+g: string
+h: string
+i: string
+j: string
+k: string
+l: string
+m: string
+n: string
+o: string
+p: string
+q1: double
+q2: double
+q3: double
+q4: double
+obs_id: string
+vis_slope: double
+nir_slope: double
+visnir_slope: double
+norm_vis_slope: double
+norm_nir_slope: double
+norm_visnir_slope: double
+curvature: double
+norm_curvature: double
+uv_downturn: double
+color_index_310_390: double
+color_index_415_750: double
+color_index_750_415: double
+color_index_750_950: double
+r310: double
+r390: double
+r750: double
+r950: double
+r1050: double
+r1400: double
+r415: double
+r433_2: double
+r479_9: double
+r556_9: double
+r628_8: double
+r748_7: double
+r828_4: double
+r898_8: double
+r996_2: double
+spot_number: int64
+lat_center: double
+lon_center: double
+surface: double
+width: double
+length: double
+ang_incidence: double
+ang_emission: double
+ang_phase: double
+azimuth: double
+geometry: binary
+-- schema metadata --
+geo: '{"version":"1.0.0","primary_column":"geometry","columns":{"geometry' + 92
+
+File Metadata:
+--------------------------------------------------------------------------------
+  geo: {"version":"1.0.0","primary_column":"geometry","columns":{"geometry":{"encoding":"WKB","geometry_types":["Polygon"],"bbox":[0.012436919,-75.05096,1e32,1e32]}}}</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Available Sidecar Files for: sample_50k.parquet
+====================================================================================================
+
+[0] sample_50k.cell-healpix_assignment-fuzzy_nside-32_order-nested.parquet  (441.4 KB)
+    mode                : fuzzy
+    nside               : 32
+    order               : nested
+    n_rows              : 55,113
+    n_unique_healpix    : 10,870
+
+[1] sample_50k.cell-healpix_assignment-fuzzy_nside-64_order-nested.parquet  (541.8 KB)
+    mode                : fuzzy
+    nside               : 64
+    order               : nested
+    n_rows              : 60,278
+    n_unique_healpix    : 28,161
+
+====================================================================================================
+Use --sidecar-index &lt;INDEX&gt; to select a specific sidecar (0-1)
+Or use --sidecar-index all to process all sidecars in batch mode
+</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="7">
+<pre><code>0</code></pre>
+</div>
+</div>
+
+
+<!-- -->
+
+</section>
+
+<a onclick="window.scrollTo(0, 0); return false;" role="button" id="quarto-back-to-top"><i class="bi bi-arrow-up"></i> Back to top</a></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="../notebooks/90_example_streaming.html" class="pagination-link" aria-label="Streaming WIP!">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text">Streaming WIP!</span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../docs_src/reference/index.html" class="pagination-link" aria-label="Function reference">
+        <span class="nav-page-text">Function reference</span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb15" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># ---</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu"># jupyter:</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="fu">#   jupytext:</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">#     formats: ipynb,py:percent</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="fu">#     text_representation:</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="fu">#       extension: .py</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="fu">#       format_name: percent</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="fu">#       format_version: '1.3'</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="fu">#       jupytext_version: 1.19.4</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="fu">#   kernelspec:</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a><span class="fu">#     display_name: python3</span></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="fu">#     language: python</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a><span class="fu">#     name: python3</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a><span class="fu"># ---</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a><span class="fu"># # Inspect Pipeline: Schema Display and Sidecar Discovery</span></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a><span class="fu"># The `healpyxel_inspect` command provides read-only investigation of parquet files</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a><span class="fu"># and HEALPix sidecars.  It is extracted from aggregate.py per ADR-017.</span></span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a><span class="fu"># Features:</span></span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a><span class="fu"># - Display parquet schemas (column names, types, metadata)</span></span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a><span class="fu"># - List available sidecars with row counts and file sizes</span></span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a><span class="fu"># - Inspect individual sidecar schemas by index</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>import sys</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>from pathlib import Path</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a><span class="fu"># Paths relative to notebooks/ execution context (cwd = notebooks/ when .py notebook runs)</span></span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>if str(Path('.').resolve()) not in sys.path:</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    sys.path.insert(0, str(Path('.').resolve()))</span>
+<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>from healpyxel.inspect import (</span>
+<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>    print_parquet_schema,</span>
+<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>    print_sidecar_summary,</span>
+<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>from healpyxel.aggregate import collect_sidecar_outputs</span>
+<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## Setup: Locate Test Data</span></span>
+<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a><span class="fu"># Use the sample input file and sidecar outputs from the test data directory.</span></span>
+<span id="cb15-45"><a href="#cb15-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-46"><a href="#cb15-46" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-47"><a href="#cb15-47" aria-hidden="true" tabindex="-1"></a>#| echo: false</span>
+<span id="cb15-48"><a href="#cb15-48" aria-hidden="true" tabindex="-1"></a><span class="fu"># Locate test data (paths relative to notebooks/)</span></span>
+<span id="cb15-49"><a href="#cb15-49" aria-hidden="true" tabindex="-1"></a>test_data_dir = Path('../test_data')</span>
+<span id="cb15-50"><a href="#cb15-50" aria-hidden="true" tabindex="-1"></a>input_file = test_data_dir / 'samples' / 'sample_50k.parquet'</span>
+<span id="cb15-51"><a href="#cb15-51" aria-hidden="true" tabindex="-1"></a>sidecar_dir = test_data_dir / 'derived' / 'cli_quickstart'</span>
+<span id="cb15-52"><a href="#cb15-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-53"><a href="#cb15-53" aria-hidden="true" tabindex="-1"></a>print(f"Input file: {input_file.name}")</span>
+<span id="cb15-54"><a href="#cb15-54" aria-hidden="true" tabindex="-1"></a>print(f"Sidecar dir: {sidecar_dir}")</span>
+<span id="cb15-55"><a href="#cb15-55" aria-hidden="true" tabindex="-1"></a>print(f"Input exists: {input_file.exists()}")</span>
+<span id="cb15-56"><a href="#cb15-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-57"><a href="#cb15-57" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-58"><a href="#cb15-58" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 1. Display Input File Schema</span></span>
+<span id="cb15-59"><a href="#cb15-59" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-60"><a href="#cb15-60" aria-hidden="true" tabindex="-1"></a><span class="fu"># Show the schema of the input parquet file: column names, types, row count, and file size.</span></span>
+<span id="cb15-61"><a href="#cb15-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-62"><a href="#cb15-62" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-63"><a href="#cb15-63" aria-hidden="true" tabindex="-1"></a>print_parquet_schema(input_file, show_metadata=True, verbose=False)</span>
+<span id="cb15-64"><a href="#cb15-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-65"><a href="#cb15-65" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-66"><a href="#cb15-66" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 2. Verbose Schema Inspection</span></span>
+<span id="cb15-67"><a href="#cb15-67" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-68"><a href="#cb15-68" aria-hidden="true" tabindex="-1"></a><span class="fu"># With `--verbose`, the inspect command also shows per-column statistics:</span></span>
+<span id="cb15-69"><a href="#cb15-69" aria-hidden="true" tabindex="-1"></a><span class="fu"># non-null counts, min/max for numeric columns, and unique values for strings.</span></span>
+<span id="cb15-70"><a href="#cb15-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-71"><a href="#cb15-71" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-72"><a href="#cb15-72" aria-hidden="true" tabindex="-1"></a>print_parquet_schema(input_file, show_metadata=True, verbose=True)</span>
+<span id="cb15-73"><a href="#cb15-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-74"><a href="#cb15-74" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-75"><a href="#cb15-75" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 3. List Available Sidecars</span></span>
+<span id="cb15-76"><a href="#cb15-76" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-77"><a href="#cb15-77" aria-hidden="true" tabindex="-1"></a><span class="fu"># Scan the sidecar directory and display all available sidecar files with metadata.</span></span>
+<span id="cb15-78"><a href="#cb15-78" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-79"><a href="#cb15-79" aria-hidden="true" tabindex="-1"></a><span class="fu"># Shows: mode (nside), order, row counts, file sizes, and derived-from-parent flags.</span></span>
+<span id="cb15-80"><a href="#cb15-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-81"><a href="#cb15-81" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-82"><a href="#cb15-82" aria-hidden="true" tabindex="-1"></a>sidecars_df = collect_sidecar_outputs(input_file, sidecar_dir, read_stats=True)</span>
+<span id="cb15-83"><a href="#cb15-83" aria-hidden="true" tabindex="-1"></a>print_sidecar_summary(sidecars_df, input_file)</span>
+<span id="cb15-84"><a href="#cb15-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-85"><a href="#cb15-85" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-86"><a href="#cb15-86" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 4. Inspect a Specific Sidecar</span></span>
+<span id="cb15-87"><a href="#cb15-87" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-88"><a href="#cb15-88" aria-hidden="true" tabindex="-1"></a><span class="fu"># Display the schema of a specific sidecar by index.</span></span>
+<span id="cb15-89"><a href="#cb15-89" aria-hidden="true" tabindex="-1"></a><span class="fu"># First use `--list-sidecars` to see available indices.</span></span>
+<span id="cb15-90"><a href="#cb15-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-91"><a href="#cb15-91" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-92"><a href="#cb15-92" aria-hidden="true" tabindex="-1"></a>if len(sidecars_df) &gt; 0:</span>
+<span id="cb15-93"><a href="#cb15-93" aria-hidden="true" tabindex="-1"></a>    idx = 0</span>
+<span id="cb15-94"><a href="#cb15-94" aria-hidden="true" tabindex="-1"></a>    sidecar_path = Path(sidecars_df.iloc<span class="co">[</span><span class="ot">idx</span><span class="co">]["file"]</span>)</span>
+<span id="cb15-95"><a href="#cb15-95" aria-hidden="true" tabindex="-1"></a>    print(f"\nSidecar index {idx}: {sidecar_path.name}")</span>
+<span id="cb15-96"><a href="#cb15-96" aria-hidden="true" tabindex="-1"></a>    print("=" * 80)</span>
+<span id="cb15-97"><a href="#cb15-97" aria-hidden="true" tabindex="-1"></a>    print_parquet_schema(sidecar_path, show_metadata=True, verbose=False)</span>
+<span id="cb15-98"><a href="#cb15-98" aria-hidden="true" tabindex="-1"></a>else:</span>
+<span id="cb15-99"><a href="#cb15-99" aria-hidden="true" tabindex="-1"></a>    print("No sidecars found in sidecar_dir.")</span>
+<span id="cb15-100"><a href="#cb15-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-101"><a href="#cb15-101" aria-hidden="true" tabindex="-1"></a><span class="fu"># %% [markdown]</span></span>
+<span id="cb15-102"><a href="#cb15-102" aria-hidden="true" tabindex="-1"></a><span class="fu"># ## 5. Using the CLI Directly</span></span>
+<span id="cb15-103"><a href="#cb15-103" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-104"><a href="#cb15-104" aria-hidden="true" tabindex="-1"></a><span class="fu"># The `healpyxel_inspect` command can also be invoked from the shell:</span></span>
+<span id="cb15-105"><a href="#cb15-105" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-106"><a href="#cb15-106" aria-hidden="true" tabindex="-1"></a><span class="fu"># ```bash</span></span>
+<span id="cb15-107"><a href="#cb15-107" aria-hidden="true" tabindex="-1"></a><span class="fu"># # Show schema</span></span>
+<span id="cb15-108"><a href="#cb15-108" aria-hidden="true" tabindex="-1"></a><span class="fu"># healpyxel_inspect -i test_data/samples/sample_50k.parquet --schema</span></span>
+<span id="cb15-109"><a href="#cb15-109" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-110"><a href="#cb15-110" aria-hidden="true" tabindex="-1"></a><span class="fu"># # List sidecars with stats</span></span>
+<span id="cb15-111"><a href="#cb15-111" aria-hidden="true" tabindex="-1"></a><span class="fu"># healpyxel_inspect -i test_data/samples/sample_50k.parquet --list-sidecars --stats --sidecar-dir test_data/derived/cli_quickstart</span></span>
+<span id="cb15-112"><a href="#cb15-112" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-113"><a href="#cb15-113" aria-hidden="true" tabindex="-1"></a><span class="fu"># # Inspect sidecar index 0</span></span>
+<span id="cb15-114"><a href="#cb15-114" aria-hidden="true" tabindex="-1"></a><span class="fu"># healpyxel_inspect -i test_data/samples/sample_50k.parquet --sidecar-schema 0 --sidecar-dir test_data/derived/cli_quickstart</span></span>
+<span id="cb15-115"><a href="#cb15-115" aria-hidden="true" tabindex="-1"></a>#</span>
+<span id="cb15-116"><a href="#cb15-116" aria-hidden="true" tabindex="-1"></a><span class="fu"># # Verbose output</span></span>
+<span id="cb15-117"><a href="#cb15-117" aria-hidden="true" tabindex="-1"></a><span class="fu"># healpyxel_inspect -i test_data/samples/sample_50k.parquet --schema -v</span></span>
+<span id="cb15-118"><a href="#cb15-118" aria-hidden="true" tabindex="-1"></a><span class="fu"># ```</span></span>
+<span id="cb15-119"><a href="#cb15-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-120"><a href="#cb15-120" aria-hidden="true" tabindex="-1"></a><span class="fu"># %%</span></span>
+<span id="cb15-121"><a href="#cb15-121" aria-hidden="true" tabindex="-1"></a>#| echo: false</span>
+<span id="cb15-122"><a href="#cb15-122" aria-hidden="true" tabindex="-1"></a><span class="fu"># Demonstrate CLI invocation via Python API</span></span>
+<span id="cb15-123"><a href="#cb15-123" aria-hidden="true" tabindex="-1"></a>from healpyxel.inspect import parse_arguments, run</span>
+<span id="cb15-124"><a href="#cb15-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-125"><a href="#cb15-125" aria-hidden="true" tabindex="-1"></a><span class="fu"># Show schema</span></span>
+<span id="cb15-126"><a href="#cb15-126" aria-hidden="true" tabindex="-1"></a>args = parse_arguments(<span class="co">[</span><span class="ot">"-i", str(input_file), "--schema"</span><span class="co">]</span>)</span>
+<span id="cb15-127"><a href="#cb15-127" aria-hidden="true" tabindex="-1"></a>run(args)</span>
+<span id="cb15-128"><a href="#cb15-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-129"><a href="#cb15-129" aria-hidden="true" tabindex="-1"></a><span class="fu"># List sidecars</span></span>
+<span id="cb15-130"><a href="#cb15-130" aria-hidden="true" tabindex="-1"></a>args = parse_arguments(<span class="co">[</span><span class="ot">"-i", str(input_file), "--list-sidecars", "--stats", "--sidecar-dir", str(sidecar_dir)</span><span class="co">]</span>)</span>
+<span id="cb15-131"><a href="#cb15-131" aria-hidden="true" tabindex="-1"></a>run(args)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

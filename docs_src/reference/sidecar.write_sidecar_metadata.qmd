@@ -9,19 +9,32 @@ sidecar.write_sidecar_metadata(
     lon_convention,
     ncores,
     args,
+    derived_from_parent=None,
 )
 ```
 
-Write sidecar processing metadata to JSON file.
+Write sidecar processing metadata to a JSON companion file.
 
-Args:
-    output_path: Path to the sidecar parquet file
-    input_path: Path to the input file
-    nside: HEALPix nside parameter
-    mode: Assignment mode ('strict' or 'fuzzy')
-    lon_convention: Longitude convention used
-    ncores: Number of cores used
-    args: Parsed command-line arguments
+Creates a ``.meta.json`` file alongside the sidecar parquet file with
+complete processing parameters, HEALPix configuration, and provenance
+information. When the sidecar is derived from a higher-nside computation
+via bit-shift aggregation, the parent nside is recorded.
 
-Returns:
-    Path to the written metadata file
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                | Type               | Description                                                                                                                 | Default    |
+|---------------------|--------------------|-----------------------------------------------------------------------------------------------------------------------------|------------|
+| output_path         | Path               | Path to the sidecar parquet file.                                                                                           | _required_ |
+| input_path          | Path               | Path to the source input file.                                                                                              | _required_ |
+| nside               | int                | HEALPix nside parameter.                                                                                                    | _required_ |
+| mode                | str                | Assignment mode: ``'strict'`` or ``'fuzzy'``.                                                                               | _required_ |
+| lon_convention      | str                | Longitude convention used: ``'0_360'`` or ``'minus_plus180'``.                                                              | _required_ |
+| ncores              | int                | Number of Dask worker cores used.                                                                                           | _required_ |
+| args                | argparse.Namespace | Parsed command-line arguments (for recording PSF settings, etc.).                                                           | _required_ |
+| derived_from_parent | int or None        | If set, this sidecar was derived from a higher-nside sidecar via NEST bit-shift aggregation. The value is the parent nside. | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                       |
+|--------|--------|---------------------------------------------------|
+|        | Path   | Path to the written ``.meta.json`` metadata file. |

@@ -6,7 +6,25 @@ accumulator.StreamingStats()
 
 Container for streaming statistics using Welford's algorithm.
 
-Maintains running statistics (mean, std, min, max) without storing raw data.
+Maintains running statistics — count, sum, sum of squares, min, max —
+without storing raw data. Supports merge for parallel/reduce workflows
+and serialization to/from dictionaries.
+
+The mean and standard deviation are computed on-the-fly from the
+accumulated state, giving numerically stable one-pass computation.
+
+## Examples {.doc-section .doc-section-examples}
+
+```python
+>>> stats = StreamingStats()
+>>> stats.update([1.0, 2.0, 3.0])
+>>> stats.n
+3
+>>> stats.mean
+2.0
+>>> stats.std
+0.816496580927726
+```
 
 ## Attributes
 

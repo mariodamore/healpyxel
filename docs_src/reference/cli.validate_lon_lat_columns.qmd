@@ -4,5 +4,31 @@
 cli.validate_lon_lat_columns(df, lon_col, lat_col, mode, input_file)
 ```
 
-Validate or auto-detect lon/lat columns. Fail fast with context.
-Returns (lon_col, lat_col) or raises ValueError.
+Validate or auto-detect longitude/latitude columns.
+
+Used by the sidecar and aggregate pipelines to resolve which
+DataFrame columns contain the geographic coordinates required for
+the HEALPix spatial join.  Supports explicit user-provided names or
+auto-detection from a common-name list.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type         | Description                                                                         | Default    |
+|------------|--------------|-------------------------------------------------------------------------------------|------------|
+| df         | pd.DataFrame | Input parquet content loaded into a DataFrame.                                      | _required_ |
+| lon_col    | str or None  | User-provided longitude column name (``None`` triggers auto-detect).                | _required_ |
+| lat_col    | str or None  | User-provided latitude column name (``None`` triggers auto-detect).                 | _required_ |
+| mode       | str          | Processing mode string (``'strict'`` or ``'fuzzy'``).  Used in error messages only. | _required_ |
+| input_file | str or Path  | Source file path for error-reporting context.                                       | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type              | Description                                           |
+|--------|-------------------|-------------------------------------------------------|
+|        | tuple\[str, str\] | ``(lon_col, lat_col)`` for the resolved column names. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type       | Description                                                                                                  |
+|--------|------------|--------------------------------------------------------------------------------------------------------------|
+|        | ValueError | * If the user-provided columns are not in ``df.columns``. * If auto-detection fails (no common names found). |

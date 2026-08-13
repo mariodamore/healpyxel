@@ -1,0 +1,277 @@
+---
+title: "workflow.run_pipeline"
+---
+
+# healpyxel.workflow.run_pipeline
+
+```python
+from pathlib import Path
+from io import TextIOBase
+from typing import Any
+from healpyxel.workflow import run_pipeline
+
+results = run_pipeline(
+    input: Path,
+    output_dir: Path,
+    nsides: tuple[int, ...] = (32, 64, 128),
+    lon_convention: str = "minus_plus180",
+    yes: bool = False,
+    loglevel: str = "info",
+    mode: str = "fuzzy",
+    ncores: int | None = None,
+    lon_col: str | None = None,
+    lat_col: str | None = None,
+    no_coalesce: bool = False,
+    stats_sample_size: int = 10000,
+    body_model: str = "sphere",
+    body_radius: float = 1.0,
+    body_polar_radius: float | None = None,
+    data_psf: str = "none",
+    cell_psf: str = "none",
+    data_psf_sigma_level: float = 2.0,
+    cell_psf_sigma_level: float = 2.0,
+    psf_combine: str = "multiply",
+    no_psf_normalize: bool = False,
+    no_multi_res_optimize: bool = False,
+    columns: tuple[str, ...] | None = None,
+    aggregate_columns: tuple[str, ...] | None = None,
+    aggs: tuple[str, ...] = ("mean", "median", "std", "robust_std"),
+    filter: str | None = None,
+    densify: bool = False,
+    use_duckdb: bool = True,
+    use_dask: bool = False,
+    dask_npartitions: int | None = None,
+    min_count: int = 1,
+    stop_on_error: bool = False,
+    verbose: bool = False,
+    quiet: bool = False,
+    output_suffix: str = ".geo",
+    gpq_output_dir: Path | None = None,
+    gpq_nside: int | None = None,
+    order: str = "nested",
+    gpq_lon_convention: str = "auto",
+    fix_antimeridian: bool = True,
+    chunk_size: int = 65536,
+    sidecar_kwargs: dict[str, Any] | None = None,
+    aggregate_kwargs: dict[str, Any] | None = None,
+    geoparquet_kwargs: dict[str, Any] | None = None,
+    log: TextIOBase | None = None,
+) -> list[dict]
+```
+
+Run the 3-phase pipeline (sidecar → aggregate → geoparquet).
+
+Returns a list of dicts, one per executed stage:
+`{"stage": str, "nside": int|None, "status": "ok"|"skip"|"error", "detail": str}`.
+
+Skip detection reads `.meta.json` (sidecar/aggregate) or globs
+`.geo.parquet`-family files. Skipped stages are reported with a `⏭`.
+
+
+## Parameters
+
+**`input`** — input parquet file. Must exist.
+**`output_dir`** — working directory for sidecars and aggregates.
+**`nsides`** — HEALPix resolutions. Default `(32, 64, 128)`.
+**`lon_convention`** — `"0_360"` or `"minus_plus180"`. Default `"minus_plus180"`.
+**`mode`** — `"strict"` or `"fuzzy"`. Default `"fuzzy"`.
+**`columns`** — value columns to aggregate. `None` → auto-discover all
+  `float64/double` columns.
+**`aggregate_columns`** — always-included columns (appended to auto-discovered
+  set). Use to force HK defaults, e.g. `("TARGET_DISTANCE_median",)`.
+**`aggs`** — aggregation functions. Choices: `mean, median, std, min, max,
+  mad, robust_std`. Default `("mean", "median", "std", "robust_std")`.
+**`filter`** — pandas query expression for pre-aggregation filtering.
+**`densify`** — fill empty HEALPix cells with NaN.
+**`use_duckdb`** — use DuckDB backend (default `True`).
+**`use_dask`** — use Dask for parallel aggregation.
+**`min_count`** — minimum observations per cell for valid aggregation.
+**`verbose`** — print equivalent CLI commands before each stage.
+**`log`** — write a self-contained bash script to this file handle.
+**`sidecar_kwargs` / `aggregate_kwargs` / `geoparquet_kwargs`** — per-stage
+  overrides. Highest precedence.
+
+
+## Examples
+
+**Minimal call:**
+
+```python
+from pathlib import Path
+from healpyxel.workflow import run_pipeline
+
+results = run_pipeline(
+    input=Path("test_data/samples/sample_50k.parquet"),
+    output_dir=Path("healpix/"),
+)
+```
+
+**With overrides:**
+
+```python
+results = run_pipeline(
+    input=Path("test_data/samples/sample_50k.parquet"),
+    output_dir=Path("healpix/"),
+    nsides=(32, 64),
+    aggs=("median", "mad"),
+    min_count=2,
+    verbose=True,
+    log=open("pipeline.log", "w"),
+)
+```
+
+
+
+
+# healpyxel.workflow.save_script
+
+```python
+from pathlib import Path
+from healpyxel.workflow import save_script
+
+save_script(
+    input: Path,
+    output_dir: Path,
+    nsides: tuple[int, ...] = (32, 64, 128),
+    lon_convention: str = "minus_plus180",
+    yes: bool = False,
+    loglevel: str = "info",
+    mode: str = "fuzzy",
+    ncores: int | None = None,
+    lon_col: str | None = None,
+    lat_col: str | None = None,
+    no_coalesce: bool = False,
+    stats_sample_size: int = 10000,
+    body_model: str = "sphere",
+    body_radius: float = 1.0,
+    body_polar_radius: float | None = None,
+    data_psf: str = "none",
+    cell_psf: str = "none",
+    data_psf_sigma_level: float = 2.0,
+    cell_psf_sigma_level: float = 2.0,
+    psf_combine: str = "multiply",
+    no_psf_normalize: bool = False,
+    no_multi_res_optimize: bool = False,
+    columns: tuple[str, ...] | None = None,
+    aggregate_columns: tuple[str, ...] | None = None,
+    aggs: tuple[str, ...] = ("mean", "median", "std", "robust_std"),
+    filter: str | None = None,
+    densify: bool = False,
+    use_duckdb: bool = True,
+    use_dask: bool = False,
+    dask_npartitions: int | None = None,
+    min_count: int = 1,
+    stop_on_error: bool = False,
+    verbose: bool = False,
+    quiet: bool = False,
+    output_suffix: str = ".geo",
+    gpq_output_dir: Path | None = None,
+    gpq_nside: int | None = None,
+    order: str = "nested",
+    gpq_lon_convention: str = "auto",
+    fix_antimeridian: bool = True,
+    chunk_size: int = 65536,
+    sidecar_kwargs: dict[str, Any] | None = None,
+    aggregate_kwargs: dict[str, Any] | None = None,
+    geoparquet_kwargs: dict[str, Any] | None = None,
+    output: Path | TextIOBase | None = None,
+) -> None
+```
+
+Write a self-contained bash script reproducing this pipeline run.
+
+Parameters mirror `run_pipeline`. If *output* is a path, write there.
+If *output* is a file handle, write directly. If *None*, write to stdout.
+
+
+## Examples
+
+**Write a script to a file:**
+
+```python
+from pathlib import Path
+from healpyxel.workflow import save_script
+
+save_script(
+    input=Path("test_data/samples/sample_50k.parquet"),
+    output_dir=Path("healpix/"),
+    nsides=(32, 64),
+    output=Path("pipeline_repro.sh"),
+)
+```
+
+**Capture to a string buffer:**
+
+```python
+from io import StringIO
+from healpyxel.workflow import save_script
+
+buf = StringIO()
+save_script(
+    input=Path("test_data/samples/sample_50k.parquet"),
+    output_dir=Path("healpix/"),
+    nsides=(32, 64),
+    output=buf,
+)
+print(buf.getvalue())
+```
+
+
+
+
+# healpyxel.workflow.pipeline_cli
+
+```python
+from healpyxel.workflow import pipeline_cli
+
+pipeline_cli(argv: list[str] | None = None) -> list[dict]
+```
+
+CLI entry point for `healpyxel_pipeline`. Accepts the most common
+pipeline parameters; for full control use the Python API.
+
+
+## Options
+
+    -i INPUT, --input INPUT
+                        Input parquet file (required).
+    -o OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        Working directory for sidecars/aggregates.
+    -n NSIDES [NSIDES ...], --nsides NSIDES [NSIDES ...]
+                        HEALPix nside values (default: 32 64 128).
+    --lon-convention {0_360,minus_plus180}
+    -y, --yes             Suppress overwrite prompts.
+    --loglevel {debug,info,warning,error}
+    --mode {strict,fuzzy}
+    --ncores NCORES
+    --body-model {sphere,ellipsoid,dsk}
+    --columns COLUMNS [COLUMNS ...]
+                        Value columns to aggregate (overrides auto-discovery).
+    --aggregate-columns AGGREGATE_COLUMNS [AGGREGATE_COLUMNS ...]
+                        Additional columns always included alongside auto-
+                        discovered ones.
+    --aggs {mean,median,std,min,max,mad,robust_std} [...]
+                        Aggregation functions (default: mean median std
+                        robust_std).
+    --filter FILTER       Pandas query expression to filter before aggregation.
+    --densify
+    --no-duckdb
+    --use-dask
+    --min-count MIN_COUNT
+    -v, --verbose         Print equivalent CLI commands before each stage.
+    --log LOG             Write a reproducible bash script to this file.
+
+
+## Example
+
+```bash
+healpyxel_pipeline \
+  -i test_data/samples/sample_50k.parquet \
+  -o test_data/derived/cli_quickstart \
+  -n 32 64 \
+  --mode fuzzy \
+  --verbose \
+  --log pipeline.log
+```
+
+For full control, pass parameters via the Python API.

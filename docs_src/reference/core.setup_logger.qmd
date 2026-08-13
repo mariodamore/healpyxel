@@ -4,11 +4,20 @@
 core.setup_logger(name, level=logging.INFO)
 ```
 
-Setup a logger with standard formatting.
+Create a logger with the standard healpyxel output format.
 
-Args:
-    name: Logger name
-    level: Logging level (default: INFO)
+Only adds a handler when the logger has no handlers yet, so repeated
+calls with the same name do not produce duplicate output.
 
-Returns:
-    Configured logger
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type   | Description                                                               | Default        |
+|--------|--------|---------------------------------------------------------------------------|----------------|
+| name   | str    | Logger name (typically the calling module, e.g. ``"healpyxel.sidecar"``). | _required_     |
+| level  | int    | Logging level threshold (default: ``logging.INFO``).                      | `logging.INFO` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type           | Description                                                                                          |
+|--------|----------------|------------------------------------------------------------------------------------------------------|
+|        | logging.Logger | Configured logger with a ``StreamHandler`` using ``"%(asctime)s %(levelname)s %(message)s"`` format. |

@@ -6,4 +6,18 @@ metadata.FileType()
 
 Pipeline file type discriminator.
 
-Used to identify which stage of the HEALPix pipeline produced a parquet file.
+Identifies which stage of the healpyxel pipeline produced a parquet file.
+Used for validation and auto-detection of file types.
+
+## Values {.doc-section .doc-section-values}
+
+SIDECAR : ``'sidecar'``
+    Source-to-cell mapping file.
+AGGREGATE : ``'aggregate'``
+    Aggregated HEALPix statistics.
+ACCUMULATOR : ``'accumulator'``
+    Streaming accumulator state (intermediate).
+FINALIZE : ``'finalize'``
+    Final HEALPix statistical map.
+GEOSPATIAL : ``'geospatial'``
+    GeoParquet with HEALPix geometry.

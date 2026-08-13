@@ -13,16 +13,28 @@ accumulator.save_state(
 
 Serialize accumulated state to Parquet with metadata.
 
-Includes idempotency checks via input fingerprinting to prevent
-accidental double-accumulation of the same batch.
+Converts the state dict to a DataFrame via :func:`state_to_dataframe`,
+then writes it to Parquet with an Arrow schema that embeds HEALPix
+metadata. Also writes a companion ``.meta.json`` sidecar with full
+processing history.
 
-Args:
-    state: Dict[int, CellAccumulator] from accumulate_batch()
-    output_path: Path to write parquet file
-    meta: HEALPyxelxMetadata instance
-    processing_metadata: Optional batch info dict
-    input_path: Path to input data file (for fingerprint tracking)
-    on_duplicate: 'error' | 'skip' — action if input already processed
+Includes idempotency checks via input fingerprinting (SHA-256 of path
++ size + mtime) to prevent accidental double-accumulation of the
+same batch.
 
-Raises:
-    ValueError: If input_path already in processed_inputs and on_duplicate='error'
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name                | Type                         | Description                                                                                                  | Default    |
+|---------------------|------------------------------|--------------------------------------------------------------------------------------------------------------|------------|
+| state               | dict\[int, CellAccumulator\] | Accumulator state from :func:`accumulate_batch`.                                                             | _required_ |
+| output_path         | Path                         | Path to write the parquet state file.                                                                        | _required_ |
+| meta                | HEALPyxelxMetadata           | HEALPix metadata instance (nside, mode, order, etc.).                                                        | _required_ |
+| processing_metadata | dict or None                 | Optional batch info dict with keys like ``batch_id``, ``columns``, ``n_cells``, ``total_observations``, etc. | `None`     |
+| input_path          | Path or None                 | Path to input data file. Used for fingerprint tracking to detect duplicate accumulation.                     | `None`     |
+| on_duplicate        | str                          | Action if input was already processed: ``'error'`` (raise) or ``'skip'`` (silently record).                  | `'error'`  |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type       | Description                                                                     |
+|--------|------------|---------------------------------------------------------------------------------|
+|        | ValueError | If ``input_path`` already in ``processed_inputs`` and ``on_duplicate='error'``. |

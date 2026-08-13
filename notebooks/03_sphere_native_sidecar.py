@@ -1,11 +1,12 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
-#       jupytext_version: 1.19.1
+#       jupytext_version: 1.19.4
 #   kernelspec:
 #     display_name: python3
 #     language: python
@@ -20,6 +21,7 @@
 # crossings, pole singularities, and winding-order problems entirely.
 
 # %%
+#| echo: false
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -82,6 +84,7 @@ from shapely.geometry import Polygon
 # the great-circle arc sampling.
 
 # %%
+#| echo: false
 # Create a simple polygon at high latitude
 coords = [(95.0, 70.0), (105.0, 70.0), (105.0, 75.0), (95.0, 75.0), (95.0, 70.0)]
 poly = Polygon(coords)
@@ -103,6 +106,7 @@ for i in range(xyz_v.shape[1]):
     print(f"  v{i}: [{xyz_v[0, i]:+.4f}, {xyz_v[1, i]:+.4f}, {xyz_v[2, i]:+.4f}]")
 
 # %%
+#| echo: false
 # Sample the first edge (v0 -> v1) via SLERP
 v0 = xyz_v[:, 0]
 v1 = xyz_v[:, 1]
@@ -127,6 +131,7 @@ for i in range(5):
 # vertices from 179° → -179° span only 2° on the sphere.
 
 # %%
+#| echo: false
 def plot_polygon_and_slrp(ax, coords_list, body, color, label, n_edge=40, ls="-"):
     """Plot polygon vertices and SLERP edge samples on a lon/lat map."""
     xyz_all = []
@@ -195,6 +200,7 @@ plt.show()
 # regardless of vertex ordering.
 
 # %%
+#| echo: false
 # Create the same polygon with CCW and CW winding
 coords_ccw = [(95.0, 70.0), (105.0, 70.0), (105.0, 75.0), (95.0, 75.0), (95.0, 70.0)]
 coords_cw = list(reversed(coords_ccw))
@@ -234,6 +240,7 @@ print(f"Sets are identical: {ccw_cells == cw_cells}")
 # produce identical sidecars. Unit vectors make this trivially true.
 
 # %%
+#| echo: false
 am_coords = [(175, 5), (179, 5), (-179, 5), (-175, 5),
              (-175, -5), (-179, -6), (179, -6), (175, -5), (175, 5)]
 
@@ -260,6 +267,7 @@ print(f"Identical sets: {cells_m180 == cells_360}")
 # have no coordinate singularity.
 
 # %%
+#| echo: false
 # Triangle covering area near the north pole
 polar_coords = [(0.0, 85.0), (120.0, 85.0), (240.0, 85.0), (0.0, 85.0)]
 poly_polar = Polygon(polar_coords)
@@ -284,6 +292,7 @@ for hid in sorted(polar_cells)[:5]:
 # The complete fuzzy-mode pipeline for a single polygon:
 
 # %%
+#| echo: false
 fig, ax = plt.subplots(figsize=(10, 6))
 
 # Simple rectangle

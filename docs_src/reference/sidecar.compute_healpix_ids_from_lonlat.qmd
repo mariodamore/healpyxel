@@ -4,11 +4,31 @@
 sidecar.compute_healpix_ids_from_lonlat(nside, lons, lats, body=None)
 ```
 
-Compute HEALPix indices for arrays of lon,lat in degrees.
+Compute HEALPix cell IDs for arrays of lon/lat coordinates in degrees.
+
+This is the fundamental coordinate-to-cell conversion function used
+throughout the pipeline. It normalizes longitudes to [0, 360) and
+delegates to healpy's ``ang2pix`` (NEST ordering).
 
 If a body geometry backend is provided, coordinates are first converted
-through the body model (lon/lat -> xyz -> unit sphere) before HEALPix
-indexing. This enables correct geodetic handling for ellipsoidal bodies.
+through the body model (lon/lat → xyz → unit sphere) before HEALPix
+indexing. This enables correct geodetic handling for ellipsoidal bodies
+like Earth or Mars.
 
-Tries to use cdshealpix if available, otherwise falls back to healpy.
-Returns a 1D integer numpy array of same length as inputs.
+Prefers healpy over cdshealpix for consistency with the rest of the
+codebase. Falls back to cdshealpix if healpy is not available.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                 | Description                                               | Default    |
+|--------|----------------------|-----------------------------------------------------------|------------|
+| nside  | int                  | HEALPix nside parameter (must be a power of 2).           | _required_ |
+| lons   | np.ndarray           | Longitude values in degrees. Shape (N,).                  | _required_ |
+| lats   | np.ndarray           | Latitude values in degrees. Shape (N,).                   | _required_ |
+| body   | BodyGeometry or None | Optional body geometry backend for coordinate conversion. | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type       | Description                                                                                               |
+|--------|------------|-----------------------------------------------------------------------------------------------------------|
+|        | np.ndarray | 1D integer array of HEALPix cell IDs, same length as input arrays. Empty array if input arrays are empty. |

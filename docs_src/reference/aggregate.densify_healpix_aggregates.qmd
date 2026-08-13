@@ -10,12 +10,20 @@ aggregate.densify_healpix_aggregates(
 
 Densify aggregated DataFrame to include all HEALPix cells.
 
-Fills missing cells with NaN for numeric columns and None for others.
+Expands a sparse aggregation result (only observed cells) to the full
+HEALPix grid (all ``12 * nside²`` cells). Missing cells are filled with
+NaN for numeric columns and None for others.
 
-Args:
-    agg_df: Aggregated DataFrame with healpix_id as index
-    nside: HEALPix nside parameter
-    healpix_col: Name of the HEALPix ID column (used as index)
+## Parameters {.doc-section .doc-section-parameters}
 
-Returns:
-    Densified DataFrame with all HEALPix cells (0 to 12*nside**2 - 1)
+| Name          | Type         | Description                                                                       | Default        |
+|---------------|--------------|-----------------------------------------------------------------------------------|----------------|
+| agg_sparse_df | pd.DataFrame | Aggregated DataFrame with ``healpix_id`` as index (sparse — only observed cells). | _required_     |
+| nside         | int          | HEALPix nside parameter.                                                          | _required_     |
+| healpix_col   | str          | Name of the HEALPix ID column. Default: ``'healpix_id'``.                         | `'healpix_id'` |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                                                                    |
+|--------|--------------|------------------------------------------------------------------------------------------------|
+|        | pd.DataFrame | Densified DataFrame with RangeIndex ``[0, 12*nside²)`` as index, containing all HEALPix cells. |

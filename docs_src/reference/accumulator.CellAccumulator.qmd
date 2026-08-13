@@ -6,8 +6,16 @@ accumulator.CellAccumulator(use_tdigest=True)
 
 Accumulator for a single HEALPix cell.
 
-Maintains streaming statistics for multiple columns plus optional T-Digest
-for approximate percentile computation.
+Maintains streaming statistics (:class:`StreamingStats`) for multiple
+value columns plus optional TDigest for approximate percentile computation.
+
+One ``CellAccumulator`` instance is created per HEALPix cell that receives
+observations. The accumulate loop creates/updates these in a dict keyed
+by ``healpix_id``.
+
+Serialization is handled via :meth:`to_dict` (in-memory) and the
+:func:`save_state` / :func:`load_state` pipeline for disk persistence.
+Supports round-trip through TDigest's centroid-based merge.
 
 ## Methods
 

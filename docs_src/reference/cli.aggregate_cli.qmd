@@ -5,3 +5,14 @@ cli.aggregate_cli(argv=None)
 ```
 
 CLI entry point for healpyxel_aggregate.
+
+Defines the ``healpyxel_aggregate`` command for computing per-cell
+statistics from sidecar parquet files.  Invokes
+:func:`healpyxel.aggregate.parse_arguments` then
+:func:`healpyxel.aggregate.run`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                | Description                                                 | Default   |
+|--------|---------------------|-------------------------------------------------------------|-----------|
+| argv   | list\[str\] or None | Argument list (defaults to ``sys.argv[1:]`` when ``None``). | `None`    |

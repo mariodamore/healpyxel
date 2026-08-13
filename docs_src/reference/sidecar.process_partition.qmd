@@ -18,24 +18,39 @@ sidecar.process_partition(
 
 Process a single dask partition and return DataFrame of assignments.
 
-Supports two workflows:
-1. Scalar lon/lat columns (efficient for strict mode): pass lon_col, lat_col
-2. Geometry-based (for fuzzy mode): pass geometries via gdf.geometry
+This is the core assignment function that maps each source in a partition to
+HEALPix cells. It supports two assignment workflows:
 
-In fuzzy mode, FOV polygons are assigned to all HEALPix cells they touch using
-spatial indexing (shapely.STRtree R-tree). This is O(log N) per polygon and
-correctly handles polygons that cross cell boundaries, unlike vertex-only sampling.
+1. **Scalar lon/lat columns** (efficient for strict mode): pass ``lon_col``
+   and ``lat_col`` for direct ``healpy.ang2pix`` indexing.
+2. **Geometry-based** (for fuzzy mode): pass geometries via ``gdf.geometry``
+   for polygon-to-cell intersection.
 
-Args:
-    gdf: GeoDataFrame or DataFrame partition
-    nside: HEALPix nside parameter
-    mode: 'strict' or 'fuzzy' assignment mode
-    base_index: Base index for global source_id generation
-    lon_convention: 'minus_plus180' or '0_360'
-    lon_col: Longitude column name (if None, use geometry)
-    lat_col: Latitude column name (if None, use geometry)
-    data_psf, cell_psf: Optional PSF functions
-    combine_method: How to combine PSF weights
+In fuzzy mode, FOV polygons are assigned to all HEALPix cells they touch
+using spherical polygon sampling. This correctly handles polygons that cross
+cell boundaries, unlike vertex-only sampling.
 
-Returns:
-    DataFrame with columns ['source_id', 'healpix_id'] and optional 'weight'
+Supports multi-resolution optimization where the finest nside is computed
+independently and lower nsides are derived by bit-shift aggregation.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type                      | Description                                                                                           | Default           |
+|----------------|---------------------------|-------------------------------------------------------------------------------------------------------|-------------------|
+| gdf            | GeoDataFrame or DataFrame | A dask partition containing source observations.                                                      | _required_        |
+| nside          | int                       | HEALPix nside parameter (power of 2).                                                                 | _required_        |
+| mode           | str                       | Assignment mode: ``'strict'`` (single cell per source) or ``'fuzzy'`` (all touched cells per source). | _required_        |
+| base_index     | int or None               | Base index for global source_id generation across partitions.                                         | `None`            |
+| lon_convention | str                       | Longitude convention: ``'minus_plus180'`` or ``'0_360'``.                                             | `'minus_plus180'` |
+| lon_col        | str or None               | Longitude column name. If None, use geometry column.                                                  | `None`            |
+| lat_col        | str or None               | Latitude column name. If None, use geometry column.                                                   | `None`            |
+| data_psf       | callable or None          | Optional data Point Spread Function. Called as ``data_psf(dx, dy)``.                                  | `None`            |
+| cell_psf       | callable or None          | Optional cell Point Spread Function. Called as ``cell_psf(dx, dy)``.                                  | `None`            |
+| combine_method | str                       | How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``, or ``'max'``.                       | `'multiply'`      |
+| body           | BodyGeometry or None      | Optional body geometry backend for coordinate conversion.                                             | `None`            |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                                                                                 |
+|--------|--------------|-------------------------------------------------------------------------------------------------------------|
+|        | pd.DataFrame | DataFrame with columns ``['source_id', 'healpix_id']`` and optional ``'weight'`` column when PSF is active. |

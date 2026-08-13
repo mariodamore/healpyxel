@@ -4,6 +4,24 @@
 finalize.export_to_geotiff(df, column, output_path, nside, crs='IAU:19900')
 ```
 
-Export a column to GeoTIFF format (requires rasterio and healpy).
+Export a HEALPix column to GeoTIFF format.
 
-Note: This creates an equirectangular projection from HEALPix data.
+Creates an equirectangular projection raster from the HEALPix-gridded
+data using ``healpy.ang2pix`` for the reprojection. Default output
+resolution is 1440×720 (0.25° per pixel).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name        | Type         | Description                                                                                 | Default       |
+|-------------|--------------|---------------------------------------------------------------------------------------------|---------------|
+| df          | pd.DataFrame | DataFrame with ``healpix_id`` as index or column.                                           | _required_    |
+| column      | str          | Data column to export.                                                                      | _required_    |
+| output_path | Path         | Output GeoTIFF file path.                                                                   | _required_    |
+| nside       | int          | HEALPix nside parameter of the source data.                                                 | _required_    |
+| crs         | str          | CRS string for the output GeoTIFF. Default: ``'IAU:19900'`` (Mercury IAU body-fixed frame). | `'IAU:19900'` |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type        | Description                                     |
+|--------|-------------|-------------------------------------------------|
+|        | ImportError | If ``rasterio`` or ``healpy`` is not available. |

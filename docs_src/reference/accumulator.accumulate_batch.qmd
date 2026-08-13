@@ -11,20 +11,26 @@ accumulator.accumulate_batch(
 )
 ```
 
-Process one batch of data and update accumulator state.
+Process one batch of data and update the accumulator state.
 
-Args:
-    new_data: DataFrame with observations (index = source_id, implicit or explicit)
-    sidecar: HEALPix mapping with columns ['source_id', 'healpix_id']
-             (source_id may be duplicated in fuzzy mode—one row per cell)
-    value_columns: Columns to accumulate
-    existing_state: Previous accumulator state (None for first batch)
-    use_tdigest: Enable T-Digest for approximate percentiles
-    filter_expr: Optional pandas query expression to filter data
+Merges observation data with the sidecar mapping, groups by HEALPix cell,
+and updates each cell's ``CellAccumulator`` with the new values. Handles
+both strict mode (one cell per source) and fuzzy mode (multiple cells
+per source via many-to-one relationship).
 
-Returns:
-    Updated state dictionary {healpix_id: CellAccumulator}
+## Parameters {.doc-section .doc-section-parameters}
 
-Note:
-    In fuzzy mode, sidecar has multiple rows per source_id (one per touched HEALPix cell).
-    This function handles the many-to-one relationship correctly by grouping on healpix_id.
+| Name           | Type         | Description                                                                                                                                              | Default    |
+|----------------|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------|------------|
+| new_data       | pd.DataFrame | DataFrame with observations. Index may be implicit or explicit ``source_id`` column.                                                                     | _required_ |
+| sidecar        | pd.DataFrame | HEALPix mapping with columns ``['source_id', 'healpix_id']``. In fuzzy mode, ``source_id`` may appear multiple times (one row per touched HEALPix cell). | _required_ |
+| value_columns  | List\[str\]  | Column names to accumulate statistics for.                                                                                                               | _required_ |
+| existing_state | dict or None | Previous accumulator state dict ``{healpix_id: CellAccumulator}``. Pass ``None`` for the first batch.                                                    | `None`     |
+| use_tdigest    | bool         | Enable TDigest for approximate percentile tracking.                                                                                                      | `True`     |
+| filter_expr    | str or None  | Optional pandas query expression to filter ``new_data`` before accumulation (e.g., ``"quality_flag > 0.8"``).                                            | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                         | Description                                                         |
+|--------|------------------------------|---------------------------------------------------------------------|
+|        | dict\[int, CellAccumulator\] | Updated state dictionary mapping ``healpix_id`` to its accumulator. |

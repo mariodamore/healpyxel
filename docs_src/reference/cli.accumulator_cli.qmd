@@ -5,3 +5,14 @@ cli.accumulator_cli(argv=None)
 ```
 
 CLI entry point for healpyxel_accumulator.
+
+Defines the ``healpyxel_accumulator`` command for streaming
+accumulation of per-cell statistics.  Invokes
+:func:`healpyxel.accumulator.parse_arguments` then
+:func:`healpyxel.accumulator.run`.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type                | Description                                                 | Default   |
+|--------|---------------------|-------------------------------------------------------------|-----------|
+| argv   | list\[str\] or None | Argument list (defaults to ``sys.argv[1:]`` when ``None``). | `None`    |

@@ -12,6 +12,27 @@ sidecar.add_psf_weights_to_sidecar(
 )
 ```
 
-Add a 'weight' column to the sidecar DataFrame using PSF functions.
-- src_geoms: sequence of source geometries (indexed by source_id)
-- cell_geoms: dict or sequence mapping healpix_id to cell geometry
+Add a ``weight`` column to the sidecar DataFrame using PSF functions.
+
+For each source-to-cell assignment, computes the weight by evaluating the
+data PSF and cell PSF at the centroid-to-centroid offset, then combines
+them using the specified method. Optionally normalizes weights per cell
+so they sum to 1.0.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type             | Description                                                                     | Default      |
+|----------------|------------------|---------------------------------------------------------------------------------|--------------|
+| sidecar_df     | pd.DataFrame     | DataFrame with at least ``source_id`` and ``healpix_id`` columns.               | _required_   |
+| src_geoms      | sequence         | Source geometries indexed by ``source_id``.                                     | _required_   |
+| cell_geoms     | dict or sequence | Mapping from ``healpix_id`` to cell geometry.                                   | _required_   |
+| data_psf       | callable or None | Data Point Spread Function. Called as ``data_psf(dx, dy)``.                     | `None`       |
+| cell_psf       | callable or None | Cell Point Spread Function. Called as ``cell_psf(dx, dy)``.                     | `None`       |
+| combine_method | str              | How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``, or ``'max'``. | `'multiply'` |
+| normalize      | bool             | If True, normalize weights per cell so they sum to 1.0.                         | `True`       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                             |
+|--------|--------------|---------------------------------------------------------|
+|        | pd.DataFrame | Copy of ``sidecar_df`` with an added ``weight`` column. |

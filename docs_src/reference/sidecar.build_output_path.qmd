@@ -5,3 +5,20 @@ sidecar.build_output_path(input_path, mode, nside)
 ```
 
 Build output path for sidecar file based on input and parameters.
+
+Constructs a descriptive filename that encodes the processing parameters
+for easy identification and downstream parsing.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name       | Type   | Description                                   | Default    |
+|------------|--------|-----------------------------------------------|------------|
+| input_path | Path   | Source input file path.                       | _required_ |
+| mode       | str    | Assignment mode: ``'strict'`` or ``'fuzzy'``. | _required_ |
+| nside      | int    | HEALPix nside parameter.                      | _required_ |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                                                                                             |
+|--------|--------|-----------------------------------------------------------------------------------------------------------------------------------------|
+|        | Path   | Output path in the same directory as input, with format::      <stem>.cell-healpix_assignment-<mode>_nside-<nside>_order-nested.parquet |

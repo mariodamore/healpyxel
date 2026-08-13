@@ -13,17 +13,33 @@ aggregate.aggregate_by_sidecar(
 )
 ```
 
-Aggregate original DataFrame by HEALPix cells using a sidecar mapping.
+Aggregate observation data by HEALPix cells using a sidecar mapping.
 
-Args:
-    original: DataFrame with data to aggregate
-    sidecar: DataFrame with source_id -> healpix_id mapping
-    value_columns: Column names to aggregate
-    aggs: Aggregation functions to apply (default: mean, median, std, robust_std)
-    min_count: Minimum sources per cell (cells below threshold set to NaN)
-    source_id_col: Name of source ID column
-    healpix_col: Name of HEALPix ID column
-    sentinel_threshold: Absolute value threshold for masking sentinel values
+This is the core aggregation function. It merges the original observation
+DataFrame with the sidecar mapping, groups by ``healpix_id``, and computes
+the requested summary statistics for each value column.
 
-Returns:
-    Aggregated DataFrame with healpix_id as index
+Features:
+* Automatically masks extreme sentinel values (configurable threshold).
+* Warns when ``min_count=0`` is used (rarely correct).
+* Reports source_id overlap between sidecar and original data.
+* Uses robust statistics (MAD, robust_std) alongside classical ones.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name               | Type                    | Description                                                                                                                                                                | Default        |
+|--------------------|-------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|
+| original           | pd.DataFrame            | DataFrame with observation data. Must contain ``source_id`` column (implicit index or explicit column) and the ``value_columns``.                                          | _required_     |
+| sidecar            | pd.DataFrame            | DataFrame with ``source_id`` → ``healpix_id`` mapping. In fuzzy mode, one source may map to multiple cells (multiple rows per source_id).                                  | _required_     |
+| value_columns      | Sequence\[str\]         | Column names in ``original`` to aggregate.                                                                                                                                 | _required_     |
+| aggs               | Sequence\[str\] or None | Aggregation function names. Default: ``['mean', 'median', 'std', 'robust_std']``. Valid options: ``mean``, ``median``, ``std``, ``min``, ``max``, ``mad``, ``robust_std``. | `None`         |
+| min_count          | int                     | Minimum number of observations per HEALPix cell for valid aggregation. Cells with fewer observations output NaN for all statistics. Default is 1.                          | `1`            |
+| source_id_col      | str                     | Name of the source ID column. Default: ``'source_id'``.                                                                                                                    | `'source_id'`  |
+| healpix_col        | str                     | Name of the HEALPix ID column. Default: ``'healpix_id'``.                                                                                                                  | `'healpix_id'` |
+| sentinel_threshold | float                   | Absolute value threshold for masking sentinel/extreme values. Values with ``\|value\| >= threshold`` are replaced with NaN. Default: ``1e30``.                             | `1e+30`        |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type         | Description                                                                                                                  |
+|--------|--------------|------------------------------------------------------------------------------------------------------------------------------|
+|        | pd.DataFrame | Aggregated DataFrame with ``healpix_id`` as index and columns named ``{value_column}_{aggregation}`` (e.g., ``r1050_mean``). |

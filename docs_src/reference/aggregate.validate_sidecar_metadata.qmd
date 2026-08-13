@@ -8,16 +8,30 @@ aggregate.validate_sidecar_metadata(
 )
 ```
 
-Validate sidecar metadata file and check source_file match.
+Validate sidecar metadata file and check source file match.
 
-Args:
-    sidecar_path: Path to sidecar parquet file
-    input_file: Expected source input file path
-    require_metadata: If True, raise error when metadata missing
+Reads the ``.meta.json`` companion file for a sidecar parquet and
+verifies that the recorded ``source_file`` matches the expected input
+file. This prevents accidentally using a sidecar derived from a
+different observation file.
 
-Returns:
-    Dictionary with metadata (empty dict if not found and not required)
+## Parameters {.doc-section .doc-section-parameters}
 
-Raises:
-    FileNotFoundError: If require_metadata=True and .meta.json not found
-    ValueError: If source_file mismatch detected
+| Name             | Type   | Description                                                                                                                      | Default    |
+|------------------|--------|----------------------------------------------------------------------------------------------------------------------------------|------------|
+| sidecar_path     | Path   | Path to sidecar parquet file.                                                                                                    | _required_ |
+| input_file       | Path   | Expected source input file path (matched by filename).                                                                           | _required_ |
+| require_metadata | bool   | If True, raise ``FileNotFoundError`` when ``.meta.json`` is missing. If False (default), log a warning and return an empty dict. | `False`    |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description                                                                                      |
+|--------|--------|--------------------------------------------------------------------------------------------------|
+|        | dict   | Metadata dictionary from ``.meta.json``. Empty dict if not found and ``require_metadata=False``. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type              | Description                                                       |
+|--------|-------------------|-------------------------------------------------------------------|
+|        | FileNotFoundError | If ``require_metadata=True`` and ``.meta.json`` not found.        |
+|        | ValueError        | If ``source_file`` in metadata doesn't match ``input_file`` name. |
