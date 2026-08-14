@@ -496,6 +496,52 @@ class TestHealpixToGeodataframe:
                                        fix_antimeridian=False)
         assert len(gdf) == len(pixels)
 
+    def test_parallel_matches_sequential(self):
+        """ncores>1 must produce identical index and geometries to ncores=1."""
+        for fix in (False, True):
+            seq = healpix_to_geodataframe(8, cache_mode='off',
+                                          fix_antimeridian=fix, ncores=1)
+            par = healpix_to_geodataframe(8, cache_mode='off',
+                                          fix_antimeridian=fix, ncores=3)
+            assert seq.index.tolist() == par.index.tolist()
+            assert len(seq) == len(par) == hp.nside2npix(8)
+            assert all(seq.geometry.iloc[i].equals(par.geometry.iloc[i])
+                       for i in range(len(seq)))
+
+    def test_parallel_subset_pixels(self):
+        pixels = [0, 1, 2, 3, 4, 5, 6, 7]
+        gdf = healpix_to_geodataframe(4, pixels=pixels, cache_mode='off',
+                                       fix_antimeridian=False, ncores=2)
+        assert len(gdf) == len(pixels)
+        assert sorted(gdf.index.tolist()) == pixels
+
+    def test_parallel_cached_path(self):
+        """ncores>1 matches ncores=1 when building polygons from cache."""
+        nside = 4
+        with tempfile.TemporaryDirectory() as tmp:
+            cache_dir = Path(tmp)
+            npix = hp.nside2npix(nside)
+            pixels = np.arange(npix, dtype=int)
+            xyz = hp.boundaries(nside, pixels, step=1, nest=True)
+            theta = np.arccos(np.clip(xyz[:, 2, :], -1, 1))
+            phi = np.arctan2(xyz[:, 1, :], xyz[:, 0, :])
+            df = pd.DataFrame({
+                'healpix_id': pixels,
+                'theta_0': theta[:, 0], 'theta_1': theta[:, 1],
+                'theta_2': theta[:, 2], 'theta_3': theta[:, 3],
+                'phi_0': phi[:, 0], 'phi_1': phi[:, 1],
+                'phi_2': phi[:, 2], 'phi_3': phi[:, 3],
+            })
+            _save_cached_boundaries(df, nside, 'nested', cache_dir)
+
+            seq = healpix_to_geodataframe(nside, cache_mode='use', cache_dir=cache_dir,
+                                          fix_antimeridian=False, ncores=1)
+            par = healpix_to_geodataframe(nside, cache_mode='use', cache_dir=cache_dir,
+                                          fix_antimeridian=False, ncores=3)
+            assert seq.index.tolist() == par.index.tolist()
+            assert all(seq.geometry.iloc[i].equals(par.geometry.iloc[i])
+                       for i in range(len(seq)))
+
 
 # ---------------------------------------------------------------------------
 # _extract_healpix_params_from_metadata
@@ -629,6 +675,14 @@ class TestParseArguments:
     def test_densify_flag(self):
         args = parse_arguments(['-a', '/tmp/test.parquet', '--densify'])
         assert args.densify is True
+
+    def test_ncores_default(self):
+        args = parse_arguments(['-a', '/tmp/test.parquet'])
+        assert args.ncores == 1
+
+    def test_ncores_custom(self):
+        args = parse_arguments(['-a', '/tmp/test.parquet', '--ncores', '4'])
+        assert args.ncores == 4
 
 
 # ---------------------------------------------------------------------------

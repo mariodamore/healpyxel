@@ -342,6 +342,24 @@ def detect_lonlat_columns(gdf_sample) -> tuple[str | None, str | None]:
 
     return lon_col, lat_col
 
+def _parquet_column_names(input_path) -> list:
+    """Read only the parquet schema footer to get column names (no data read).
+
+    The footer is a tiny metadata block at the end of the file, so this is cheap
+    regardless of file size and never materializes any rows in memory.
+    """
+    import pyarrow.parquet as pq
+    return list(pq.ParquetFile(str(input_path)).schema_arrow.names)
+
+
+def _find_geometry_column(colnames) -> str | None:
+    """Return the first column whose name looks like a geometry column."""
+    for col in colnames:
+        cl = col.lower()
+        if any(kw in cl for kw in ('polygon', 'geometry', 'wkt', 'wkb', 'geom')):
+            return col
+    return None
+
 def compute_geo_statistics(input_path: Path, lon_col: str | None = None,
                           lat_col: str | None = None,
                           sample_size: int = 10000,
@@ -1299,6 +1317,9 @@ def parse_arguments(argv=None):
                         help="Longitude column name (if not specified, will auto-detect or extract from geometry)")
     parser.add_argument("--lat-col", type=str, default=None,
                         help="Latitude column name (if not specified, will auto-detect or extract from geometry)")
+    parser.add_argument("--geometry", action="store_true",
+                        help="Force geometry-based assignment using the geometry column (works in both strict and fuzzy "
+                             "modes, for Point and Polygon geometries). When set, --lon-col/--lat-col are ignored.")
     parser.add_argument("--stats-sample-size", type=int, default=10000,
                         help="Number of rows to sample when extracting coordinates from geometry (default: 10000)")
     parser.add_argument("--loglevel", "-l", choices=["debug", "info", "warning", "error"], default="info",
@@ -1564,13 +1585,22 @@ def _convert_wkb_columns_to_geometry(ddf):
         pass
     return ddf
 
-def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame":
+def _read_input_lazy(input_path: Path, ncores: int,
+                     columns: list | None = None) -> "dask.dataframe.DataFrame":
     """Three-tier lazy parquet reader with graceful degradation.
 
     Tier 1: dask_geopandas.read_parquet — preserves spatial metadata if valid.
     Tier 2: plain dask.dataframe.read_parquet — ignores broken spatial metadata.
             WKB geometry columns are decoded to shapely objects (ADR-018).
     Tier 3: raise with clear diagnostic.
+
+    Parameters
+    ----------
+    columns : list or None
+        Subset of columns to read. The sidecar only needs the geometry column
+        (geometry mode) or the lon/lat columns (scalar mode); reading every
+        column can balloon memory on wide input files (e.g. spectrum/reflectance
+        columns). Pass ``None`` to read everything.
 
     Performance note
     ----------------
@@ -1586,7 +1616,7 @@ def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame
     try:
         import dask_geopandas as dg
 
-        ddf = dg.read_parquet(str(input_path))
+        ddf = dg.read_parquet(str(input_path), columns=columns)
         logger.info(
             "Read with dask_geopandas (%d partitions, spatial partitions OK)",
             ddf.npartitions,
@@ -1617,7 +1647,7 @@ def _read_input_lazy(input_path: Path, ncores: int) -> "dask.dataframe.DataFrame
 
     # Tier 2 — plain dask (geometry col becomes WKB bytes; decode for workflow compat)
     try:
-        ddf = dd.read_parquet(str(input_path))
+        ddf = dd.read_parquet(str(input_path), columns=columns)
         logger.info(
             "Read with plain dask.dataframe (%d partitions, %d columns)",
             ddf.npartitions,
@@ -1688,44 +1718,91 @@ def run(config):
     logger.info(f"Input file: {input_path.name}")
     logger.info(f"Mode: {_get_config(config, 'mode')}, lon-convention: {_get_config(config, 'lon_convention')}, nside: {nsides}")
 
-    has_geometry = False
-    try:
-        df_sample = pd.read_parquet(str(input_path), engine="pyarrow").head(1)
-        has_geometry = any(
-            str(df_sample[col].dtype) == 'object'
-            and any(kw in col.lower() for kw in ('polygon', 'geometry', 'wkt', 'wkb', 'geom'))
-            for col in df_sample.columns
-        )
-    except Exception:
-        pass
+    # Resolve the assignment workflow and the exact subset of columns needed.
+    # This reads only the parquet schema footer (no rows), so it never
+    # materializes the full file in memory — the previous implementation read
+    # the whole file to sample, which OOM-killed the process on wide files.
+    schema_names = _parquet_column_names(input_path)
+    geometry_col = _find_geometry_column(schema_names)
+    has_geometry = geometry_col is not None
 
-    if _get_config(config, 'lon_col') is None and _get_config(config, 'lat_col') is None and has_geometry:
-        logger.info("Polygon geometry column detected — using geometry-based fuzzy mode (ignoring scalar lon/lat columns)")
+    lon_col = _get_config(config, 'lon_col')
+    lat_col = _get_config(config, 'lat_col')
+    use_geometry = _get_config(config, 'geometry', False)
+    mode_val = _get_config(config, 'mode', 'fuzzy')
+
+    if use_geometry:
+        if geometry_col is None:
+            raise RuntimeError(
+                "--geometry requested but no geometry column found in parquet schema. "
+                f"Available columns: {schema_names}"
+            )
         lon_col = None
         lat_col = None
-    elif _get_config(config, 'lon_col') is None or _get_config(config, 'lat_col') is None:
-        logger.info(f"Auto-detecting lon/lat columns (user provided: lon_col={_get_config(config, 'lon_col')}, lat_col={_get_config(config, 'lat_col')})")
-        try:
-            df_sample = pd.read_parquet(str(input_path), engine="pyarrow").head(100)
-            if has_geometry:
-                logger.info(f"  Note: scalar columns found but geometry column exists — set --lon-col=0 --lat-col=0 to force geometry mode")
-            detected_lon, detected_lat = detect_lonlat_columns(df_sample)
-            lon_col = _get_config(config, 'lon_col') or detected_lon
-            lat_col = _get_config(config, 'lat_col') or detected_lat
-            if isinstance(config, dict):
-                config['lon_col'] = lon_col
-                config['lat_col'] = lat_col
-            else:
-                config.lon_col = lon_col
-                config.lat_col = lat_col
-            if detected_lon or detected_lat:
-                logger.info(f"✓ Auto-detected: lon_col='{lon_col}', lat_col='{lat_col}'")
-            else:
-                logger.warning(f"Could not auto-detect lon/lat columns. Checked: {df_sample.columns.tolist()}")
-        except Exception as e:
-            logger.warning(f"Auto-detection sampling failed ({e}). Will retry during processing or use geometry fallback.")
+        logger.info(
+            f"Geometry mode forced via --geometry: using column '{geometry_col}' "
+            f"(mode={mode_val})"
+        )
+    elif lon_col is None and lat_col is None and has_geometry:
+        # Existing default: when no lon/lat are given and a geometry column exists,
+        # use geometry-based assignment (works for strict and fuzzy, Point/Polygon).
+        lon_col = None
+        lat_col = None
+        logger.info(
+            f"Geometry column '{geometry_col}' detected — using geometry-based mode "
+            f"(mode={mode_val}, ignoring scalar lon/lat columns)"
+        )
+    elif lon_col is None or lat_col is None:
+        # Auto-detect lon/lat from schema column names (no data read).
+        logger.info(
+            f"Auto-detecting lon/lat columns (user provided: "
+            f"lon_col={_get_config(config, 'lon_col')}, lat_col={_get_config(config, 'lat_col')})"
+        )
+        detected_lon, detected_lat = detect_lonlat_columns(pd.DataFrame(columns=schema_names))
+        lon_col = lon_col or detected_lon
+        lat_col = lat_col or detected_lat
+        if isinstance(config, dict):
+            config['lon_col'] = lon_col
+            config['lat_col'] = lat_col
+        else:
+            config.lon_col = lon_col
+            config.lat_col = lat_col
+        if detected_lon or detected_lat:
+            logger.info(f"✓ Auto-detected: lon_col='{lon_col}', lat_col='{lat_col}'")
+        elif has_geometry:
+            # No scalar lon/lat found but a geometry column exists — fall back to it.
+            lon_col = None
+            lat_col = None
+            logger.warning(
+                f"Could not auto-detect lon/lat columns from schema. "
+                f"Falling back to geometry column '{geometry_col}'."
+            )
+        else:
+            logger.warning(
+                f"Could not auto-detect lon/lat columns. Checked: {schema_names}"
+            )
     else:
         logger.info(f"✓ Using user-provided lon/lat: lon_col='{_get_config(config, 'lon_col')}', lat_col='{_get_config(config, 'lat_col')}'")
+
+    # Only materialize the columns the chosen workflow actually needs. The sidecar
+    # never uses spectrum/reflectance/string columns, so loading them is pure waste.
+    if lon_col is None and lat_col is None:
+        if geometry_col is None:
+            raise RuntimeError(
+                "No lon/lat columns and no geometry column available to assign cells."
+            )
+        read_columns = [geometry_col]
+    else:
+        read_columns = [c for c in (lon_col, lat_col) if c is not None]
+    logger.info(f"Reading only sidecar-relevant columns: {read_columns}")
+
+    # Keep config in sync with the resolved columns for downstream ADR-018 logic.
+    if isinstance(config, dict):
+        config['lon_col'] = lon_col
+        config['lat_col'] = lat_col
+    else:
+        config.lon_col = lon_col
+        config.lat_col = lat_col
 
     if _get_config(config, 'geo_stats'):
         lon_conv = _get_config(config, 'lon_convention')
@@ -1770,7 +1847,7 @@ def run(config):
     body = _get_body(config)
     logger.info(f"Body geometry model: {body.name()}")
 
-    ddf = _read_input_lazy(input_path, _get_config(config, 'ncores'))
+    ddf = _read_input_lazy(input_path, _get_config(config, 'ncores'), columns=read_columns)
 
     # ADR-018: If geometry mode was selected but dask_geopandas fell back,
     # extract scalar lon/lat from decoded geometry column so the efficient

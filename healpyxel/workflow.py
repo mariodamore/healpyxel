@@ -30,7 +30,12 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from healpyxel.sidecar import parse_arguments as sidecar_parse, run as sidecar_run
-from healpyxel.aggregate import parse_arguments as agg_parse, run as agg_run, AGG_LOOKUP
+from healpyxel.aggregate import (
+    parse_arguments as agg_parse,
+    run as agg_run,
+    AGG_LOOKUP,
+    collect_sidecar_outputs,
+)
 from healpyxel.geospatial import parse_arguments as geo_parse, run as geo_run
 
 logger = logging.getLogger("healpyxel.workflow")
@@ -145,14 +150,14 @@ def _build_aggregate_cmd(
     input: Path,
     output_dir: Path,
     nside: int,
-    sidecar_index: int,
     kw: dict[str, Any],
 ) -> list[str]:
     """Build the CLI command list for the aggregate stage.
 
     Constructs a ``healpyxel_aggregate`` command from the merged keyword
-    dictionary.  Tallies ``--sidecar-dir``, ``--output``, ``--sidecar-index``,
-    column/aggregation/backend flags, and boolean options present in *kw*.
+    dictionary.  Selects the sidecar by ``--nside`` (rather than the positional
+    ``--sidecar-index``) so the command is unambiguous regardless of the sidecar
+    discovery ordering.
 
     Parameters
     ----------
@@ -162,8 +167,6 @@ def _build_aggregate_cmd(
         Working directory for sidecar outputs.
     nside : int
         HEALPix resolution for this aggregate run.
-    sidecar_index : int
-        Index into the ``nsides`` tuple, matching the sidecar output.
     kw : dict[str, Any]
         Merged keyword dict (function defaults overridden by
         ``aggregate_kwargs``).
@@ -176,7 +179,7 @@ def _build_aggregate_cmd(
     cmd = ["healpyxel_aggregate", "-i", str(input)]
 
     cmd += ["--sidecar-dir", str(output_dir), "--output", str(output_dir)]
-    cmd += ["--sidecar-index", str(sidecar_index)]
+    cmd += ["--nside", str(nside)]
 
     # aggregate flag
     if kw.get("aggregate", True):
@@ -259,6 +262,7 @@ def _build_geoparquet_cmd(
         "order": "--order",
         "lon_convention": "--lon-convention",
         "chunk_size": "--chunk-size",
+        "ncores": "--ncores",
     }
     for key, flag in flag_map.items():
         val = kw.get(key)
@@ -352,12 +356,15 @@ def _aggregate_meta_exists(
     output_dir: Path,
     nside: int,
     sidecar_output_file: str,
+    mode: str | None = None,
 ) -> bool:
     """Check whether a valid aggregate output already exists.
 
     Scans ``output_dir`` for ``.meta.json`` files with ``stage ==
     "aggregate"``, matching either the given *sidecar_output_file* reference
-    or the expected ``nside``.  Also verifies the output parquet is on disk.
+    or the expected ``nside``.  When *mode* is given, the aggregate must also
+    have been produced in that mode.  Also verifies the output parquet is on
+    disk.
 
     Parameters
     ----------
@@ -369,6 +376,8 @@ def _aggregate_meta_exists(
         Expected HEALPix resolution.
     sidecar_output_file : str
         Expected sidecar output path (for exact-match check).
+    mode : str | None
+        If set, only consider aggregates whose recorded mode matches.
 
     Returns
     -------
@@ -388,14 +397,21 @@ def _aggregate_meta_exists(
         sm = meta.get("sidecar_metadata", {}).get("healpix", {})
         if sm:
             hp_nside = sm.get("nside")
+            hp_mode = sm.get("mode")
+        else:
+            hp_mode = None
         legacy_nside = meta.get("_legacy", {}).get("healpix_nside")
         if hp_nside is None and legacy_nside is not None:
             try:
                 hp_nside = int(legacy_nside)
             except (ValueError, TypeError):
                 pass
+        if hp_mode is None:
+            hp_mode = meta.get("_legacy", {}).get("healpix_mode")
         if (sc_file == sidecar_output_file
                 or hp_nside == nside):
+            if mode is not None and hp_mode not in (None, mode):
+                continue
             out_file = proc.get("output_file", "")
             if out_file and Path(out_file).exists():
                 return True
@@ -567,6 +583,11 @@ def run_pipeline(
     output_dir = output_dir.resolve()
     output_dir.mkdir(parents=True, exist_ok=True)
 
+    # Normalize to a deterministic, deduplicated order. The sidecar stage already
+    # sorts internally for the bit-shift optimization, so this only keeps the
+    # downstream aggregate/geoparquet iteration tidy and reproducible.
+    nsides = tuple(sorted(set(nsides)))
+
     results: list[dict] = []
 
     if not input.exists():
@@ -650,6 +671,7 @@ def run_pipeline(
         "lon_convention": gpq_lon_convention,
         "fix_antimeridian": fix_antimeridian,
         "chunk_size": chunk_size,
+        "ncores": ncores,
         "densify": densify,
         "yes": yes,
     }
@@ -698,8 +720,9 @@ def run_pipeline(
                 log.write(f"# status: error — {e}\n")
 
     # ── Phase 2: Aggregate (per nside) ────────────────────────────
-    for i, nside in enumerate(nsides):
-        agg_cmd = _build_aggregate_cmd(input, output_dir, nside, i, ag_kw)
+    agg_mode = sc_kw.get("mode", "fuzzy")
+    for nside in nsides:
+        agg_cmd = _build_aggregate_cmd(input, output_dir, nside, ag_kw)
         agg_label = f"healpyxel aggregate (nside={nside})"
 
         # Find the sidecar output to link via meta.json
@@ -712,11 +735,21 @@ def run_pipeline(
             if proc.get("stage") != "sidecar":
                 continue
             hp = meta.get("healpix", {})
-            if hp.get("nside") == nside and hp.get("mode") == sc_kw.get("mode", "fuzzy"):
+            if hp.get("nside") == nside and hp.get("mode") == agg_mode:
                 sidecar_out = proc.get("output_file", "")
                 break
 
-        if sidecar_out and _aggregate_meta_exists(input, output_dir, nside, sidecar_out):
+        # Pre-check: fail loudly if no sidecar exists for the target nside rather
+        # than letting the aggregate command silently pick a different resolution.
+        if sidecar_out is None:
+            _print_status(agg_label, "error", f"no sidecar found for nside={nside} (mode={agg_mode})")
+            results.append({"stage": "aggregate", "nside": nside, "status": "error",
+                            "detail": "sidecar missing"})
+            if log:
+                log.write(f"# status: error — no sidecar found for nside={nside}\n")
+            continue
+
+        if _aggregate_meta_exists(input, output_dir, nside, sidecar_out, mode=agg_mode):
             _print_status(agg_label, "skip",
                           f"aggregate for nside={nside} already exists (verify via .meta.json)")
             results.append({"stage": "aggregate", "nside": nside, "status": "skip",
@@ -737,15 +770,46 @@ def run_pipeline(
         try:
             args = agg_parse(agg_cmd[1:])
             agg_run(args)
-            _print_status(agg_label, "ok", f"output: {output_dir}")
-            results.append({"stage": "aggregate", "nside": nside, "status": "ok", "detail": ""})
-            if log:
-                log.write(f"# status: ok\n")
         except Exception as e:
             _print_status(agg_label, "error", str(e))
             results.append({"stage": "aggregate", "nside": nside, "status": "error", "detail": str(e)})
             if log:
                 log.write(f"# status: error — {e}\n")
+            continue
+
+        # Post-aggregate nside check: verify the aggregate actually targeted the
+        # intended nside. This is a safety net against any residual ordering drift.
+        agg_metas = list(
+            output_dir.glob(f"{input.stem}-aggregated.cell-healpix_assignment-*_nside-{nside}_order-*.meta.json")
+        )
+        ok_nside = False
+        for meta_path in agg_metas:
+            meta = _load_meta(meta_path)
+            if not meta:
+                continue
+            sm = meta.get("sidecar_metadata", {}).get("healpix", {})
+            recorded_nside = sm.get("nside")
+            if recorded_nside is None:
+                legacy = meta.get("_legacy", {}).get("healpix_nside")
+                try:
+                    recorded_nside = int(legacy)
+                except (TypeError, ValueError):
+                    recorded_nside = None
+            if recorded_nside == nside:
+                ok_nside = True
+                break
+        if ok_nside:
+            _print_status(agg_label, "ok", f"output: {output_dir}")
+            results.append({"stage": "aggregate", "nside": nside, "status": "ok", "detail": ""})
+            if log:
+                log.write(f"# status: ok\n")
+        else:
+            _print_status(agg_label, "error",
+                          f"aggregate produced wrong nside (expected {nside}); check sidecar index resolution")
+            results.append({"stage": "aggregate", "nside": nside, "status": "error",
+                            "detail": f"wrong nside in output meta (expected {nside})"})
+            if log:
+                log.write(f"# status: error — aggregate produced wrong nside (expected {nside})\n")
 
     # ── Phase 3: GeoParquet (per nside) ───────────────────────────
     for nside in nsides:
@@ -953,6 +1017,7 @@ def save_script(
             "lon_convention": gpq_lon_convention,
             "fix_antimeridian": fix_antimeridian,
             "chunk_size": chunk_size,
+            "ncores": ncores,
             "densify": densify,
             "yes": yes,
         }
@@ -966,8 +1031,8 @@ def save_script(
         fh.write("\n")
 
         # Write aggregate commands (per nside)
-        for i, nside in enumerate(nsides):
-            agg_cmd = _build_aggregate_cmd(input, output_dir, nside, i, ag_kw)
+        for nside in nsides:
+            agg_cmd = _build_aggregate_cmd(input, output_dir, nside, ag_kw)
             fh.write(f"\n# ── healpyxel aggregate (nside={nside}) ──\n")
             _write_log_cmd(fh, agg_cmd)
             fh.write("\n")

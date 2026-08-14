@@ -862,26 +862,36 @@ EXAMPLES:
     # =========================================================================
     # AGGREGATION CONTROL
     # =========================================================================
-    parser.add_argument(
+    sel_group = parser.add_mutually_exclusive_group()
+    sel_group.add_argument(
         '--sidecar-index',
         type=str,
         nargs='+',
         metavar='INDEX',
-        help='Select which sidecar(s) to process. Three modes:\n'
+        help='Select which sidecar(s) to process by position (sorted by nside ascending). Three modes:\n'
              '  --sidecar-index all           Process all sidecars in batch mode\n'
              '  --sidecar-index 0             Process single sidecar (index 0)\n'
              '  --sidecar-index 0 2 4         Process specific sidecars (batch mode)\n'
-             'Required for --aggregate. Use --list-sidecars to see available indices.\n'
+             'Mutually exclusive with --nside. Use --list-sidecars to see available indices.\n'
              'Batch mode processes all specified sidecars sequentially, aggregating '
              'by different HEALPix resolutions in one command.'
+    )
+    sel_group.add_argument(
+        '--nside',
+        type=int,
+        nargs='+',
+        metavar='NSIDE',
+        help='Select sidecar(s) by HEALPix resolution (e.g. --nside 256). '
+             'Mutually exclusive with --sidecar-index. Preferred: unambiguous and '
+             'independent of the sidecar discovery ordering.'
     )
 
     parser.add_argument(
         '--aggregate',
         action='store_true',
         help='Perform aggregation (required flag to enable processing). '
-             'Must be paired with --sidecar-index and either --columns or --all-columns. '
-             'Without this flag, only schema inspection operations run.'
+             'Must be paired with --sidecar-index or --nside, and either --columns or '
+             '--all-columns. Without this flag, only schema inspection operations run.'
     )
 
     col_group = parser.add_mutually_exclusive_group()
@@ -1405,9 +1415,9 @@ def run(config):
     sidecar_index = _get_config(config, 'sidecar_index')
     columns = _get_config(config, 'columns')
     all_columns = _get_config(config, 'all_columns', False)
-    if sidecar_index or _get_config(config, 'aggregate'):
-        if sidecar_index is None:
-            raise RuntimeError("--sidecar-index is required when using --aggregate")
+    if sidecar_index or _get_config(config, 'nside') or _get_config(config, 'aggregate'):
+        if sidecar_index is None and _get_config(config, 'nside') is None:
+            raise RuntimeError("--sidecar-index or --nside is required when using --aggregate")
         if all_columns:
             columns = get_numeric_columns(input_file)
             if not columns:
@@ -1425,7 +1435,18 @@ def run(config):
         if len(sidecars_df) == 0:
             raise RuntimeError("No sidecar files found")
 
-        if sidecar_index == ['all']:
+        nside_sel = _get_config(config, 'nside')
+        if nside_sel is not None:
+            # Resolve requested nside(s) to positional indices in the sorted sidecar table
+            indices_to_process = []
+            for n in nside_sel:
+                matches = sidecars_df.index[sidecars_df['nside'] == n].tolist()
+                if not matches:
+                    raise RuntimeError(f"nside={n} not found among sidecars. "
+                                       f"Available: {sorted(sidecars_df['nside'].dropna().astype(int).unique().tolist())}")
+                indices_to_process.append(int(matches[0]))
+            logger.info(f"Selected sidecar(s) by nside: {list(zip(nside_sel, indices_to_process))}")
+        elif sidecar_index == ['all']:
             indices_to_process = list(range(len(sidecars_df)))
             logger.info(f"Batch mode: processing all {len(indices_to_process)} sidecar(s)")
         else:

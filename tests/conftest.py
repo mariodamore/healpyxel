@@ -30,6 +30,18 @@ def validation_dir(test_data_dir):
     return test_data_dir / "validation"
 
 
+@pytest.fixture(scope="session")
+def derived_dir(test_data_dir):
+    """Return the derived CLI-quickstart directory with pre-built sidecars/aggregates."""
+    return test_data_dir / "derived" / "cli_quickstart"
+
+
+@pytest.fixture(scope="session")
+def sample_50k_path(samples_dir):
+    """Return the path to the 50k sample parquet file."""
+    return samples_dir / "sample_50k.parquet"
+
+
 @pytest.fixture
 def sample_5k(samples_dir):
     """Load the 5k sample parquet file."""

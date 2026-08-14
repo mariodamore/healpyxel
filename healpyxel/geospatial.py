@@ -322,6 +322,18 @@ def _lonlat_to_polygons(lons: np.ndarray, lats: np.ndarray,
     lons = np.atleast_2d(lons)
     lats = np.atleast_2d(lats)
 
+    return _polygons_from_lonlat(lons, lats, lon_convention, fix_antimeridian)
+
+
+def _polygons_from_lonlat(lons: np.ndarray, lats: np.ndarray,
+                          lon_convention: str = '0_360',
+                          fix_antimeridian: bool = True) -> List[Union[Polygon, MultiPolygon]]:
+    """Build one shapely Polygon (optionally antimeridian-fixed) per cell.
+
+    This is the module-level worker used both sequentially and inside the
+    thread pool. *lons* / *lats* must be 2-D arrays already normalized to the
+    requested longitude convention (shape ``(n, 4)``).
+    """
     polys = []
     for i in range(len(lons)):
         coords = list(zip(lons[i].tolist(), lats[i].tolist()))
@@ -339,6 +351,57 @@ def _lonlat_to_polygons(lons: np.ndarray, lats: np.ndarray,
         polys.append(poly)
 
     return polys
+
+
+def _lonlat_to_polygons_parallel(lons: np.ndarray, lats: np.ndarray,
+                                 lon_convention: str = '0_360',
+                                 fix_antimeridian: bool = True,
+                                 chunk_size: int = 65536,
+                                 ncores: int = 1) -> List[Union[Polygon, MultiPolygon]]:
+    """Build polygons for a 2-D lon/lat array, parallelized across row blocks.
+
+    Splits the rows into ``chunk_size`` blocks and maps each block through
+    :func:`_polygons_from_lonlat` on a bounded thread pool. GEOS (via shapely)
+    releases the GIL during geometry construction, so threads give real
+    parallelism. Results are collected in original row order.
+
+    Parameters
+    ----------
+    lons, lats : np.ndarray
+        2-D arrays of shape ``(n, 4)``, already normalized to *lon_convention*.
+    lon_convention : str
+        Longitude convention (informational; inputs are expected normalized).
+    fix_antimeridian : bool
+        Whether to call ``antimeridian.fix_polygon`` per cell.
+    chunk_size : int
+        Number of cells per worker block.
+    ncores : int
+        Number of worker threads. ``1`` runs sequentially.
+
+    Returns
+    -------
+    list[Polygon | MultiPolygon]
+        One geometry per input row, in row order.
+    """
+    lons = np.atleast_2d(lons)
+    lats = np.atleast_2d(lats)
+
+    n = len(lons)
+    starts = list(range(0, n, chunk_size))
+    if len(starts) <= 1 or ncores <= 1:
+        return _polygons_from_lonlat(lons, lats, lon_convention, fix_antimeridian)
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    def _block(args):
+        s = args
+        e = min(s + chunk_size, n)
+        return _polygons_from_lonlat(lons[s:e], lats[s:e], lon_convention, fix_antimeridian)
+
+    with ThreadPoolExecutor(max_workers=ncores) as ex:
+        blocks = list(ex.map(_block, starts))
+
+    return [poly for block in blocks for poly in block]
 
 def _load_user_settings(config_dir: Optional[Path] = None) -> dict:
     """Load user runtime settings from XDG config file.
@@ -730,48 +793,11 @@ def _healpy_boundaries_lonlat(nside: int, pixels: np.ndarray, nest: bool = True)
     # Already in correct shape: (npix, 4)
     return lons, lats
 
-def _normalize_lon(lons: np.ndarray, convention: str = '0_360') -> np.ndarray:
-    """Normalize longitude array to given convention.
-    convention: '0_360' or '-180_180'
-    lons: array-like of longitudes in degrees
-    Returns same-shaped array.
-    """
-    lons = np.asarray(lons, dtype=float)
-    if convention == '0_360':
-        lons = np.mod(lons, 360.0)
-    else:
-        # map to (-180, 180]
-        lons = ((lons + 180.0) % 360.0) - 180.0
-    return lons
-
-def _make_polygon_from_corners(lons: List[float], lats: List[float], lon_convention: str = '0_360', fix_antimeridian: bool = True) -> Union[Polygon, MultiPolygon]:
-    """Make a shapely Polygon from corner lon/lat lists.
-    Automatically fixes antimeridian-wrapping using `antimeridian.fix_polygon` when requested.
-    """
-    # Normalize input longitudes to requested convention
-    lons = np.asarray(lons, dtype=float)
-    lats = np.asarray(lats, dtype=float)
-    lons = _normalize_lon(lons, convention=lon_convention)
-    # Build polygon coords in lon,lat order
-    coords = list(zip(lons.tolist(), lats.tolist()))
-    poly = Polygon(coords)
-    if fix_antimeridian:
-        try:
-            fixed = antimeridian.fix_polygon(poly)
-            if fixed.geom_type == 'MultiPolygon':
-                logger.debug(f"Antimeridian split cell into {len(fixed.geoms)} parts "
-                             f"(bounds: {poly.bounds} -> parts: {[p.bounds for p in fixed.geoms]})")
-            return fixed
-        except Exception:
-            # Fallback: return original polygon but warn
-            warnings.warn('antimeridian.fix_polygon failed; returning raw polygon')
-            return poly
-    return poly
-
 def healpix_to_geodataframe(nside: int, order: str = 'nested', lon_convention: str = '0_360',
                               pixels: Optional[Iterable[int]] = None, fix_antimeridian: bool = True,
                               chunk_size: int = 65536, cache_mode: str = 'use',
-                              cache_dir: Optional[Path] = None) -> gpd.GeoDataFrame:
+                              cache_dir: Optional[Path] = None,
+                              ncores: int = 1) -> gpd.GeoDataFrame:
     """Create a GeoDataFrame of HEALPix cell polygons.
 
     Args:
@@ -786,6 +812,8 @@ def healpix_to_geodataframe(nside: int, order: str = 'nested', lon_convention: s
             - 'require': require cache; if missing, raise error (no computation)
             - 'off': ignore cache entirely
         cache_dir: optional cache directory override
+        ncores: number of worker threads for polygon construction. Default 1
+            (sequential). >1 parallelizes across chunk blocks.
 
     Returns:
         GeoDataFrame with columns: 'healpix_id' and 'geometry' (EPSG:4326)
@@ -805,23 +833,34 @@ def healpix_to_geodataframe(nside: int, order: str = 'nested', lon_convention: s
 
     def _compute_polygons_for_pixels(pix_array: np.ndarray) -> gpd.GeoDataFrame:
         """Compute polygons for the given pixel array only."""
-        records_local = []
         total_local = len(pix_array)
+        chunks = [pix_array[start:start + chunk_size]
+                  for start in range(0, total_local, chunk_size)]
+
+        def _process_chunk(pix_chunk: np.ndarray) -> list[dict]:
+            xyz = hp.boundaries(nside, pix_chunk, step=1, nest=nest)  # (npix, 3, 4)
+            x, y, z = xyz[:, 0, :], xyz[:, 1, :], xyz[:, 2, :]
+            theta = np.arccos(np.clip(z, -1, 1))
+            phi = np.arctan2(y, x)
+            lons_arr, lats_arr = _spherical_to_lonlat(theta, phi, lon_convention)
+            polys = _polygons_from_lonlat(lons_arr, lats_arr, lon_convention, fix_antimeridian)
+            return [{'healpix_id': int(pix), 'geometry': poly}
+                    for pix, poly in zip(pix_chunk, polys)]
+
+        records_list: list[list[dict]] = []
         with tqdm(total=total_local, desc=f"Building HEALPix geometries (nside={nside})", unit="cell") as pbar:
-            for start in range(0, total_local, chunk_size):
-                end = min(start + chunk_size, total_local)
-                pix_chunk = pix_array[start:end]
-                xyz = hp.boundaries(nside, pix_chunk, step=1, nest=nest)  # (npix, 3, 4)
-                x, y, z = xyz[:, 0, :], xyz[:, 1, :], xyz[:, 2, :]
-                theta = np.arccos(np.clip(z, -1, 1))
-                phi = np.arctan2(y, x)
-                lons_arr, lats_arr = _spherical_to_lonlat(theta, phi, lon_convention)
-                for i, pix in enumerate(pix_chunk):
-                    poly = _make_polygon_from_corners(lons_arr[i], lats_arr[i],
-                                                      lon_convention=lon_convention,
-                                                      fix_antimeridian=fix_antimeridian)
-                    records_local.append({'healpix_id': int(pix), 'geometry': poly})
-                pbar.update(len(pix_chunk))
+            if ncores > 1 and len(chunks) > 1:
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=ncores) as ex:
+                    for records in ex.map(_process_chunk, chunks):
+                        records_list.append(records)
+                        pbar.update(len(records))
+            else:
+                for chunk in chunks:
+                    records_list.append(_process_chunk(chunk))
+                    pbar.update(len(chunk))
+
+        records_local = [r for recs in records_list for r in recs]
         gdf_local = gpd.GeoDataFrame(records_local, geometry='geometry', crs='EPSG:4326')
         gdf_local = gdf_local.set_index('healpix_id')
         return gdf_local
@@ -844,8 +883,14 @@ def healpix_to_geodataframe(nside: int, order: str = 'nested', lon_convention: s
             theta_arr = cached_df[theta_cols].values
             phi_arr = cached_df[phi_cols].values
             lons_arr, lats_arr = _spherical_to_lonlat(theta_arr, phi_arr, lon_convention)
-            polys = _lonlat_to_polygons(lons_arr, lats_arr, lon_convention=lon_convention,
-                                        fix_antimeridian=fix_antimeridian)
+            if ncores > 1:
+                polys = _lonlat_to_polygons_parallel(
+                    lons_arr, lats_arr, lon_convention=lon_convention,
+                    fix_antimeridian=fix_antimeridian,
+                    chunk_size=chunk_size, ncores=ncores)
+            else:
+                polys = _lonlat_to_polygons(lons_arr, lats_arr, lon_convention=lon_convention,
+                                            fix_antimeridian=fix_antimeridian)
             gdf_cached = gpd.GeoDataFrame({'geometry': polys}, index=cached_df.index, crs='EPSG:4326')
             gdf_cached.index.name = 'healpix_id'
 
@@ -948,7 +993,8 @@ def _validate_aggregate_file(metadata: dict, input_path: Path) -> None:
 def save_healpix_to_geoparquet(nside: int, output_path: Union[str, Path], order: str = 'nested',
                                lon_convention: str = '0_360', fix_antimeridian: bool = True,
                                chunk_size: int = 65536, parquet_kwargs: Optional[dict] = None,
-                               overwrite: bool = False, interactive: bool = True) -> Path:
+                               overwrite: bool = False, interactive: bool = True,
+                               ncores: int = 1) -> Path:
     """Build HEALPix vector layer and save as GeoParquet.
 
     Args:
@@ -961,6 +1007,7 @@ def save_healpix_to_geoparquet(nside: int, output_path: Union[str, Path], order:
         parquet_kwargs: Forwarded to `GeoDataFrame.to_parquet`
         overwrite: Whether to overwrite the file if it exists (default: False)
         interactive: If True, prompt the user for confirmation before overwriting
+        ncores: Number of worker threads for polygon construction (default 1).
 
     Returns:
         Path to the written file
@@ -989,7 +1036,8 @@ def save_healpix_to_geoparquet(nside: int, output_path: Union[str, Path], order:
         order=order,
         lon_convention=lon_convention,
         fix_antimeridian=fix_antimeridian,
-        chunk_size=chunk_size
+        chunk_size=chunk_size,
+        ncores=ncores
     )
 
     # Save with geopandas (which will write GeoParquet using pyarrow backend)
@@ -1106,6 +1154,7 @@ def run(config):
     lon_convention = _get_config(config, 'lon_convention', 'auto')
     fix_antimeridian = _get_config(config, 'fix_antimeridian', True)
     chunk_size = _get_config(config, 'chunk_size', 65536)
+    ncores = _get_config(config, 'ncores', 1)
     dense = _get_config(config, 'densify', False)
     yes = _get_config(config, 'yes', False)
 
@@ -1146,7 +1195,8 @@ def run(config):
         order=order,
         lon_convention=lon_param,
         fix_antimeridian=fix_antimeridian,
-        chunk_size=chunk_size
+        chunk_size=chunk_size,
+        ncores=ncores
     )
 
     if healpix_gdf.index.name != 'healpix_id':
@@ -1198,6 +1248,8 @@ def parse_arguments(argv=None):
     parser.add_argument('-l', '--lon-convention', type=str, default='auto')
     parser.add_argument('-f', '--fix-antimeridian/--no-fix-antimeridian', action='store_true', default=True)
     parser.add_argument('-c', '--chunk-size', type=int, default=65536)
+    parser.add_argument('--ncores', type=int, default=1,
+                        help='Number of worker threads for polygon construction (default: 1).')
     parser.add_argument('--densify', action='store_true')
     return parser.parse_args(argv)
 
