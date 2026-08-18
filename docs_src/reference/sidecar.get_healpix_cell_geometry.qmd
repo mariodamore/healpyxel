@@ -10,4 +10,22 @@ sidecar.get_healpix_cell_geometry(
 ```
 
 Return a shapely Polygon for the given HEALPix cell.
-Uses healpy boundaries (in degrees, lon/lat).
+
+Uses ``healpy.boundaries`` to retrieve the cell boundary vertices on the
+unit sphere (Cartesian x, y, z), converts them to spherical coordinates,
+and builds a planar lon/lat polygon.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type   | Description                                                                      | Default    |
+|----------------|--------|----------------------------------------------------------------------------------|------------|
+| healpix_id     | int    | HEALPix cell index.                                                              | _required_ |
+| nside          | int    | HEALPix nside parameter (power of 2).                                            | _required_ |
+| nest           | bool   | If True, use NESTED ordering; otherwise RING.                                    | `True`     |
+| lon_convention | str    | Longitude convention for the output polygon: ``'0_360'`` or ``'minus_plus180'``. | `'0_360'`  |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type                     | Description                                                |
+|--------|--------------------------|------------------------------------------------------------|
+|        | shapely.geometry.Polygon | Polygon representing the HEALPix cell boundary in lon/lat. |

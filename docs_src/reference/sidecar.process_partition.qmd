@@ -13,6 +13,7 @@ sidecar.process_partition(
     cell_psf=None,
     combine_method='multiply',
     body=None,
+    exhaustive=False,
 )
 ```
 
@@ -30,24 +31,31 @@ In fuzzy mode, FOV polygons are assigned to all HEALPix cells they touch
 using spherical polygon sampling. This correctly handles polygons that cross
 cell boundaries, unlike vertex-only sampling.
 
+When ``exhaustive=True``, fuzzy mode uses a two-tier candidate search
+(``healpy.query_polygon`` / ``healpy.query_disc``) followed by exact
+``shapely.intersects`` filtering to guarantee complete coverage for large
+FOVs. This is slower but exact; the default sampling path is retained for
+performance.
+
 Supports multi-resolution optimization where the finest nside is computed
 independently and lower nsides are derived by bit-shift aggregation.
 
 ## Parameters {.doc-section .doc-section-parameters}
 
-| Name           | Type                      | Description                                                                                           | Default           |
-|----------------|---------------------------|-------------------------------------------------------------------------------------------------------|-------------------|
-| gdf            | GeoDataFrame or DataFrame | A dask partition containing source observations.                                                      | _required_        |
-| nside          | int                       | HEALPix nside parameter (power of 2).                                                                 | _required_        |
-| mode           | str                       | Assignment mode: ``'strict'`` (single cell per source) or ``'fuzzy'`` (all touched cells per source). | _required_        |
-| base_index     | int or None               | Base index for global source_id generation across partitions.                                         | `None`            |
-| lon_convention | str                       | Longitude convention: ``'minus_plus180'`` or ``'0_360'``.                                             | `'minus_plus180'` |
-| lon_col        | str or None               | Longitude column name. If None, use geometry column.                                                  | `None`            |
-| lat_col        | str or None               | Latitude column name. If None, use geometry column.                                                   | `None`            |
-| data_psf       | callable or None          | Optional data Point Spread Function. Called as ``data_psf(dx, dy)``.                                  | `None`            |
-| cell_psf       | callable or None          | Optional cell Point Spread Function. Called as ``cell_psf(dx, dy)``.                                  | `None`            |
-| combine_method | str                       | How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``, or ``'max'``.                       | `'multiply'`      |
-| body           | BodyGeometry or None      | Optional body geometry backend for coordinate conversion.                                             | `None`            |
+| Name           | Type                      | Description                                                                                                     | Default           |
+|----------------|---------------------------|-----------------------------------------------------------------------------------------------------------------|-------------------|
+| gdf            | GeoDataFrame or DataFrame | A dask partition containing source observations.                                                                | _required_        |
+| nside          | int                       | HEALPix nside parameter (power of 2).                                                                           | _required_        |
+| mode           | str                       | Assignment mode: ``'strict'`` (single cell per source) or ``'fuzzy'`` (all touched cells per source).           | _required_        |
+| base_index     | int or None               | Base index for global source_id generation across partitions.                                                   | `None`            |
+| lon_convention | str                       | Longitude convention: ``'minus_plus180'`` or ``'0_360'``.                                                       | `'minus_plus180'` |
+| lon_col        | str or None               | Longitude column name. If None, use geometry column.                                                            | `None`            |
+| lat_col        | str or None               | Latitude column name. If None, use geometry column.                                                             | `None`            |
+| data_psf       | callable or None          | Optional data Point Spread Function. Called as ``data_psf(dx, dy)``.                                            | `None`            |
+| cell_psf       | callable or None          | Optional cell Point Spread Function. Called as ``cell_psf(dx, dy)``.                                            | `None`            |
+| combine_method | str                       | How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``, or ``'max'``.                                 | `'multiply'`      |
+| body           | BodyGeometry or None      | Optional body geometry backend for coordinate conversion.                                                       | `None`            |
+| exhaustive     | bool                      | If True, use candidate-search + exact-intersection for fuzzy mode (requires ``body`` to be set). Default False. | `False`           |
 
 ## Returns {.doc-section .doc-section-returns}
 

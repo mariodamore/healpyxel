@@ -4,4 +4,10 @@
 sidecar.GaussianPSF(sigma=None)
 ```
 
-2D Gaussian PSF centered at (0,0).
+2D Gaussian Point Spread Function centered at (0,0).
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name   | Type          | Description                                                                                                                                             | Default   |
+|--------|---------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|-----------|
+| sigma  | float or None | Standard deviation of the Gaussian kernel in the same units as the input coordinates (e.g., degrees). If None, must be set before calling the instance. | `None`    |

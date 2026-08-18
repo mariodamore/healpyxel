@@ -190,11 +190,11 @@ def test_run_pipeline_descending_nsides_all_outputs(samples_dir, tmp_path, pipel
     results = run_pipeline(
         input=input_path,
         output_dir=tmp_path,
-        nsides=(128, 64, 32),  # intentionally non-ascending
+        nsides=(32, 16, 8),  # intentionally non-ascending
         **pipeline_kwargs,
     )
     assert not [r for r in results if r["status"] == "error"], results
-    for n in (128, 64, 32):
+    for n in (32, 16, 8):
         assert any(r["stage"] == "aggregate" and r["nside"] == n and r["status"] == "ok"
                    for r in results), f"aggregate nside={n} not ok: {results}"
         assert any(r["stage"] == "geoparquet" and r["nside"] == n and r["status"] == "ok"

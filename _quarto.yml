@@ -4,7 +4,7 @@ project:
   output-dir: docs
   render:
     - docs_src/index.qmd
-    - docs_src/reference/index.qmd
+    - "docs_src/reference/*.qmd"
     - notebooks/01_core_concepts.py
     - notebooks/02_full_workflow.py
     - notebooks/82_example_visualization_psf.py
@@ -22,9 +22,7 @@ website:
       - text: "Home"
         href: docs_src/index.qmd
       - text: "Tutorials"
-        href: notebooks/01_core_concepts.py.html
-      - text: "Sphere-Native Sidecar"
-        href: notebooks/03_sphere_native_sidecar.py.html
+        href: notebooks/01_core_concepts.html
       - text: "Reference"
         href: docs_src/reference/index.qmd
   favicon: docs_src/favicon.ico
@@ -57,67 +55,132 @@ website:
           - docs_src/reference/index.qmd
           - section: "Core"
             contents:
-              - docs_src/reference/core.validate_nside
-              - docs_src/reference/core.mad
-              - docs_src/reference/core.robust_std
-              - docs_src/reference/core.setup_logger
+              - text: "healpix_cell_sizes"
+                href: docs_src/reference/core.healpix_cell_sizes.qmd
+              - text: "validate_nside"
+                href: docs_src/reference/core.validate_nside.qmd
+              - text: "mad"
+                href: docs_src/reference/core.mad.qmd
+              - text: "robust_std"
+                href: docs_src/reference/core.robust_std.qmd
+              - text: "setup_logger"
+                href: docs_src/reference/core.setup_logger.qmd
           - section: "Sidecar"
             contents:
-              - docs_src/reference/sidecar.compute_healpix_ids_from_lonlat
-              - docs_src/reference/sidecar.detect_lonlat_columns
-              - docs_src/reference/sidecar.process_partition
-              - docs_src/reference/sidecar.add_psf_weights_to_sidecar
-              - docs_src/reference/sidecar.normalize_weights_per_cell
-              - docs_src/reference/sidecar.build_output_path
-              - docs_src/reference/sidecar.write_sidecar_metadata
-              - docs_src/reference/sidecar.validate_nside
-              - docs_src/reference/sidecar.get_healpix_cell_geometry
-              - docs_src/reference/sidecar.get_psf
-              - docs_src/reference/sidecar.GaussianPSF
+              - text: "compute_healpix_ids_from_lonlat"
+                href: docs_src/reference/sidecar.compute_healpix_ids_from_lonlat.qmd
+              - text: "detect_lonlat_columns"
+                href: docs_src/reference/sidecar.detect_lonlat_columns.qmd
+              - text: "process_partition"
+                href: docs_src/reference/sidecar.process_partition.qmd
+              - text: "add_psf_weights_to_sidecar"
+                href: docs_src/reference/sidecar.add_psf_weights_to_sidecar.qmd
+              - text: "compute_assignment_weight"
+                href: docs_src/reference/sidecar.compute_assignment_weight.qmd
+              - text: "normalize_weights_per_cell"
+                href: docs_src/reference/sidecar.normalize_weights_per_cell.qmd
+              - text: "build_output_path"
+                href: docs_src/reference/sidecar.build_output_path.qmd
+              - text: "write_sidecar_metadata"
+                href: docs_src/reference/sidecar.write_sidecar_metadata.qmd
+              - text: "validate_nside"
+                href: docs_src/reference/sidecar.validate_nside.qmd
+              - text: "get_healpix_cell_geometry"
+                href: docs_src/reference/sidecar.get_healpix_cell_geometry.qmd
+              - text: "get_psf"
+                href: docs_src/reference/sidecar.get_psf.qmd
+              - text: "GaussianPSF"
+                href: docs_src/reference/sidecar.GaussianPSF.qmd
+          - section: "Candidate Search"
+            contents:
+              - text: "QueryPolygonSearch"
+                href: docs_src/reference/healpix_search.QueryPolygonSearch.qmd
+              - text: "QueryDiscSearch"
+                href: docs_src/reference/healpix_search.QueryDiscSearch.qmd
+              - text: "AutoSearch"
+                href: docs_src/reference/healpix_search.AutoSearch.qmd
+              - text: "CandidateSearchUnsupported"
+                href: docs_src/reference/healpix_search.CandidateSearchUnsupported.qmd
+              - text: "DEFAULT_SEARCH"
+                href: docs_src/reference/healpix_search.DEFAULT_SEARCH.qmd
           - section: "Aggregate"
             contents:
-              - docs_src/reference/aggregate.aggregate_by_sidecar
-              - docs_src/reference/aggregate.collect_sidecar_outputs
-              - docs_src/reference/aggregate.densify_healpix_aggregates
-              - docs_src/reference/aggregate.generate_output_filename
-              - docs_src/reference/aggregate.extract_nside_from_filename
-              - docs_src/reference/aggregate.validate_sidecar_metadata
-              - docs_src/reference/aggregate.process_single_sidecar
+              - text: "aggregate_by_sidecar"
+                href: docs_src/reference/aggregate.aggregate_by_sidecar.qmd
+              - text: "collect_sidecar_outputs"
+                href: docs_src/reference/aggregate.collect_sidecar_outputs.qmd
+              - text: "densify_healpix_aggregates"
+                href: docs_src/reference/aggregate.densify_healpix_aggregates.qmd
+              - text: "generate_output_filename"
+                href: docs_src/reference/aggregate.generate_output_filename.qmd
+              - text: "extract_nside_from_filename"
+                href: docs_src/reference/aggregate.extract_nside_from_filename.qmd
+              - text: "validate_sidecar_metadata"
+                href: docs_src/reference/aggregate.validate_sidecar_metadata.qmd
+              - text: "process_single_sidecar"
+                href: docs_src/reference/aggregate.process_single_sidecar.qmd
           - section: "Accumulator"
             contents:
-              - docs_src/reference/accumulator.StreamingStats
-              - docs_src/reference/accumulator.CellAccumulator
-              - docs_src/reference/accumulator.accumulate_batch
-              - docs_src/reference/accumulator.save_state
-              - docs_src/reference/accumulator.load_state
-              - docs_src/reference/accumulator.state_to_dataframe
-              - docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility
-              - docs_src/reference/accumulator.find_sidecar
-              - docs_src/reference/accumulator.ensure_not_processed
+              - text: "StreamingStats"
+                href: docs_src/reference/accumulator.StreamingStats.qmd
+              - text: "CellAccumulator"
+                href: docs_src/reference/accumulator.CellAccumulator.qmd
+              - text: "accumulate_batch"
+                href: docs_src/reference/accumulator.accumulate_batch.qmd
+              - text: "save_state"
+                href: docs_src/reference/accumulator.save_state.qmd
+              - text: "load_state"
+                href: docs_src/reference/accumulator.load_state.qmd
+              - text: "state_to_dataframe"
+                href: docs_src/reference/accumulator.state_to_dataframe.qmd
+              - text: "validate_accumulator_sidecar_compatibility"
+                href: docs_src/reference/accumulator.validate_accumulator_sidecar_compatibility.qmd
+              - text: "find_sidecar"
+                href: docs_src/reference/accumulator.find_sidecar.qmd
+              - text: "ensure_not_processed"
+                href: docs_src/reference/accumulator.ensure_not_processed.qmd
           - section: "Finalize"
             contents:
-              - docs_src/reference/finalize.finalize_statistics
-              - docs_src/reference/finalize.densify_healpix_map
-              - docs_src/reference/finalize.export_to_geotiff
-              - docs_src/reference/finalize.load_state
+              - text: "finalize_statistics"
+                href: docs_src/reference/finalize.finalize_statistics.qmd
+              - text: "densify_healpix_map"
+                href: docs_src/reference/finalize.densify_healpix_map.qmd
+              - text: "export_to_geotiff"
+                href: docs_src/reference/finalize.export_to_geotiff.qmd
+              - text: "load_state"
+                href: docs_src/reference/finalize.load_state.qmd
           - section: "Metadata"
             contents:
-              - docs_src/reference/metadata.HEALPyxelxMetadata
-              - docs_src/reference/metadata.FileType
-              - docs_src/reference/metadata.read_metadata_from_file
-              - docs_src/reference/metadata.save_with_metadata
-              - docs_src/reference/metadata.validate_sidecar
-              - docs_src/reference/metadata.validate_aggregate
+              - text: "HEALPyxelxMetadata"
+                href: docs_src/reference/metadata.HEALPyxelxMetadata.qmd
+              - text: "FileType"
+                href: docs_src/reference/metadata.FileType.qmd
+              - text: "read_metadata_from_file"
+                href: docs_src/reference/metadata.read_metadata_from_file.qmd
+              - text: "save_with_metadata"
+                href: docs_src/reference/metadata.save_with_metadata.qmd
+              - text: "validate_sidecar"
+                href: docs_src/reference/metadata.validate_sidecar.qmd
+              - text: "validate_aggregate"
+                href: docs_src/reference/metadata.validate_aggregate.qmd
           - section: "CLI"
             contents:
-              - docs_src/reference/cli.sidecar_cli
-              - docs_src/reference/cli.aggregate_cli
-              - docs_src/reference/cli.accumulator_cli
-              - docs_src/reference/cli.finalize_cli
-              - docs_src/reference/cli.to_geoparquet_cli
-              - docs_src/reference/cli.cache_cli
-              - docs_src/reference/cli.inspect_cli
-              - docs_src/reference/cli.validate_lon_lat_columns
+              - text: "sidecar_cli"
+                href: docs_src/reference/cli.sidecar_cli.qmd
+              - text: "aggregate_cli"
+                href: docs_src/reference/cli.aggregate_cli.qmd
+              - text: "accumulator_cli"
+                href: docs_src/reference/cli.accumulator_cli.qmd
+              - text: "finalize_cli"
+                href: docs_src/reference/cli.finalize_cli.qmd
+              - text: "to_geoparquet_cli"
+                href: docs_src/reference/cli.to_geoparquet_cli.qmd
+              - text: "cache_cli"
+                href: docs_src/reference/cli.cache_cli.qmd
+              - text: "inspect_cli"
+                href: docs_src/reference/cli.inspect_cli.qmd
+              - text: "validate_lon_lat_columns"
+                href: docs_src/reference/cli.validate_lon_lat_columns.qmd
   reader-mode: true
   page-navigation: true
   back-to-top-navigation: true
@@ -174,6 +237,15 @@ quartodoc:
         - sidecar.get_healpix_cell_geometry
         - sidecar.get_psf
         - sidecar.GaussianPSF
+        - sidecar.compute_assignment_weight
+    - title: Candidate Search
+      desc: HEALPix candidate-cell search backends (ADR-020).
+      contents:
+        - healpix_search.QueryPolygonSearch
+        - healpix_search.QueryDiscSearch
+        - healpix_search.AutoSearch
+        - healpix_search.CandidateSearchUnsupported
+        - healpix_search.DEFAULT_SEARCH
     - title: Aggregate
       desc: Sidecar aggregation and output generation.
       contents:

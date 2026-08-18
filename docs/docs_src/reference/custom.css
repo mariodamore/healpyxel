@@ -1,6 +1,0 @@
-/* reference page width — primary override via JS (custom-width.html)
-   This file kept for fallback / non-JS environments */
-#quarto-content.page-layout-article {
-	max-width: 90vw;
-	padding-left: 1rem;
-	padding-right: 1rem;}

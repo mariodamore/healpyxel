@@ -54,6 +54,8 @@ except Exception:
 
 from healpyxel.geometry import Sphere, Ellipsoid, SpiceDSK, BodyGeometry
 
+from healpyxel.healpix_search import DEFAULT_SEARCH  # ADR-020
+
 from shapely import get_coordinates, from_wkb, prepare  # shapely>=2.0
 from shapely.geometry import Polygon, MultiPolygon
 from tqdm.auto import tqdm
@@ -296,80 +298,6 @@ def _query_healpix_spherical(body, geom, nside, _healpy):
         all_hids.extend(hids)
     return np.unique(np.asarray(all_hids, dtype=np.int64)) if all_hids else np.array([], dtype=np.int64)
 
-# ADR-019: exhaustive FOV coverage via candidate search + exact intersection
-def candidate_cells(body, geom, nside, _healpy, fact=16, margin_deg=1.0):
-    """Return a conservative superset of HEALPix cells intersecting a polygon.
-
-    Uses healpy.query_polygon for convex polygons (fast, native) and
-    healpy.query_disc as a bounding-cap fallback for concave polygons.
-    The candidate set is guaranteed to contain all touched cells; exact
-    intersection filtering is required to remove false positives.
-
-    Parameters
-    ----------
-    body : BodyGeometry
-        Body geometry backend for lon/lat -> xyz conversion.
-    geom : shapely Polygon or MultiPolygon
-        Source geometry in lon/lat degrees.
-    nside : int
-        HEALPix nside parameter.
-    _healpy : module
-        healpy module (passed to avoid circular imports).
-    fact : int
-        Oversampling factor for healpy.query_polygon (default 16).
-    margin_deg : float
-        Angular margin in degrees added to the bounding cap radius for
-        the query_disc fallback (default 1.0).
-
-    Returns
-    -------
-    np.ndarray
-        Sorted array of unique candidate HEALPix cell IDs.
-    """
-    geoms = list(getattr(geom, 'geoms', [geom]))
-    all_hids = set()
-    for part in geoms:
-        coords = get_coordinates(part)
-        lons = coords[:, 0].astype(np.float64)
-        lats = coords[:, 1].astype(np.float64)
-
-        # Remove duplicate consecutive vertices and closing point (degenerate corners break query_polygon)
-        if lons.size >= 1 and lons[0] == lons[-1] and lats[0] == lats[-1]:
-            lons = lons[:-1]
-            lats = lats[:-1]
-        unique_mask = np.concatenate([[True], (lons[1:] != lons[:-1]) | (lats[1:] != lats[:-1])])
-        lons = lons[unique_mask]
-        lats = lats[unique_mask]
-
-        if lons.size < 3:
-            continue
-
-        xyz = body.lonlat_to_xyz(lons, lats)  # (3, N)
-
-        # Always use query_disc for robustness. While query_polygon is faster for
-        # convex polygons, it hard-errors on non-convex input and is unreliable
-        # for antimeridian-crossing polygons. query_disc is always safe and the
-        # exact-intersection step filters false positives efficiently.
-        centroid_xyz = xyz.mean(axis=1)
-        centroid_norm = np.linalg.norm(centroid_xyz)
-        if centroid_norm > 1e-15:
-            centroid_xyz = centroid_xyz / centroid_norm
-        else:
-            centroid_xyz = xyz[:, 0]
-
-        # Max central angle from centroid to any vertex
-        dots = np.clip(np.dot(centroid_xyz, xyz), -1.0, 1.0)
-        max_angle = np.arccos(dots.min())
-        radius = max_angle + np.radians(margin_deg)
-
-        hids = _healpy.query_disc(
-            nside, centroid_xyz, radius, inclusive=True, nest=True
-        )
-
-        all_hids.update(hids)
-
-    return np.array(sorted(all_hids), dtype=np.int64) if all_hids else np.array([], dtype=np.int64)
-
 
 def _filter_candidates_exact(candidate_hids, geom, nside, lon_convention):
     """Filter candidate cells to those actually intersecting the polygon.
@@ -380,7 +308,7 @@ def _filter_candidates_exact(candidate_hids, geom, nside, lon_convention):
     Parameters
     ----------
     candidate_hids : np.ndarray
-        Candidate HEALPix cell IDs from candidate_cells().
+        Candidate HEALPix cell IDs from DEFAULT_SEARCH (ADR-020).
     geom : shapely Polygon or MultiPolygon
         Source geometry in lon/lat degrees.
     nside : int
@@ -1049,7 +977,7 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                                 "exhaustive=True requires body geometry (use body=Sphere()). "
                                 "Planar exhaustive mode not yet implemented."
                             )
-                        candidates = candidate_cells(body, geom2, nside, _healpy)
+                        candidates = DEFAULT_SEARCH(body, geom2, nside, _healpy)  # ADR-020
                         hids = _filter_candidates_exact(candidates, geom2, nside, lon_convention)
                     elif body is None:
                         # ADR-013: planar path (no body)
@@ -1249,11 +1177,30 @@ def compute_assignment_weight(
     data_psf_sigma=None,
     cell_psf_sigma=None
 ):
-    """
-    Compute the assignment weight for a (source geometry, cell geometry) pair.
-    - data_psf: callable or None
-    - cell_psf: callable or None
-    - combine_method: 'multiply', 'sum', 'min', 'max'
+    """Compute the assignment weight for a (source geometry, cell geometry) pair.
+
+    Parameters
+    ----------
+    src_geom : shapely.geometry
+        Source geometry (e.g., FOV polygon).
+    cell_geom : shapely.geometry
+        Target HEALPix cell geometry.
+    data_psf : callable or None
+        Optional data Point Spread Function. Called as ``data_psf(dx, dy)``.
+    cell_psf : callable or None
+        Optional cell Point Spread Function. Called as ``cell_psf(dx, dy)``.
+    combine_method : str
+        How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``,
+        or ``'max'``.
+    data_psf_sigma : float or None
+        Sigma parameter for the data PSF (if applicable).
+    cell_psf_sigma : float or None
+        Sigma parameter for the cell PSF (if applicable).
+
+    Returns
+    -------
+    float
+        Combined weight value.
     """
     # For now, use centroid-to-centroid distance for polygons
     # (future: integrate over geometry or use rasterized PSF)
@@ -1495,11 +1442,35 @@ class PSF:
         raise NotImplementedError
 
 class GaussianPSF(PSF):
-    """2D Gaussian PSF centered at (0,0)."""
+    """2D Gaussian Point Spread Function centered at (0,0).
+
+    Parameters
+    ----------
+    sigma : float or None
+        Standard deviation of the Gaussian kernel in the same units as
+        the input coordinates (e.g., degrees). If None, must be set
+        before calling the instance.
+    """
+
     def __init__(self, sigma=None):
         super().__init__()
         self.sigma = sigma  # If None, must be set by user or context
+
     def __call__(self, dx, dy):
+        """Evaluate the Gaussian PSF at offset (dx, dy).
+
+        Parameters
+        ----------
+        dx : float or np.ndarray
+            Offset in x direction.
+        dy : float or np.ndarray
+            Offset in y direction.
+
+        Returns
+        -------
+        float or np.ndarray
+            Gaussian weight value(s).
+        """
         if self.sigma is None:
             raise ValueError("Sigma must be set for GaussianPSF.")
         r2 = dx**2 + dy**2
@@ -1511,6 +1482,26 @@ PSF_REGISTRY = {
 }
 
 def get_psf(psf_type, sigma=None):
+    """Return a PSF callable for the given type.
+
+    Parameters
+    ----------
+    psf_type : str
+        PSF model name. Supported values: ``'gaussian'``, ``'none'``.
+    sigma : float or None
+        Standard deviation for the Gaussian PSF (required if
+        ``psf_type='gaussian'``).
+
+    Returns
+    -------
+    callable
+        A PSF function that accepts ``(dx, dy)`` and returns a weight.
+
+    Raises
+    ------
+    ValueError
+        If ``psf_type`` is not recognized.
+    """
     if psf_type == 'none':
         return lambda dx, dy: 1.0
     cls = PSF_REGISTRY.get(psf_type, None)
@@ -2208,9 +2199,28 @@ def main(argv=None):
 # CLI entry point (use via command line or import main() function)
 
 def get_healpix_cell_geometry(healpix_id, nside, nest=True, lon_convention='0_360'):
-    """
-    Return a shapely Polygon for the given HEALPix cell.
-    Uses healpy boundaries (Cartesian x,y,z on unit sphere) and converts to lon/lat.
+    """Return a shapely Polygon for the given HEALPix cell.
+
+    Uses ``healpy.boundaries`` to retrieve the cell boundary vertices on the
+    unit sphere (Cartesian x, y, z), converts them to spherical coordinates,
+    and builds a planar lon/lat polygon.
+
+    Parameters
+    ----------
+    healpix_id : int
+        HEALPix cell index.
+    nside : int
+        HEALPix nside parameter (power of 2).
+    nest : bool
+        If True, use NESTED ordering; otherwise RING.
+    lon_convention : str
+        Longitude convention for the output polygon:
+        ``'0_360'`` or ``'minus_plus180'``.
+
+    Returns
+    -------
+    shapely.geometry.Polygon
+        Polygon representing the HEALPix cell boundary in lon/lat.
     """
     import healpy as hp
     from shapely.geometry import Polygon

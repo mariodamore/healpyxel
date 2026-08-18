@@ -18,7 +18,6 @@ from healpyxel.sidecar import (
     validate_nside,
     get_psf,
     get_healpix_cell_geometry,
-    candidate_cells,
     _filter_candidates_exact,
 )
 

@@ -1,0 +1,33 @@
+# sidecar.compute_assignment_weight { #healpyxel.sidecar.compute_assignment_weight }
+
+```python
+sidecar.compute_assignment_weight(
+    src_geom,
+    cell_geom,
+    data_psf=None,
+    cell_psf=None,
+    combine_method='multiply',
+    data_psf_sigma=None,
+    cell_psf_sigma=None,
+)
+```
+
+Compute the assignment weight for a (source geometry, cell geometry) pair.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name           | Type             | Description                                                                     | Default      |
+|----------------|------------------|---------------------------------------------------------------------------------|--------------|
+| src_geom       | shapely.geometry | Source geometry (e.g., FOV polygon).                                            | _required_   |
+| cell_geom      | shapely.geometry | Target HEALPix cell geometry.                                                   | _required_   |
+| data_psf       | callable or None | Optional data Point Spread Function. Called as ``data_psf(dx, dy)``.            | `None`       |
+| cell_psf       | callable or None | Optional cell Point Spread Function. Called as ``cell_psf(dx, dy)``.            | `None`       |
+| combine_method | str              | How to combine PSF weights: ``'multiply'``, ``'sum'``, ``'min'``, or ``'max'``. | `'multiply'` |
+| data_psf_sigma | float or None    | Sigma parameter for the data PSF (if applicable).                               | `None`       |
+| cell_psf_sigma | float or None    | Sigma parameter for the cell PSF (if applicable).                               | `None`       |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type   | Description            |
+|--------|--------|------------------------|
+|        | float  | Combined weight value. |

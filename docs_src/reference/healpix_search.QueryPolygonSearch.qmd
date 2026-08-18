@@ -1,0 +1,9 @@
+# healpix_search.QueryPolygonSearch { #healpyxel.healpix_search.QueryPolygonSearch }
+
+```python
+healpix_search.QueryPolygonSearch(fact=16)
+```
+
+Convex polygon search via healpy.query_polygon.
+
+Applicability: valid Polygon / MultiPolygon only.

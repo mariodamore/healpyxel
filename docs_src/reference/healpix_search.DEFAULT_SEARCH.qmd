@@ -1,0 +1,4 @@
+# healpix_search.DEFAULT_SEARCH { #healpyxel.healpix_search.DEFAULT_SEARCH }
+
+`healpix_search.DEFAULT_SEARCH`
+

@@ -1,0 +1,11 @@
+# healpix_search.AutoSearch { #healpyxel.healpix_search.AutoSearch }
+
+```python
+healpix_search.AutoSearch(backends)
+```
+
+Try backends in declared order, fall back on CandidateSearchUnsupported.
+
+First backend that reports supports(geom) is used. If __call__ raises
+CandidateSearchUnsupported at runtime (e.g., healpy.query_polygon on
+a non-convex polygon), fall through to the next backend.

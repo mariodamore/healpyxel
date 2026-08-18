@@ -4,3 +4,23 @@
 sidecar.get_psf(psf_type, sigma=None)
 ```
 
+Return a PSF callable for the given type.
+
+## Parameters {.doc-section .doc-section-parameters}
+
+| Name     | Type          | Description                                                                    | Default    |
+|----------|---------------|--------------------------------------------------------------------------------|------------|
+| psf_type | str           | PSF model name. Supported values: ``'gaussian'``, ``'none'``.                  | _required_ |
+| sigma    | float or None | Standard deviation for the Gaussian PSF (required if ``psf_type='gaussian'``). | `None`     |
+
+## Returns {.doc-section .doc-section-returns}
+
+| Name   | Type     | Description                                                    |
+|--------|----------|----------------------------------------------------------------|
+|        | callable | A PSF function that accepts ``(dx, dy)`` and returns a weight. |
+
+## Raises {.doc-section .doc-section-raises}
+
+| Name   | Type       | Description                        |
+|--------|------------|------------------------------------|
+|        | ValueError | If ``psf_type`` is not recognized. |

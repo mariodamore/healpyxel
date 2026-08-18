@@ -1,0 +1,7 @@
+# healpix_search.CandidateSearchUnsupported { #healpyxel.healpix_search.CandidateSearchUnsupported }
+
+```python
+healpix_search.CandidateSearchUnsupported()
+```
+
+Raised when a backend cannot handle the given geometry.

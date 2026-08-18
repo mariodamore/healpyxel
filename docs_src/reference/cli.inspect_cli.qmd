@@ -11,15 +11,6 @@ visualising pipeline results.  Invokes
 :func:`healpyxel.inspect.parse_arguments` then
 :func:`healpyxel.inspect.run`.
 
-New flags (ADR-018):
-- ``--geometry`` — show geometry column discovery info (GEO metadata,
-  encoding, geometry types, bbox, sidecar compatibility).
-- ``--correct-geometry OUTPUT.parquet`` — rewrite the input with corrected
-  GeoParquet metadata (decodes WKB, sets EPSG:4326 CRS via geopandas).
-  One-time fix to eliminate per-run WKB decode overhead.
-- ``--force`` — overwrite output without prompting (used with
-  ``--correct-geometry``).
-
 ## Parameters {.doc-section .doc-section-parameters}
 
 | Name   | Type                | Description                                                 | Default   |

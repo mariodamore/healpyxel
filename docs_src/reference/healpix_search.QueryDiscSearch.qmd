@@ -1,0 +1,9 @@
+# healpix_search.QueryDiscSearch { #healpyxel.healpix_search.QueryDiscSearch }
+
+```python
+healpix_search.QueryDiscSearch(margin_deg=1.0)
+```
+
+Bounding-cap search via healpy.query_disc.
+
+Universally applicable regardless of polygon shape or convexity.

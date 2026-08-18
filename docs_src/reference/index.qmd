@@ -27,10 +27,21 @@ HEALPix sidecar generation and PSF-weighted assignment.
 | [sidecar.write_sidecar_metadata](sidecar.write_sidecar_metadata.qmd#healpyxel.sidecar.write_sidecar_metadata) | Write sidecar processing metadata to a JSON companion file. |
 | [sidecar.validate_nside](sidecar.validate_nside.qmd#healpyxel.sidecar.validate_nside) | Validate that nside is a positive power of two. |
 | [sidecar.get_healpix_cell_geometry](sidecar.get_healpix_cell_geometry.qmd#healpyxel.sidecar.get_healpix_cell_geometry) | Return a shapely Polygon for the given HEALPix cell. |
-| [sidecar.get_psf](sidecar.get_psf.qmd#healpyxel.sidecar.get_psf) |  |
-| [sidecar.GaussianPSF](sidecar.GaussianPSF.qmd#healpyxel.sidecar.GaussianPSF) | 2D Gaussian PSF centered at (0,0). |
-| [sidecar._convert_wkb_columns_to_geometry](sidecar._convert_wkb_columns_to_geometry.qmd#healpyxel.sidecar._convert_wkb_columns_to_geometry) | ADR-018: convert WKB binary geometry columns to shapely objects in plain dask DataFrames. |
-| [sidecar._read_input_lazy](sidecar._read_input_lazy.qmd#healpyxel.sidecar._read_input_lazy) | 3-tier lazy parquet reader with WKB decode fallback (ADR-018). |
+| [sidecar.get_psf](sidecar.get_psf.qmd#healpyxel.sidecar.get_psf) | Return a PSF callable for the given type. |
+| [sidecar.GaussianPSF](sidecar.GaussianPSF.qmd#healpyxel.sidecar.GaussianPSF) | 2D Gaussian Point Spread Function centered at (0,0). |
+| [sidecar.compute_assignment_weight](sidecar.compute_assignment_weight.qmd#healpyxel.sidecar.compute_assignment_weight) | Compute the assignment weight for a (source geometry, cell geometry) pair. |
+
+## Candidate Search
+
+HEALPix candidate-cell search backends (ADR-020).
+
+| | |
+| --- | --- |
+| [healpix_search.QueryPolygonSearch](healpix_search.QueryPolygonSearch.qmd#healpyxel.healpix_search.QueryPolygonSearch) | Convex polygon search via healpy.query_polygon. |
+| [healpix_search.QueryDiscSearch](healpix_search.QueryDiscSearch.qmd#healpyxel.healpix_search.QueryDiscSearch) | Bounding-cap search via healpy.query_disc. |
+| [healpix_search.AutoSearch](healpix_search.AutoSearch.qmd#healpyxel.healpix_search.AutoSearch) | Try backends in declared order, fall back on CandidateSearchUnsupported. |
+| [healpix_search.CandidateSearchUnsupported](healpix_search.CandidateSearchUnsupported.qmd#healpyxel.healpix_search.CandidateSearchUnsupported) | Raised when a backend cannot handle the given geometry. |
+| [healpix_search.DEFAULT_SEARCH](healpix_search.DEFAULT_SEARCH.qmd#healpyxel.healpix_search.DEFAULT_SEARCH) |  |
 
 ## Aggregate
 
@@ -98,14 +109,5 @@ Command-line interface entry points.
 | [cli.finalize_cli](cli.finalize_cli.qmd#healpyxel.cli.finalize_cli) | CLI entry point for healpyxel_finalize. |
 | [cli.to_geoparquet_cli](cli.to_geoparquet_cli.qmd#healpyxel.cli.to_geoparquet_cli) | CLI entry point for healpyxel_to_geoparquet. |
 | [cli.cache_cli](cli.cache_cli.qmd#healpyxel.cli.cache_cli) | CLI entry point for the ``healpyxel-cache`` command. |
-| [cli.inspect_cli](cli.inspect_cli.qmd#healpyxel.cli.inspect_cli) | CLI entry point for healpyxel_inspect (includes ``--geometry`` and ``--correct-geometry``). |
+| [cli.inspect_cli](cli.inspect_cli.qmd#healpyxel.cli.inspect_cli) | CLI entry point for healpyxel_inspect. |
 | [cli.validate_lon_lat_columns](cli.validate_lon_lat_columns.qmd#healpyxel.cli.validate_lon_lat_columns) | Validate or auto-detect longitude/latitude columns. |
-
-## Inspect Utilities
-
-Geometry discovery and one-time correction for parquet input files.
-
-| | |
-| --- | --- |
-| [inspect.print_geometry_info](inspect.print_geometry_info.qmd#healpyxel.inspect.print_geometry_info) | Print geometry column discovery info from parquet GEO metadata (encoding, types, bbox, sidecar compatibility). |
-| [inspect.correct_geometry_metadata](inspect.correct_geometry_metadata.qmd#healpyxel.inspect.correct_geometry_metadata) | Rewrite parquet with corrected GeoParquet metadata (decode WKB, set CRS, fix spatial partition metadata). |
