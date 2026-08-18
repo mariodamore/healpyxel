@@ -66,3 +66,5 @@ Revisit hierarchical or spherical-geometry approaches when:
 - NSIDE > 128 is required (grid memory becomes a concern)
 - Source polygons are very large (many cells per polygon) and STRtree query returns thousands of candidates
 - A spherical-geometry library (e.g., `spherical_geometry` from STScI) is added as a dependency
+
+**Updated 2026-08-16:** The trigger condition "source polygons very large... STRtree query returns thousands of candidates" has been revisited by ADR-019, which resolves the large-FOV correctness issue using `healpy.query_disc` + exact intersection instead of reviving STRtree or hierarchical traversal.

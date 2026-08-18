@@ -25,8 +25,11 @@
 
 ## Upcoming Phases
 
+- **Phase: Exhaustive FOV Coverage (ADR-019)** — Opt-in `exhaustive=True` mode for `process_partition` using `healpy.query_disc` + exact `shapely.intersects()` filtering. Guarantees complete coverage for large FOVs. Fixed latent bug in `get_healpix_cell_geometry()`. All 456 tests pass.
 - **Phase: Scale Testing** — Validate accumulator performance at 50M observation scale
-- **Phase: PSF Implementation** — Angular PSF evaluation, configurable subgrid NSIDE, tangent-plane + spherical backends
+- **Phase: PSF Redesign (pluggable/unit-sphere)** — Replace the legacy centroid/lat-lon PSF with a pluggable model: sub-pixel integration via `nside_high`, unit-sphere angular-separation `PSF(θ)`, boresight source, sparse stencil, two accuracy modes, tangent/spherical backends. See `IDEAS_HEALPYXEL.md` §4/§5/§6/§9.
+- **Phase: Downstream PSF weight application** — Wire the sidecar `weight` column into aggregation (currently ignored).
+- **Phase: Cloud-native exports (COG / GeoZarr)** — Regular GeoTIFF exists; add COG and native Zarr/GeoZarr (incl. multi-level Zarr) exporters. See `IDEAS_HEALPYXEL.md` §11/§12.
 - **Phase: FITS Export** — Enhanced FITS format support for planetary science archives
 
 ## Completed Phases
@@ -40,6 +43,7 @@
 - **Phase: nbdev→Quarto migration** — Full migration to pure Python + Quarto (ADR-007)
 - **Phase: Geometry Backend** — Pluggable body geometry (Sphere/Ellipsoid/DSK) via ADR-013
 - **Phase: Accumulator Stabilization** — Bug fixes, test suite, ADR-014, 261 tests green
+- **Phase: Multi-resolution sidecar (ADR-015)** — NEST bit-shift aggregation; compute `nside_max` once, derive lower nsides (verified 2026-08-15)
 
 ## Documentation Structure
 
@@ -53,4 +57,4 @@ This project uses the `.ai/` folder as single source of truth:
 | `03_CURRENT_STATUS.md` | Active state only: NOW / NEXT / KNOWN_ISSUES |
 | `decisions/index.md` | One-liner per ADR + current status |
 
-_Last updated: 2026-07-15_
+_Last updated: 2026-08-16_

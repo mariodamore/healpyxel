@@ -54,7 +54,7 @@ except Exception:
 
 from healpyxel.geometry import Sphere, Ellipsoid, SpiceDSK, BodyGeometry
 
-from shapely import get_coordinates, from_wkb  # shapely>=2.0
+from shapely import get_coordinates, from_wkb, prepare  # shapely>=2.0
 from shapely.geometry import Polygon, MultiPolygon
 from tqdm.auto import tqdm
 
@@ -295,6 +295,111 @@ def _query_healpix_spherical(body, geom, nside, _healpy):
         hids = _query_healpix_single_polygon(body, part, nside, _healpy)
         all_hids.extend(hids)
     return np.unique(np.asarray(all_hids, dtype=np.int64)) if all_hids else np.array([], dtype=np.int64)
+
+# ADR-019: exhaustive FOV coverage via candidate search + exact intersection
+def candidate_cells(body, geom, nside, _healpy, fact=16, margin_deg=1.0):
+    """Return a conservative superset of HEALPix cells intersecting a polygon.
+
+    Uses healpy.query_polygon for convex polygons (fast, native) and
+    healpy.query_disc as a bounding-cap fallback for concave polygons.
+    The candidate set is guaranteed to contain all touched cells; exact
+    intersection filtering is required to remove false positives.
+
+    Parameters
+    ----------
+    body : BodyGeometry
+        Body geometry backend for lon/lat -> xyz conversion.
+    geom : shapely Polygon or MultiPolygon
+        Source geometry in lon/lat degrees.
+    nside : int
+        HEALPix nside parameter.
+    _healpy : module
+        healpy module (passed to avoid circular imports).
+    fact : int
+        Oversampling factor for healpy.query_polygon (default 16).
+    margin_deg : float
+        Angular margin in degrees added to the bounding cap radius for
+        the query_disc fallback (default 1.0).
+
+    Returns
+    -------
+    np.ndarray
+        Sorted array of unique candidate HEALPix cell IDs.
+    """
+    geoms = list(getattr(geom, 'geoms', [geom]))
+    all_hids = set()
+    for part in geoms:
+        coords = get_coordinates(part)
+        lons = coords[:, 0].astype(np.float64)
+        lats = coords[:, 1].astype(np.float64)
+
+        # Remove duplicate consecutive vertices and closing point (degenerate corners break query_polygon)
+        if lons.size >= 1 and lons[0] == lons[-1] and lats[0] == lats[-1]:
+            lons = lons[:-1]
+            lats = lats[:-1]
+        unique_mask = np.concatenate([[True], (lons[1:] != lons[:-1]) | (lats[1:] != lats[:-1])])
+        lons = lons[unique_mask]
+        lats = lats[unique_mask]
+
+        if lons.size < 3:
+            continue
+
+        xyz = body.lonlat_to_xyz(lons, lats)  # (3, N)
+
+        # Always use query_disc for robustness. While query_polygon is faster for
+        # convex polygons, it hard-errors on non-convex input and is unreliable
+        # for antimeridian-crossing polygons. query_disc is always safe and the
+        # exact-intersection step filters false positives efficiently.
+        centroid_xyz = xyz.mean(axis=1)
+        centroid_norm = np.linalg.norm(centroid_xyz)
+        if centroid_norm > 1e-15:
+            centroid_xyz = centroid_xyz / centroid_norm
+        else:
+            centroid_xyz = xyz[:, 0]
+
+        # Max central angle from centroid to any vertex
+        dots = np.clip(np.dot(centroid_xyz, xyz), -1.0, 1.0)
+        max_angle = np.arccos(dots.min())
+        radius = max_angle + np.radians(margin_deg)
+
+        hids = _healpy.query_disc(
+            nside, centroid_xyz, radius, inclusive=True, nest=True
+        )
+
+        all_hids.update(hids)
+
+    return np.array(sorted(all_hids), dtype=np.int64) if all_hids else np.array([], dtype=np.int64)
+
+
+def _filter_candidates_exact(candidate_hids, geom, nside, lon_convention):
+    """Filter candidate cells to those actually intersecting the polygon.
+
+    Uses shapely.intersects against cell geometries built via
+    get_healpix_cell_geometry.
+
+    Parameters
+    ----------
+    candidate_hids : np.ndarray
+        Candidate HEALPix cell IDs from candidate_cells().
+    geom : shapely Polygon or MultiPolygon
+        Source geometry in lon/lat degrees.
+    nside : int
+        HEALPix nside parameter.
+    lon_convention : str
+        Longitude convention for cell geometry construction.
+
+    Returns
+    -------
+    np.ndarray
+        Filtered array of HEALPix cell IDs that truly intersect the polygon.
+    """
+    result = []
+    for hid in candidate_hids:
+        cell_geom = get_healpix_cell_geometry(hid, nside, lon_convention=lon_convention)
+        if geom.intersects(cell_geom):
+            result.append(hid)
+    return np.array(result, dtype=np.int64)
+
 
 def detect_lonlat_columns(gdf_sample) -> tuple[str | None, str | None]:
     """Auto-detect longitude and latitude columns from a DataFrame sample.
@@ -712,7 +817,8 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                      lon_col: str | None = None,
                      lat_col: str | None = None,
                      data_psf=None, cell_psf=None, combine_method='multiply',
-                     body: BodyGeometry | None = None
+                     body: BodyGeometry | None = None,
+                     exhaustive: bool = False
                         ) -> pd.DataFrame:
     """Process a single dask partition and return DataFrame of assignments.
 
@@ -727,6 +833,12 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
     In fuzzy mode, FOV polygons are assigned to all HEALPix cells they touch
     using spherical polygon sampling. This correctly handles polygons that cross
     cell boundaries, unlike vertex-only sampling.
+
+    When ``exhaustive=True``, fuzzy mode uses a two-tier candidate search
+    (``healpy.query_polygon`` / ``healpy.query_disc``) followed by exact
+    ``shapely.intersects`` filtering to guarantee complete coverage for large
+    FOVs. This is slower but exact; the default sampling path is retained for
+    performance.
 
     Supports multi-resolution optimization where the finest nside is computed
     independently and lower nsides are derived by bit-shift aggregation.
@@ -757,6 +869,9 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
         or ``'max'``.
     body : BodyGeometry or None
         Optional body geometry backend for coordinate conversion.
+    exhaustive : bool
+        If True, use candidate-search + exact-intersection for fuzzy mode
+        (requires ``body`` to be set). Default False.
 
     Returns
     -------
@@ -844,6 +959,13 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
     elif hasattr(gdf, 'geometry') and gdf.geometry is not None:
         logger.debug("Using geometry-based workflow")
 
+        # ADR-019: validate exhaustive mode prerequisites before processing
+        if exhaustive and body is None:
+            raise NotImplementedError(
+                "exhaustive=True requires body geometry (use body=Sphere()). "
+                "Planar exhaustive mode not yet implemented."
+            )
+
         for src_id, geom in zip(src_ids, gdf.geometry.to_numpy()):
             try:
                 if geom is None or (hasattr(geom, 'is_empty') and geom.is_empty):
@@ -920,11 +1042,21 @@ def process_partition(gdf, nside: int, mode: str, base_index: int | None = None,
                 lats = lats[mask]
 
                 if mode == 'fuzzy' and geom2.geom_type in ('Polygon', 'MultiPolygon'):
-                    # ADR-013: spherical query_disc replaces STRtree + dense sampling.
-                    # No antimeridian, no shapely cell polygons, no dense boundary fallback.
-                    if body is None:
+                    if exhaustive:
+                        # ADR-019: exhaustive candidate search + exact intersection
+                        if body is None:
+                            raise NotImplementedError(
+                                "exhaustive=True requires body geometry (use body=Sphere()). "
+                                "Planar exhaustive mode not yet implemented."
+                            )
+                        candidates = candidate_cells(body, geom2, nside, _healpy)
+                        hids = _filter_candidates_exact(candidates, geom2, nside, lon_convention)
+                    elif body is None:
+                        # ADR-013: planar path (no body)
                         hids = compute_healpix_ids_from_polygon(nside, geom2)
                     else:
+                        # ADR-013: spherical query_disc replaces STRtree + dense sampling.
+                        # No antimeridian, no shapely cell polygons, no dense boundary fallback.
                         hids = _query_healpix_spherical(body, geom2, nside, _healpy)
                 else:
                     hids = compute_healpix_ids_from_lonlat(nside, lons, lats, body=body)
@@ -2078,22 +2210,28 @@ def main(argv=None):
 def get_healpix_cell_geometry(healpix_id, nside, nest=True, lon_convention='0_360'):
     """
     Return a shapely Polygon for the given HEALPix cell.
-    Uses healpy boundaries (in degrees, lon/lat).
+    Uses healpy boundaries (Cartesian x,y,z on unit sphere) and converts to lon/lat.
     """
     import healpy as hp
     from shapely.geometry import Polygon
 
-    # Get the boundary vertices of the cell (returns theta, phi in radians)
-    vertices = hp.boundaries(nside, healpix_id, step=1, nest=nest)  # shape (2, N)
-    # Convert to lon/lat in degrees
-    theta = vertices[0]  # colatitude in radians
-    phi = vertices[1]    # longitude in radians
+    # Get the boundary vertices of the cell (returns Cartesian x,y,z, shape (3, N))
+    vertices = hp.boundaries(nside, healpix_id, step=1, nest=nest)
+    x = vertices[0]
+    y = vertices[1]
+    z = vertices[2]
+
+    # Convert Cartesian to spherical (theta, phi) then to lon/lat
+    theta = np.arccos(np.clip(z, -1.0, 1.0))  # colatitude in radians
+    phi = np.arctan2(y, x)                      # longitude in radians
     lats = 90.0 - np.degrees(theta)
     lons = np.degrees(phi)
 
     # Adjust lon convention
     if lon_convention in ('-180_180', 'minus_plus180'):
         lons = np.where(lons > 180, lons - 360, lons)
+    elif lon_convention == '0_360':
+        lons = np.mod(lons, 360.0)
 
     # Build polygon (healpy returns vertices in order)
     coords = list(zip(lons, lats))

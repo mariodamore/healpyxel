@@ -3,7 +3,13 @@
 
 ## Status
 
-Proposed
+Proposed (partially superseded by ADR-013; `intersects()` primitive still open)
+
+**Updated 2026-08-16:** ADR-013 (Pluggable body geometry backend) adopted a form of
+sphere-native representation via SLERP dense sampling as the concrete fuzzy-mode
+algorithm, rather than the full `SurfaceModel.contains()/intersects()` abstraction
+this draft envisioned. The `intersects()` primitive described here remains an open
+dependency for ADR-019's step-2 exact-intersection replacement.
 
 ## Context
 

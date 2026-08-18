@@ -20,6 +20,8 @@
 | ADR-016 | Pipeline wrapper for healpyxel 3-phase workflow | Active | 2026-08-11 |
 | ADR-017 | Separate inspection CLI (`healpyxel_inspect`) from aggregation | Active | 2026-08-12 |
 | ADR-018 | WKB fallback + --correct-geometry for broken spatial partition metadata | Active | 2026-08-13 |
+| ADR-019 | Exhaustive FOV coverage mode for large polygons | Active | 2026-08-16 |
+| ADR-020 | Separate geometry from candidate search (interface) | Proposed | 2026-08-16 |
 
 ## Notes
 

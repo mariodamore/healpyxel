@@ -1,5 +1,5 @@
 - [Proposals from ChatGPT Review](PROPOSALS.md) — categorized optimization proposals (PSF, geometry, sidecar) from 2026-07-11 chat review
 - [Current Status](03_CURRENT_STATUS.md) — NOW/NEXT/KNOWN_ISSUES for active work
-- [Decision Index](decisions/index.md) — ADR-001 through ADR-012
+- [Decision Index](decisions/index.md) — ADR-001 through ADR-020
 - [Hierarchical HEALPix Traversal Rejection](decisions/ADR-010-hierarchical-healpix-traversal.md) — why STRtree is retained and when to revisit
-- [Session Log](sessions/2026-07-13.md) — latest session including proposal analysis
+- [Session Log](sessions/2026-08-16.md) — latest session including ADR-019/020 review and implementation

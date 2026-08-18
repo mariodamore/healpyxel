@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 import numpy as np
 import geopandas as gpd
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point, Polygon, MultiPolygon
 from pathlib import Path
 import healpy as hp
 
@@ -18,6 +18,8 @@ from healpyxel.sidecar import (
     validate_nside,
     get_psf,
     get_healpix_cell_geometry,
+    candidate_cells,
+    _filter_candidates_exact,
 )
 
 # ============================================================================
@@ -689,7 +691,7 @@ class TestGeometryComprehensive:
         """Test that all cells stay within valid longitude bounds."""
         nside = 8
         for cell_id in range(hp.nside2npix(nside)):
-            geom = get_healpix_cell_geometry(cell_id, nside, nest=True)
+            geom = get_healpix_cell_geometry(cell_id, nside, nest=True, lon_convention='minus_plus180')
             bounds = geom.bounds
             assert -180 <= bounds[0] <= 180  # min lon
             assert -180 <= bounds[2] <= 180  # max lon
@@ -832,6 +834,234 @@ class TestSphereNativeFuzzyMode:
             np.array([c[1] for c in coords], dtype=np.float64)))
         fuzzy_hids = {r['healpix_id'] for r in recs}
         assert vertex_hids.issubset(fuzzy_hids)
+
+    def test_exhaustive_convex_polygon(self):
+        """Exhaustive mode returns at least as many cells as sampling for a large convex polygon."""
+        # Large convex polygon (~20° x 10°) at nside=32
+        coords = [(0, 0), (20, 0), (20, 10), (0, 10)]  # no duplicate closing point
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+
+        # Sampling mode (default)
+        sampling_result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                            lon_convention='0_360',
+                                            body=Sphere())
+        sampling_hids = {r['healpix_id'] for r in sampling_result.to_dict('records')}
+
+        # Exhaustive mode
+        exhaustive_result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                              lon_convention='0_360',
+                                              body=Sphere(), exhaustive=True)
+        exhaustive_hids = {r['healpix_id'] for r in exhaustive_result.to_dict('records')}
+
+        # Exhaustive must be a superset of sampling (no false negatives)
+        assert sampling_hids.issubset(exhaustive_hids), \
+            f"Exhaustive mode missed cells: {sampling_hids - exhaustive_hids}"
+
+    def test_exhaustive_concave_polygon(self):
+        """Exhaustive mode works for concave polygons via query_disc fallback."""
+        # Concave polygon (L-shape)
+        coords = [(0, 0), (10, 0), (10, 5), (5, 5), (5, 10), (0, 10), (0, 0)]
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+
+        exhaustive_result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                              lon_convention='0_360',
+                                              body=Sphere(), exhaustive=True)
+        recs = exhaustive_result.to_dict('records')
+        assert len(recs) > 0, "Exhaustive mode should return cells for concave polygon"
+
+        # Verify vertex cells are included
+        vertex_hids = set(compute_healpix_ids_from_lonlat(
+            nside, np.array([c[0] for c in coords], dtype=np.float64),
+            np.array([c[1] for c in coords], dtype=np.float64)))
+        exhaustive_hids = {r['healpix_id'] for r in recs}
+        assert vertex_hids.issubset(exhaustive_hids)
+
+    def test_exhaustive_matches_ground_truth(self):
+        """Exhaustive mode returns at least the cells covering a known polygon."""
+        # Small polygon covering a few cells at nside=32 (roughly 5° x 5°)
+        coords = [(100, 70), (105, 70), (105, 75), (100, 75), (100, 70)]
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+
+        exhaustive_result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                              lon_convention='minus_plus180',
+                                              body=Sphere(), exhaustive=True)
+        recs = exhaustive_result.to_dict('records')
+        assert len(recs) > 0
+
+        # Build a dense ground-truth grid of interior points
+        minx, miny, maxx, maxy = poly.bounds
+        grid_lons = np.linspace(minx, maxx, 50)
+        grid_lats = np.linspace(miny, maxy, 50)
+        grid_points = []
+        for lon in grid_lons:
+            for lat in grid_lats:
+                if poly.contains(Point(lon, lat)):
+                    grid_points.append((lon, lat))
+
+        grid_hids = set(compute_healpix_ids_from_lonlat(
+            nside,
+            np.array([p[0] for p in grid_points], dtype=np.float64),
+            np.array([p[1] for p in grid_points], dtype=np.float64)
+        ))
+        exhaustive_hids = {r['healpix_id'] for r in recs}
+
+        # Exhaustive must include all interior cells (no false negatives)
+        # It may include additional boundary cells, which is correct for "touches" semantic
+        assert grid_hids.issubset(exhaustive_hids), \
+            f"Exhaustive mode missed interior cells: {grid_hids - exhaustive_hids}"
+
+    def test_exhaustive_antimeridian(self):
+        """Exhaustive mode handles antimeridian-crossing polygons."""
+        coords = [(175, 5), (179, 5), (-179, 5), (-175, 5), (-175, -5), (-179, -6), (179, -6), (175, -5), (175, 5)]
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+
+        # Exhaustive mode with minus_plus180
+        result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                   lon_convention='minus_plus180',
+                                   body=Sphere(), exhaustive=True)
+        recs = result.to_dict('records')
+        assert len(recs) > 0, "Exhaustive mode should assign cells to antimeridian-crossing FOV"
+
+        # Same polygon in 0_360 convention should also return cells
+        # (exact intersection is convention-dependent for antimeridian polygons,
+        #  so we don't require identical cell sets, just non-empty coverage)
+        poly_360 = Polygon([(lon if lon >= 0 else lon + 360, lat) for lon, lat in coords])
+        gdf_360 = gpd.GeoDataFrame({'geometry': [poly_360]})
+        result_360 = process_partition(gdf_360, nside=nside, mode='fuzzy',
+                                       lon_convention='0_360',
+                                       body=Sphere(), exhaustive=True)
+        recs_360 = result_360.to_dict('records')
+        assert len(recs_360) > 0, "Exhaustive mode should assign cells in 0_360 convention too"
+
+        # Verify vertex cells are included in both conventions
+        vertex_hids = set(compute_healpix_ids_from_lonlat(
+            nside, np.array([c[0] for c in coords], dtype=np.float64),
+            np.array([c[1] for c in coords], dtype=np.float64)))
+        hids = {r['healpix_id'] for r in recs}
+        hids_360 = {r['healpix_id'] for r in recs_360}
+        assert vertex_hids.issubset(hids), "Vertex cells missing in minus_plus180"
+        assert vertex_hids.issubset(hids_360), "Vertex cells missing in 0_360"
+
+    def test_exhaustive_requires_body(self):
+        """Exhaustive mode raises NotImplementedError when body is None."""
+        coords = [(100, 70), (105, 70), (105, 75), (100, 75), (100, 70)]
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+
+        with pytest.raises(NotImplementedError, match="exhaustive=True requires body geometry"):
+            process_partition(gdf, nside=nside, mode='fuzzy',
+                              lon_convention='minus_plus180',
+                              body=None, exhaustive=True)
+
+    def test_exhaustive_multipolygon(self):
+        """Exhaustive mode handles MultiPolygon geometries (disjoint parts)."""
+        # Two disjoint polygons
+        poly1 = Polygon([(0, 0), (5, 0), (5, 5), (0, 5)])
+        poly2 = Polygon([(20, 20), (25, 20), (25, 25), (20, 25)])
+        multipoly = MultiPolygon([poly1, poly2])
+
+        gdf = gpd.GeoDataFrame({'geometry': [multipoly]})
+        nside = 32
+
+        exhaustive_result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                              lon_convention='0_360',
+                                              body=Sphere(), exhaustive=True)
+        recs = exhaustive_result.to_dict('records')
+        assert len(recs) > 0, "Exhaustive mode should return cells for MultiPolygon"
+
+        exhaustive_hids = {r['healpix_id'] for r in recs}
+
+        # Verify cells from both parts are present
+        part1_hids = set(compute_healpix_ids_from_lonlat(
+            nside,
+            np.array([0, 5, 5, 0], dtype=np.float64),
+            np.array([0, 0, 5, 5], dtype=np.float64)))
+        part2_hids = set(compute_healpix_ids_from_lonlat(
+            nside,
+            np.array([20, 25, 25, 20], dtype=np.float64),
+            np.array([20, 20, 20, 25], dtype=np.float64)))
+
+        assert part1_hids.issubset(exhaustive_hids), "Cells from first polygon part missing"
+        assert part2_hids.issubset(exhaustive_hids), "Cells from second polygon part missing"
+
+    def test_exhaustive_multipolygon_antimeridian(self):
+        """Exhaustive mode handles antimeridian-split MultiPolygon (GeoParquet-style)."""
+        # Two polygons that together form a band crossing the antimeridian
+        # This simulates what GeoParquet might produce for an antimeridian-crossing FOV
+        # In 0_360 convention
+        poly1_360 = Polygon([(175, -5), (179, -5), (179, 5), (175, 5)])
+        poly2_360 = Polygon([(181, -5), (185, -5), (185, 5), (181, 5)])
+        multipoly_360 = MultiPolygon([poly1_360, poly2_360])
+
+        gdf_360 = gpd.GeoDataFrame({'geometry': [multipoly_360]})
+        nside = 32
+
+        result_360 = process_partition(gdf_360, nside=nside, mode='fuzzy',
+                                       lon_convention='0_360',
+                                       body=Sphere(), exhaustive=True)
+        recs_360 = result_360.to_dict('records')
+        assert len(recs_360) > 0, "Exhaustive mode should return cells for antimeridian-split MultiPolygon"
+
+        # In minus_plus180 convention
+        poly1_mp180 = Polygon([(175, -5), (179, -5), (179, 5), (175, 5)])
+        poly2_mp180 = Polygon([(-179, -5), (-175, -5), (-175, 5), (-179, 5)])
+        multipoly_mp180 = MultiPolygon([poly1_mp180, poly2_mp180])
+
+        gdf_mp180 = gpd.GeoDataFrame({'geometry': [multipoly_mp180]})
+        result_mp180 = process_partition(gdf_mp180, nside=nside, mode='fuzzy',
+                                         lon_convention='minus_plus180',
+                                         body=Sphere(), exhaustive=True)
+        recs_mp180 = result_mp180.to_dict('records')
+        assert len(recs_mp180) > 0, "Exhaustive mode should work in minus_plus180 convention too"
+
+        # Both conventions should cover their respective vertex cells
+        vertex_hids_360 = set(compute_healpix_ids_from_lonlat(
+            nside,
+            np.array([175, 179, 181, 185], dtype=np.float64),
+            np.array([-5, -5, -5, -5], dtype=np.float64)))
+        vertex_hids_mp180 = set(compute_healpix_ids_from_lonlat(
+            nside,
+            np.array([175, 179, -179, -175], dtype=np.float64),
+            np.array([-5, -5, -5, -5], dtype=np.float64)))
+        hids_360 = {r['healpix_id'] for r in recs_360}
+        hids_mp180 = {r['healpix_id'] for r in recs_mp180}
+        assert vertex_hids_360.issubset(hids_360), "Vertex cells missing in 0_360 convention"
+        assert vertex_hids_mp180.issubset(hids_mp180), "Vertex cells missing in minus_plus180 convention"
+
+    def test_exhaustive_polar_polygon(self):
+        """Exhaustive mode handles polar polygons correctly."""
+        # Large polygon covering the north pole region
+        coords = [(0, 85), (90, 85), (180, 85), (270, 85), (0, 85)]
+        poly = Polygon(coords)
+        gdf = gpd.GeoDataFrame({'geometry': [poly]})
+        nside = 32
+
+        exhaustive_result = process_partition(gdf, nside=nside, mode='fuzzy',
+                                              lon_convention='0_360',
+                                              body=Sphere(), exhaustive=True)
+        recs = exhaustive_result.to_dict('records')
+        assert len(recs) > 0, "Exhaustive mode should return cells for polar polygon"
+
+        # Verify the result is non-empty
+        exhaustive_hids = {r['healpix_id'] for r in recs}
+        assert len(exhaustive_hids) > 0
+
+        # Verify vertex cells are included
+        vertex_hids = set(compute_healpix_ids_from_lonlat(
+            nside,
+            np.array([0, 90, 180, 270], dtype=np.float64),
+            np.array([85, 85, 85, 85], dtype=np.float64)))
+        assert vertex_hids.issubset(exhaustive_hids), \
+            "Exhaustive mode should include vertex cells for polar polygon"
 
 
 def test_antimeridian_crossing():

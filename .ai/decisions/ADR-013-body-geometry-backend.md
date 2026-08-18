@@ -141,6 +141,7 @@ With this interface in place, `antimeridian.fix_polygon` is eliminated from the 
 - **Two coordinate transformations** per ingestion (lon/lat → xyz at input, xyz → lon/lat at output/visualization)
 - **Ellipsoid doesn't help current data** (Mercury/Moon are spherical) — it's for Earth/Mars applications only
 - **ADR-008 partially waived:** antimeridian.fix_polygon no longer required before bounds pre-filter in the computation path (but still needed for geospatial export)
+- **ADR-019 selectively reintroduces candidate search** for the opt-in exhaustive path only. The "Eliminated: shapely.STRtree construction and caching" line above is not contradicted for the default path — ADR-019's exhaustive mode is explicitly opt-in and uses `healpy.query_disc`, not STRtree.
 
 ## Alternatives Considered
 
